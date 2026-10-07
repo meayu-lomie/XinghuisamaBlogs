@@ -7,7 +7,7 @@ import { getBlogRoot } from '../../lib/blog-paths';
 
 export const metadata = {
   title: "说说 | " + siteConfig.authorName + " の 博客",
-  description: "生活动态与瞬间记录",
+  description: "说说与瞬间记录",
 };
 
 export default function MomentsPage() {

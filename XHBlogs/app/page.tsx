@@ -116,8 +116,8 @@ export default function Home() {
                   {top5Moments.length > 0 ? (
                     <LatestMomentsCarousel moments={top5Moments} />
                   ) : (
-                    <Link href="/moments" className="rounded-3xl bg-white/40 dark:bg-slate-800/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-xl min-h-[420px] h-full flex flex-col items-center justify-center gap-3 group">
-                      <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest bg-black/30 backdrop-blur-sm px-2 py-1 rounded-md border border-white/10">说说 · Moments</span>
+                    <Link href="/moments" className="rounded-2xl paper-card border border-[var(--card-border)] shadow-md min-h-[420px] h-full flex flex-col items-center justify-center gap-3 group">
+                      <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest bg-black/30 px-2 py-1 rounded-md border border-[var(--card-border)]">说说 · Moments</span>
                       <p className="text-slate-600 dark:text-slate-300 font-bold">还没有说说</p>
                       <p className="text-sm text-slate-500 dark:text-slate-400">去记录第一个瞬间吧</p>
                     </Link>
@@ -128,7 +128,7 @@ export default function Home() {
                 <div className="col-span-1 lg:col-span-8 flex flex-col gap-6">
 
                   {/* 照片墙大海报 */}
-                  <Link href="/photowall" className="w-full rounded-3xl bg-white/40 dark:bg-slate-800/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-xl overflow-hidden transition-all duration-700 hover:scale-[1.02] relative group min-h-[200px] sm:min-h-[220px] flex-shrink-0">
+                  <Link href="/photowall" className="w-full rounded-2xl paper-card border border-[var(--card-border)] shadow-md overflow-hidden transition-all duration-700 hover:scale-[1.02] relative group min-h-[200px] sm:min-h-[220px] flex-shrink-0">
                     <img src={latestAlbum.cover} className="w-full h-full absolute inset-0 object-cover transition-transform duration-700 group-hover:scale-105 opacity-90"/>
                     <div className="absolute inset-0 bg-black/30 dark:bg-black/50 group-hover:bg-black/10 transition-colors duration-500"></div>
                     <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 right-6">

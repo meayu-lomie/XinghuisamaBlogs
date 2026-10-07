@@ -17,7 +17,7 @@ export default function TagsPage() {
       </div>
 
       {tags.length === 0 ? (
-        <div className="text-center py-20 rounded-3xl bg-white/40 dark:bg-slate-800/50 border border-white/40 dark:border-white/10">
+        <div className="text-center py-20 rounded-2xl paper-card border border-[var(--card-border)]">
           <p className="text-slate-500 dark:text-slate-400 font-bold">还没有任何标签，在杂谈的 frontmatter 里写上 tags 就会出现在这里</p>
         </div>
       ) : (
@@ -26,7 +26,7 @@ export default function TagsPage() {
             <Link
               key={tag}
               href={`/tags/${encodeURIComponent(tag)}`}
-              className="group rounded-3xl bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-lg p-6 hover:shadow-xl hover:-translate-y-1 transition-all"
+              className="group rounded-2xl paper-card border border-[var(--card-border)] shadow-lg p-6 hover:shadow-xl hover:-translate-y-1 transition-all"
             >
               <div className="flex items-center justify-between mb-3">
                 <span className="text-lg font-black text-indigo-600 dark:text-indigo-400 group-hover:scale-105 origin-left transition-transform">#{tag}</span>

@@ -55,10 +55,10 @@ export default function ChatterBoard({ chatters }: { chatters: Chatter[] }) {
           {/* 🌟 核心修改：搜索框在手机端更扁凑 */}
           <input
             type="text"
-            placeholder="搜寻被遗忘的思绪..."
+            placeholder="搜索杂谈..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl border border-white/40 dark:border-white/5 rounded-xl md:rounded-2xl px-4 md:px-6 py-3 md:py-4 pl-10 md:pl-14 text-sm md:text-base text-slate-800 dark:text-white shadow-lg md:shadow-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder-slate-400 font-medium"
+            className="w-full paper-card border border-[var(--card-border)] rounded-xl md:rounded-2xl px-4 md:px-6 py-3 md:py-4 pl-10 md:pl-14 text-sm md:text-base text-slate-800 dark:text-white shadow-lg md:shadow-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder-slate-400 font-medium"
           />
           <svg className="w-4 h-4 md:w-6 md:h-6 absolute left-5 md:left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
         </div>
@@ -71,7 +71,7 @@ export default function ChatterBoard({ chatters }: { chatters: Chatter[] }) {
               className={`px-3 py-1.5 md:px-5 md:py-2 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black transition-all duration-500 border ${
                 activeTag === tag 
                 ? 'bg-indigo-500 text-white border-indigo-500 shadow-md md:shadow-lg md:shadow-indigo-500/30 scale-105' 
-                : 'bg-white/30 dark:bg-slate-800/30 text-slate-600 dark:text-slate-400 border-white/20 dark:border-white/5 hover:bg-white/60 dark:hover:bg-slate-700/60'
+                : 'bg-white/30 text-slate-600 dark:text-slate-400 border-white/20 hover:paper-card dark:hover:bg-slate-700/60'
               }`}
             >
               {tag === "全部" ? tag : `# ${tag}`}
@@ -95,7 +95,7 @@ export default function ChatterBoard({ chatters }: { chatters: Chatter[] }) {
               {/* 🌟 核心修改 2：卡片圆角缩小 rounded-2xl */}
               <Link
                 href={`/chatter/${chatter.slug}`}
-                className="block rounded-2xl md:rounded-[32px] bg-white/40 dark:bg-slate-800/40 backdrop-blur-2xl border border-white/50 dark:border-white/5 shadow-md md:shadow-xl hover:shadow-2xl transition-all duration-500 group relative overflow-hidden"
+                className="block rounded-2xl md:rounded-[32px] paper-card border border-[var(--card-border)] shadow-md md:shadow-xl hover:shadow-2xl transition-all duration-500 group relative overflow-hidden"
               >
                 {chatter.cover && (
                   // 🌟 核心修改 3：图片高度自适应 h-28 -> h-52
@@ -105,8 +105,8 @@ export default function ChatterBoard({ chatters }: { chatters: Chatter[] }) {
 
                     {/* 🌟 核心修改 4：心情徽章微缩 */}
                     {chatter.mood && (
-                      <span className="absolute top-2 right-2 md:top-4 md:right-4 bg-white/20 backdrop-blur-md text-white text-[8px] md:text-[10px] font-black px-2 py-1 md:px-3 md:py-1.5 rounded-full shadow-sm border border-white/20 uppercase tracking-widest">
-                        ✨ {chatter.mood}
+                      <span className="absolute top-2 right-2 md:top-4 md:right-4 bg-white/20 text-white text-[8px] md:text-[10px] font-black px-2 py-1 md:px-3 md:py-1.5 rounded-full shadow-sm border border-[var(--card-border)] uppercase tracking-widest">
+                        {chatter.mood}
                       </span>
                     )}
                   </div>
@@ -140,7 +140,7 @@ export default function ChatterBoard({ chatters }: { chatters: Chatter[] }) {
                   {chatter.tags && chatter.tags.length > 0 && (
                     <div className="mt-3 md:mt-6 flex flex-wrap gap-1 md:gap-2">
                       {chatter.tags.map(t => (
-                        <span key={t} className="text-[8px] md:text-[9px] font-black text-slate-500 dark:text-slate-400 bg-slate-500/5 dark:bg-white/5 px-1.5 py-0.5 md:px-2.5 md:py-1 rounded-md border border-slate-500/10 dark:border-white/5 transition-all group-hover:bg-indigo-500/10 group-hover:text-indigo-500">
+                        <span key={t} className="text-[8px] md:text-[9px] font-black text-slate-500 dark:text-slate-400 bg-slate-500/5 dark:bg-white/5 px-1.5 py-0.5 md:px-2.5 md:py-1 rounded-md border border-slate-500/10 transition-all group-hover:bg-indigo-500/10 group-hover:text-indigo-500">
                           #{t}
                         </span>
                       ))}

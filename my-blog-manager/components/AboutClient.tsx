@@ -107,7 +107,7 @@ export default function AboutClient({
   }, [activities]);
 
   const getColorClass = (count: number) => {
-    if (count === 0) return 'bg-slate-100 dark:bg-slate-800/50';
+    if (count === 0) return 'bg-slate-100';
     if (count === 1) return 'bg-green-300 dark:bg-green-900/80';
     if (count === 2) return 'bg-green-400 dark:bg-green-700/80';
     if (count === 3) return 'bg-green-500 dark:bg-green-600';
@@ -124,7 +124,7 @@ export default function AboutClient({
   };
 
   return (
-    <div className="bg-white/60 dark:bg-slate-800/50 backdrop-blur-xl rounded-[40px] shadow-2xl border border-white/40 dark:border-white/10 overflow-hidden transition-colors duration-700 relative">
+    <div className="paper-card rounded-2xl shadow-lg border border-[var(--card-border)] overflow-hidden transition-colors duration-700 relative">
 
       <div className="w-full h-40 sm:h-48 md:h-64 relative bg-slate-200 dark:bg-slate-700 overflow-hidden group">
         <img src={coverImage} alt="About Hero" className="w-full h-full object-cover opacity-90 transition-transform duration-1000 group-hover:scale-105" />
@@ -132,7 +132,7 @@ export default function AboutClient({
       </div>
 
       <div className="px-5 sm:px-8 md:px-16 pb-10 md:pb-16 relative">
-        <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white dark:border-slate-800 shadow-2xl overflow-hidden -mt-12 md:-mt-16 relative z-20 bg-white">
+        <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white dark:border-slate-800 shadow-lg overflow-hidden -mt-12 md:-mt-16 relative z-20 bg-white">
           <img src={siteConfig.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
         </div>
 
@@ -143,7 +143,7 @@ export default function AboutClient({
             <p className="text-sm md:text-lg text-indigo-600 dark:text-indigo-400 font-bold tracking-widest uppercase transition-colors duration-700">Hello World, I'm {siteConfig.authorName}</p>
           </div>
 
-          <div className="flex items-center w-full md:w-auto gap-1 bg-white/50 dark:bg-slate-900/50 p-1 md:p-1.5 rounded-xl md:rounded-2xl shadow-inner border border-white/40 dark:border-white/5">
+          <div className="flex items-center w-full md:w-auto gap-1 paper-card p-1 md:p-1.5 rounded-xl md:rounded-2xl shadow-inner border border-[var(--card-border)]">
             <button
               onClick={() => handleTabChange('intro')}
               className={`flex-1 md:flex-none px-4 md:px-6 py-2 md:py-2 rounded-lg md:rounded-xl text-xs md:text-sm font-black transition-all duration-300 ${activeTab === 'intro' ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-500 hover:text-indigo-500'}`}
@@ -221,7 +221,7 @@ export default function AboutClient({
           {activeTab === 'activity' && (
             <motion.div key="activity" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
 
-              <div className="mb-12 p-5 md:p-8 bg-slate-50/50 dark:bg-slate-900/30 rounded-3xl border border-slate-200/50 dark:border-white/5 shadow-inner">
+              <div className="mb-12 p-5 md:p-8 bg-slate-50/50 rounded-2xl border border-slate-200/50 shadow-inner">
                 <h3 className="text-lg font-black text-slate-800 dark:text-white mb-6 flex items-center gap-2">
                   <Activity size={20} className="text-green-500" />
                   {activities.length} contributions in the last year
@@ -285,7 +285,7 @@ export default function AboutClient({
 
                 <div className="flex items-center justify-end gap-2 mt-2 text-[10px] md:text-xs font-bold text-slate-500">
                   Less
-                  <div className="w-[11px] h-[11px] rounded-[3px] bg-slate-100 dark:bg-slate-800/50"></div>
+                  <div className="w-[11px] h-[11px] rounded-[3px] bg-slate-100"></div>
                   <div className="w-[11px] h-[11px] rounded-[3px] bg-green-300 dark:bg-green-900/80"></div>
                   <div className="w-[11px] h-[11px] rounded-[3px] bg-green-400 dark:bg-green-700/80"></div>
                   <div className="w-[11px] h-[11px] rounded-[3px] bg-green-500 dark:bg-green-600"></div>
@@ -305,7 +305,7 @@ export default function AboutClient({
 
                       <Link
                         href={targetUrl}
-                        className="flex flex-col md:flex-row md:items-center gap-3 bg-white/60 dark:bg-slate-800/60 backdrop-blur-md p-4 rounded-2xl border border-white/50 dark:border-white/5 shadow-sm hover:shadow-lg transition-all group-hover:-translate-y-1 cursor-pointer block relative overflow-hidden"
+                        className="flex flex-col md:flex-row md:items-center gap-3 paper-card p-4 rounded-2xl border border-[var(--card-border)] shadow-sm hover:shadow-lg transition-all group-hover:-translate-y-1 cursor-pointer block relative overflow-hidden"
                       >
                         <div className="flex items-center gap-3 w-full md:w-auto">
                           <img src={siteConfig.avatarUrl} alt="author" className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white dark:border-slate-700 shadow-sm shrink-0" />
@@ -339,7 +339,7 @@ export default function AboutClient({
                           <div className="flex-1 hidden md:block"></div>
                         )}
 
-                        <div className="hidden md:block text-[11px] font-mono text-slate-400 shrink-0 ml-auto bg-slate-100 dark:bg-slate-900/50 px-2 py-1 rounded-md">
+                        <div className="hidden md:block text-[11px] font-mono text-slate-400 shrink-0 ml-auto bg-slate-100 px-2 py-1 rounded-md">
                           {formatDateTime(act.date)}
                         </div>
                       </Link>

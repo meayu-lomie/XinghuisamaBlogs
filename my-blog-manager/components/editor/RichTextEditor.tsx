@@ -62,10 +62,10 @@ const CustomColorPicker = ({ activeColor, onSelect, onConfirm, recentColors, onC
   return (
     <>
       {/* 带有毛玻璃模糊效果的全屏遮罩 */}
-      <div className="fixed inset-0 z-[9990] bg-slate-900/20 dark:bg-black/40 backdrop-blur-sm transition-all" onClick={onClose} />
+      <div className="fixed inset-0 z-[9990] bg-slate-900/20 dark:bg-black/40 transition-all" onClick={onClose} />
 
       {/* 永远居中显示的调色板面板 */}
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 bg-white/95 dark:bg-slate-900/95 backdrop-blur-3xl rounded-[32px] p-6 shadow-2xl border border-white/40 dark:border-white/10 z-[9999] animate-in fade-in zoom-in-95 duration-200">
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 paper-card-strong rounded-[32px] p-6 shadow-lg border border-[var(--card-border)] z-[9999] animate-in fade-in zoom-in-95 duration-200">
         <div className="flex flex-col gap-5">
           <div className="flex justify-between items-center">
             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Color Palette</span>
@@ -78,12 +78,12 @@ const CustomColorPicker = ({ activeColor, onSelect, onConfirm, recentColors, onC
               <button
                 key={c}
                 onClick={() => { setHex(c); onSelect(c); }}
-                className="w-full aspect-square rounded-xl border border-white/20 hover:scale-110 hover:shadow-md transition-all"
+                className="w-full aspect-square rounded-xl border border-[var(--card-border)] hover:scale-110 hover:shadow-md transition-all"
                 style={{ backgroundColor: c }}
               />
             ))}
           </div>
-          <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 p-3 rounded-2xl border border-white/10 shadow-inner">
+          <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 p-3 rounded-2xl border border-[var(--card-border)] shadow-inner">
             <Hash size={14} className="text-slate-400" />
             <input
               type="text"
@@ -93,12 +93,12 @@ const CustomColorPicker = ({ activeColor, onSelect, onConfirm, recentColors, onC
             />
           </div>
           {recentColors && recentColors.length > 0 && (
-            <div className="flex flex-wrap gap-2 pt-3 border-t border-slate-200/50 dark:border-white/10">
+            <div className="flex flex-wrap gap-2 pt-3 border-t border-slate-200/50">
               {recentColors.map((c: string) => (
                 <button
                   key={c}
                   onClick={() => { setHex(c); onSelect(c); }}
-                  className="w-6 h-6 rounded-full border border-white/40 shadow-sm hover:scale-125 transition-transform"
+                  className="w-6 h-6 rounded-full border border-[var(--card-border)] shadow-sm hover:scale-125 transition-transform"
                   style={{ backgroundColor: c }}
                 />
               ))}
@@ -225,7 +225,7 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, s
       onClick={onClick}
       title={title}
       className={`p-2.5 rounded-xl transition-all duration-300 ease-out flex items-center justify-center 
-        ${active ? 'bg-indigo-500 text-white shadow-md shadow-indigo-500/40 scale-110' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'}`}
+        ${active ? 'bg-indigo-500 text-white shadow-md scale-110' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-700/50'}`}
     >
       {children}
     </button>
@@ -303,7 +303,7 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, s
         )}
       </div>
 
-      <div className="shrink-0 px-8 py-2.5 border-y border-white/20 dark:border-white/10 flex flex-wrap items-center gap-1.5 bg-white/10 dark:bg-black/20 backdrop-blur-md z-50">
+      <div className="shrink-0 px-8 py-2.5 border-y border-white/20 flex flex-wrap items-center gap-1.5 bg-white/10 dark:bg-black/20 z-50">
         <div className="flex items-center gap-1"><Btn onClick={() => editor.chain().focus().undo().run()}><Undo2 size={16}/></Btn><Btn onClick={() => editor.chain().focus().redo().run()}><Redo2 size={16}/></Btn><Btn onClick={() => editor.chain().focus().unsetAllMarks().run()}><RemoveFormatting size={16}/></Btn></div>
         <div className="w-px h-6 bg-slate-400/20 mx-1" />
 
@@ -364,24 +364,24 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, s
         <div className="flex-1" />
         <div className="flex items-center gap-4">
           <div className="relative">
-            <div className="flex items-center gap-1 bg-black/5 dark:bg-white/5 p-1.5 px-3 rounded-2xl border border-white/10 shadow-inner">
+            <div className="flex items-center gap-1 bg-black/5 dark:bg-white/5 p-1.5 px-3 rounded-2xl border border-[var(--card-border)] shadow-inner">
               <Palette size={14} className="text-slate-400 mr-2" />
               <div className="flex items-center gap-1 pr-2 border-r border-white/10">
-                {textColors.map(c => <button key={c} onClick={() => editor.chain().focus().setColor(c).run()} onContextMenu={(e) => { e.preventDefault(); setTextColors(prev => prev.filter(col => col !== c)); }} className="w-4 h-4 rounded-full border border-white/40 hover:scale-125 transition-all shadow-sm" style={{ backgroundColor: c }} />)}
+                {textColors.map(c => <button key={c} onClick={() => editor.chain().focus().setColor(c).run()} onContextMenu={(e) => { e.preventDefault(); setTextColors(prev => prev.filter(col => col !== c)); }} className="w-4 h-4 rounded-full border border-[var(--card-border)] hover:scale-125 transition-all shadow-sm" style={{ backgroundColor: c }} />)}
               </div>
-              <button onClick={() => { setShowTextPicker(true); setShowHighlightPicker(false); }} className="w-8 h-8 rounded-xl bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center border border-indigo-500/30 ml-1">
+              <button onClick={() => { setShowTextPicker(true); setShowHighlightPicker(false); }} className="w-8 h-8 rounded-xl bg-white dark:bg-slate-800 shadow-md flex items-center justify-center border border-indigo-500/30 ml-1">
                 <Pipette size={14} className="text-indigo-500" />
               </button>
             </div>
           </div>
 
           <div className="relative">
-            <div className="flex items-center gap-1 bg-black/5 dark:bg-white/5 p-1.5 px-3 rounded-2xl border border-white/10 shadow-inner">
+            <div className="flex items-center gap-1 bg-black/5 dark:bg-white/5 p-1.5 px-3 rounded-2xl border border-[var(--card-border)] shadow-inner">
               <Highlighter size={14} className="text-slate-400 mr-2" />
               <div className="flex items-center gap-1 pr-2 border-r border-white/10">
-                {highlightColors.map(c => <button key={c} onClick={() => editor.chain().focus().setHighlight({ color: c }).run()} onContextMenu={(e) => { e.preventDefault(); setHighlightColors(prev => prev.filter(col => col !== c)); }} className="w-4 h-4 rounded-md border border-white/40 hover:scale-125 transition-all shadow-sm" style={{ backgroundColor: c }} />)}
+                {highlightColors.map(c => <button key={c} onClick={() => editor.chain().focus().setHighlight({ color: c }).run()} onContextMenu={(e) => { e.preventDefault(); setHighlightColors(prev => prev.filter(col => col !== c)); }} className="w-4 h-4 rounded-md border border-[var(--card-border)] hover:scale-125 transition-all shadow-sm" style={{ backgroundColor: c }} />)}
               </div>
-              <button onClick={() => { setShowHighlightPicker(true); setShowTextPicker(false); }} className="w-8 h-8 rounded-xl bg-yellow-400 shadow-xl flex items-center justify-center border border-white/20 ml-1">
+              <button onClick={() => { setShowHighlightPicker(true); setShowTextPicker(false); }} className="w-8 h-8 rounded-xl bg-yellow-400 shadow-md flex items-center justify-center border border-[var(--card-border)] ml-1">
                 <Highlighter size={14} className="text-white" />
               </button>
             </div>

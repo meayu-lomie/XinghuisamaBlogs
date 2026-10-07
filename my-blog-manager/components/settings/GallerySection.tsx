@@ -35,9 +35,9 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
       setTestResult({ success: data.success, msg: data.message });
 
       if (data.success) {
-        showToast("✅ 测试通过！图床已就绪", "success");
+        showToast("测试通过！图床已就绪", "success");
       } else {
-        showToast("❌ Token 无效或服务异常", "error");
+        showToast("Token 无效或服务异常", "error");
       }
     } catch (error) {
       showToast("无法连接到本地 Python 引擎", "error");
@@ -59,7 +59,7 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
   };
 
   return (
-    <motion.section initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/50 dark:border-slate-800/50 rounded-[40px] p-8 shadow-2xl">
+    <motion.section initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="paper-card border border-[var(--card-border)] dark:border-slate-800/50 rounded-2xl p-8 shadow-lg">
       <h2 className="text-xl font-black text-slate-800 dark:text-white mb-8">图床引擎设置</h2>
 
       <div className="max-w-xl space-y-6">
@@ -69,7 +69,7 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
             type="text"
             value={formData.picBedName}
             onChange={e => handleUpdate('picBedName', e.target.value)}
-            className="w-full bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm outline-none mt-1 font-bold text-slate-700 dark:text-slate-200"
+            className="w-full paper-card border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm outline-none mt-1 font-bold text-slate-700 dark:text-slate-200"
           />
         </div>
 
@@ -81,7 +81,7 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
             placeholder="例如: https://pic.dusays.com"
             value={formData.picBedUrl || ''}
             onChange={e => handleUpdate('picBedUrl', e.target.value)}
-            className="w-full bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm outline-none mt-1 text-slate-700 dark:text-slate-200"
+            className="w-full paper-card border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm outline-none mt-1 text-slate-700 dark:text-slate-200"
           />
         </div>
 
@@ -92,7 +92,7 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
             placeholder="输入 Bearer Token 或纯 Token"
             value={formData.picBedToken || ''}
             onChange={e => handleUpdate('picBedToken', e.target.value)}
-            className="w-full bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm outline-none mt-1 text-slate-700 dark:text-slate-200"
+            className="w-full paper-card border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm outline-none mt-1 text-slate-700 dark:text-slate-200"
           />
         </div>
 
@@ -105,12 +105,12 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
           >
             {isTesting ? (
               <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-            ) : "📡 发送探针测试 Token"}
+            ) : "发送探针测试 Token"}
           </button>
 
           <button
             onClick={handleSave}
-            className="flex-1 py-3 bg-indigo-500 text-white rounded-2xl text-sm font-black shadow-lg hover:bg-indigo-600 shadow-indigo-500/30 transition-all active:scale-95"
+            className="flex-1 py-3 bg-indigo-500 text-white rounded-2xl text-sm font-black shadow-lg hover:bg-indigo-600 transition-all active:scale-95"
           >
             暂存图床配置
           </button>
@@ -125,7 +125,7 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
               className="overflow-hidden"
             >
               <div className={`p-4 rounded-2xl border flex items-center gap-3 ${testResult.success ? 'bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-400' : 'bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400'}`}>
-                <span className="text-xl">{testResult.success ? '✅' : '❌'}</span>
+                <span className="text-xl">{testResult.success ? '✓' : '✕'}</span>
                 <span className="text-sm font-bold leading-relaxed">{testResult.msg}</span>
               </div>
             </motion.div>

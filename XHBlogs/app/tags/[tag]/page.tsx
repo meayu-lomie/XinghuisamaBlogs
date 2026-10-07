@@ -23,7 +23,7 @@ export default async function TagDetailPage({ params }: { params: Promise<{ tag:
       </div>
 
       {posts.length === 0 ? (
-        <div className="text-center py-20 rounded-3xl bg-white/40 dark:bg-slate-800/50 border border-white/40 dark:border-white/10">
+        <div className="text-center py-20 rounded-2xl paper-card border border-[var(--card-border)]">
           <p className="text-slate-500 dark:text-slate-400 font-bold">这个标签下暂时没有内容</p>
         </div>
       ) : (
@@ -32,7 +32,7 @@ export default async function TagDetailPage({ params }: { params: Promise<{ tag:
             <Link
               key={p.slug}
               href={`/chatter/${p.slug}`}
-              className="group flex items-center justify-between gap-4 rounded-2xl bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-md p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+              className="group flex items-center justify-between gap-4 rounded-2xl paper-card border border-[var(--card-border)] shadow-md p-5 hover:shadow-lg hover:-translate-y-0.5 transition-all"
             >
               <div className="min-w-0">
                 <h2 className="text-base font-bold text-slate-800 dark:text-slate-100 line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{p.title}</h2>

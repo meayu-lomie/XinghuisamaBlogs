@@ -39,7 +39,7 @@ import { useToast } from '../../components/ToastProvider';
       label: "同步项目矩阵变更",
       value: nextList
     });
-    showToast("📍 变更已加入待处理队列，请在 Navbar 点击更新本地", "info");
+    showToast("变更已加入待处理队列，请在 Navbar 点击更新本地", "info");
   };
 
   const handleSaveProject = () => {
@@ -56,7 +56,7 @@ import { useToast } from '../../components/ToastProvider';
         name: data.name!,
         githubUrl: data.githubUrl!,
         description: data.description || '暂无描述。',
-        icon: data.icon || '🚀',
+        icon: data.icon || '',
         tags: data.tags || ['OpenSource']
       };
       next = [newProj, ...editableProjects];
@@ -86,13 +86,13 @@ import { useToast } from '../../components/ToastProvider';
   return (
     <div className="w-full max-w-6xl mx-auto px-4 sm:px-10 py-10 relative z-10">
 
-      {/* 💎 销毁确认弹窗 */}
+      {/* 销毁确认弹窗 */}
       <AnimatePresence>
         {deleteModal.isOpen && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDeleteModal({ ...deleteModal, isOpen: false })} className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" />
-            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative w-full max-w-sm bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[40px] shadow-2xl border border-white/50 p-10 text-center">
-              <div className="w-16 h-16 bg-red-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6"><AlertTriangle className="text-red-500" /></div>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDeleteModal({ ...deleteModal, isOpen: false })} className="absolute inset-0 bg-slate-900/40" />
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative w-full max-w-sm paper-card-strong rounded-2xl shadow-lg border border-[var(--card-border)] p-10 text-center">
+              <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6"><AlertTriangle className="text-red-500" /></div>
               <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">注销项目？</h3>
               <p className="text-sm text-slate-500 mb-8 leading-relaxed text-balance">确认从矩阵中移除 <span className="font-bold text-red-500">"{deleteModal.name}"</span> 吗？</p>
               <div className="flex gap-3">
@@ -104,12 +104,12 @@ import { useToast } from '../../components/ToastProvider';
         )}
       </AnimatePresence>
 
-      {/* 💎 项目编辑弹窗 */}
+      {/* 项目编辑弹窗 */}
       <AnimatePresence>
         {projectModal.isOpen && (
           <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setProjectModal({ ...projectModal, isOpen: false })} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="relative w-full max-w-md bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl rounded-[40px] border border-white/20 p-8 shadow-2xl">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} onClick={() => setProjectModal({ ...projectModal, isOpen: false })} className="absolute inset-0 bg-black/60" />
+            <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="relative w-full max-w-md paper-card-strong rounded-2xl border border-[var(--card-border)] p-8 shadow-lg">
                <h2 className="text-2xl font-black mb-6 dark:text-white flex items-center gap-2"><Code2 className="text-indigo-500" /> {projectModal.mode === 'add' ? '开启新项目' : '修改项目档案'}</h2>
                <div className="space-y-4">
                  <div className="flex gap-4">
@@ -143,7 +143,7 @@ import { useToast } from '../../components/ToastProvider';
       {/* 搜索框 */}
       <div className="mb-12 flex justify-center w-full">
         <div className="relative w-full max-w-lg group">
-          <input type="text" placeholder="搜索项目、代号或技术栈..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border border-white/40 dark:border-white/10 rounded-full px-6 py-3 pl-12 text-slate-800 dark:text-white shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-serif" />
+          <input type="text" placeholder="搜索项目、代号或技术栈..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full paper-card border border-[var(--card-border)] rounded-full px-6 py-3 pl-12 text-slate-800 dark:text-white shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-serif" />
           <svg className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
         </div>
       </div>
@@ -151,7 +151,7 @@ import { useToast } from '../../components/ToastProvider';
       <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
 
         {/* 👇 新建项目虚线矩阵 */}
-        <motion.div layout onClick={() => setProjectModal({ isOpen: true, mode: 'add', data: { icon: '🚀', tags: [] } })} className="group cursor-pointer flex flex-col items-center justify-center min-h-[320px] rounded-[40px] border-4 border-dashed border-slate-300 dark:border-slate-700 bg-white/10 hover:border-indigo-500 hover:bg-indigo-500/5 transition-all duration-500">
+        <motion.div layout onClick={() => setProjectModal({ isOpen: true, mode: 'add', data: { icon: '', tags: [] } })} className="group cursor-pointer flex flex-col items-center justify-center min-h-[320px] rounded-2xl border-4 border-dashed border-slate-300 dark:border-slate-700 bg-white/10 hover:border-indigo-500 hover:bg-indigo-500/5 transition-all duration-500">
             <div className="w-16 h-16 rounded-full bg-white dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-indigo-500 group-hover:text-white transition-all shadow-md group-hover:rotate-90">
               <Plus size={40} />
             </div>
@@ -168,7 +168,7 @@ import { useToast } from '../../components/ToastProvider';
                   <button onClick={(e) => { e.preventDefault(); setDeleteModal({ isOpen: true, id: project.id, name: project.name }); }} className="w-9 h-9 rounded-xl bg-red-500 text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform"><Trash2 size={16}/></button>
               </div>
 
-              <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="block h-full rounded-[40px] bg-white/60 dark:bg-slate-800/50 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-xl overflow-hidden transition-all duration-700 hover:-translate-y-1 p-8 md:p-10 relative group">
+              <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" className="block h-full rounded-2xl paper-card border border-[var(--card-border)] shadow-md overflow-hidden transition-all duration-700 hover:-translate-y-1 p-8 md:p-10 relative group">
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-colors"></div>
 
                 <div className="flex items-start justify-between mb-8 relative z-10">

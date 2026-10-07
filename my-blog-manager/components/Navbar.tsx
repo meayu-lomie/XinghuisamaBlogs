@@ -35,9 +35,9 @@ export default function Navbar() {
   const navLinks = [
     { name: '写杂谈', href: '/editor' },
     { name: '草稿箱', href: '/drafts' },
-    { name: '时间线', href: '/timeline' },
-    { name: '说说', href: '/moments' },
     { name: '杂谈', href: '/chatter' },
+    { name: '说说', href: '/moments' },
+    { name: '时间线', href: '/timeline' },
     { name: '照片墙', href: '/photowall' },
     { name: '项目', href: '/projects' },
     { name: '关于', href: '/about' },
@@ -68,7 +68,7 @@ export default function Navbar() {
       }
 
       try {
-        showToast(`🔍 正在准备发送 ${operations.length} 个任务...`, "info");
+        showToast(`正在准备发送 ${operations.length} 个任务...`, "info");
 
         const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
         const configData = await configRes.json();
@@ -111,12 +111,12 @@ export default function Navbar() {
 
           const data = await res.json();
           if (!data.success) {
-            showToast(`❌ 任务执行失败: ${data.message}`, "error");
+            showToast(`任务执行失败: ${data.message}`, "error");
             return;
           }
         }
 
-        showToast("✅ 任务已全部执行，本地数据已写入！", "success");
+        showToast("任务已全部执行，本地数据已写入！", "success");
         clearOperations();
         setIsOpBoxOpen(false);
 
@@ -131,7 +131,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`w-full fixed top-0 left-0 right-0 z-[100] transition-all duration-500 border-b ${showNav ? 'translate-y-0' : '-translate-y-full'} bg-white/40 dark:bg-slate-900/50 backdrop-blur-xl border-white/20 dark:border-white/5 shadow-sm pywebview-drag-region`}>
+      <header className={`w-full fixed top-0 left-0 right-0 z-[100] transition-all duration-500 border-b ${showNav ? 'translate-y-0' : '-translate-y-full'} bg-[color-mix(in_oklab,var(--paper)_88%,transparent)] border-[var(--rule)] shadow-sm pywebview-drag-region`}>
         <div className="w-[95%] max-w-7xl mx-auto h-16 flex items-center justify-between px-4 box-border">
 
           <Link href="/" className="text-xl font-black text-slate-800 dark:text-white tracking-tighter">
@@ -160,7 +160,7 @@ export default function Navbar() {
               <button
                 onClick={() => setIsOpBoxOpen(!isOpBoxOpen)}
                 title="待写入的改动"
-                className="relative h-10 px-4 rounded-xl bg-white/50 dark:bg-slate-800/50 flex items-center justify-center text-xs font-bold whitespace-nowrap hover:scale-105 transition-all border border-white/20 shadow-sm cursor-pointer"
+                className="relative h-10 px-4 rounded-xl paper-card flex items-center justify-center text-xs font-bold whitespace-nowrap hover:scale-105 transition-all border border-[var(--card-border)] shadow-sm cursor-pointer"
               >
                 收件箱
                 {operations.length > 0 && (
@@ -175,7 +175,7 @@ export default function Navbar() {
 
               <AnimatePresence>
                 {isOpBoxOpen && (
-                  <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute right-0 mt-3 w-80 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl p-4 z-50 cursor-default">
+                  <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute right-0 mt-3 w-80 paper-card-strong border border-slate-200 dark:border-slate-700 rounded-2xl shadow-lg p-4 z-50 cursor-default">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">待处理操作</h3>
                       <button onClick={clearOperations} className="text-[10px] text-red-500 font-bold hover:underline">清空全部</button>
@@ -186,7 +186,7 @@ export default function Navbar() {
                         <p className="text-center py-6 text-sm text-slate-400 font-medium">暂无积攒的操作</p>
                       ) : (
                         operations.map(op => (
-                          <div key={op.id} className="bg-white/50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700 flex justify-between items-center group">
+                          <div key={op.id} className="paper-card p-3 rounded-xl border border-slate-100 dark:border-slate-700 flex justify-between items-center group">
                             <div className="flex flex-col">
                               <span className="text-[13px] font-bold text-slate-700 dark:text-slate-200">{op.label}</span>
                               <span className="text-[10px] text-slate-400">{op.timestamp}</span>
@@ -198,7 +198,7 @@ export default function Navbar() {
                     </div>
 
                     {/* 只有"更新本地"一步：内容直接写进博客前端目录，不再需要同步 */}
-                    <button onClick={handleUpdateLocal} className="w-full py-2.5 rounded-xl bg-indigo-500 text-white text-xs font-black shadow-lg shadow-indigo-500/30 hover:bg-indigo-600 transition-colors">
+                    <button onClick={handleUpdateLocal} className="w-full py-2.5 rounded-xl bg-indigo-500 text-white text-xs font-black shadow-lg hover:bg-indigo-600 transition-colors">
                       写入博客
                     </button>
                   </motion.div>

@@ -50,7 +50,7 @@ import FloatingImageTool from '../../components/editor/FloatingImageTool';
       label: "同步画廊数据变更",
       value: normalized
     });
-    showToast("📍 变更已加入待处理队列，请在 Navbar 点击更新本地", "info");
+    showToast("变更已加入待处理队列，请在 Navbar 点击更新本地", "info");
   };
 
   const { matchedAlbums, matchedPhotos } = useMemo(() => {
@@ -82,9 +82,9 @@ import FloatingImageTool from '../../components/editor/FloatingImageTool';
         {/* 物理销毁弹窗 */}
         {deleteModal.isOpen && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDeleteModal({ ...deleteModal, isOpen: false })} className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" />
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative w-full max-w-sm bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[40px] shadow-2xl border border-white/50 p-10 text-center">
-              <div className="w-16 h-16 bg-red-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6"><AlertTriangle className="text-red-500" /></div>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDeleteModal({ ...deleteModal, isOpen: false })} className="absolute inset-0 bg-slate-900/40" />
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative w-full max-w-sm paper-card-strong rounded-2xl shadow-lg border border-[var(--card-border)] p-10 text-center">
+              <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6"><AlertTriangle className="text-red-500" /></div>
               <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">确认移除？</h3>
               <p className="text-sm text-slate-500 mb-8 leading-relaxed">该操作将加入队列并清空相关数据</p>
               <div className="flex gap-3">
@@ -112,8 +112,8 @@ import FloatingImageTool from '../../components/editor/FloatingImageTool';
         {albumModal.isOpen && (
           <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
             {/* 🌟 核心修复 1：去掉了 onClick 属性，防止误触关闭！ */}
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="relative w-full max-w-md bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl rounded-[40px] border border-white/20 p-8 shadow-2xl">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-black/60" />
+            <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="relative w-full max-w-md paper-card-strong rounded-2xl border border-[var(--card-border)] p-8 shadow-lg">
               <h2 className="text-2xl font-black mb-6 dark:text-white">{albumModal.mode === 'add' ? '创建新相册' : '修改相册属性'}</h2>
               <div className="space-y-5">
                 <input type="text" value={albumModal.data.title || ''} onChange={e => setAlbumModal({...albumModal, data: {...albumModal.data, title: e.target.value}})} className="w-full bg-slate-100 dark:bg-black/20 rounded-2xl px-5 py-3.5 dark:text-white outline-none border border-transparent focus:border-indigo-500" placeholder="相册名称" />
@@ -136,7 +136,7 @@ import FloatingImageTool from '../../components/editor/FloatingImageTool';
                     next = editableAlbums.map(a => a.id === albumModal.data.id ? albumModal.data : a);
                   }
                   setEditableAlbums(next); syncToQueue(next); setAlbumModal({ ...albumModal, isOpen: false });
-                }} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl font-black shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 hover:bg-indigo-600 transition-colors"><Save size={18} /> 加入暂存</button>
+                }} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl font-black shadow-lg flex items-center justify-center gap-2 hover:bg-indigo-600 transition-colors"><Save size={18} /> 加入暂存</button>
               </div>
             </motion.div>
           </div>
@@ -146,8 +146,8 @@ import FloatingImageTool from '../../components/editor/FloatingImageTool';
         {photoModal.isOpen && (
           <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
             {/* 🌟 核心修复 1：同样去掉 onClick 误触关闭 */}
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-            <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="relative w-full max-w-md bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl rounded-[40px] border border-white/20 p-8 shadow-2xl">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 bg-black/60" />
+            <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="relative w-full max-w-md paper-card-strong rounded-2xl border border-[var(--card-border)] p-8 shadow-lg">
               <h2 className="text-2xl font-black mb-6 dark:text-white">{photoModal.mode === 'add' ? '添加新照片' : '修改照片描述'}</h2>
               <div className="space-y-5">
                 {photoModal.mode === 'add' && (
@@ -171,7 +171,7 @@ import FloatingImageTool from '../../components/editor/FloatingImageTool';
                   const next = [...editableAlbums];
                   setEditableAlbums(next); setCurrentAlbum({...album}); syncToQueue(next);
                   setPhotoModal({ ...photoModal, isOpen: false });
-                }} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl font-black shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2 hover:bg-indigo-600 transition-colors"><Save size={18} /> 加入暂存</button>
+                }} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl font-black shadow-lg flex items-center justify-center gap-2 hover:bg-indigo-600 transition-colors"><Save size={18} /> 加入暂存</button>
               </div>
             </motion.div>
           </div>
@@ -194,7 +194,7 @@ import FloatingImageTool from '../../components/editor/FloatingImageTool';
                   <input
                     type="text" placeholder="搜索相册或描述..." value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-12 pl-12 pr-4 bg-white/40 dark:bg-slate-800/40 backdrop-blur-md border border-white/50 dark:border-white/10 rounded-full text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 shadow-sm transition-all"
+                    className="w-full h-12 pl-12 pr-4 paper-card border border-[var(--card-border)] rounded-full text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 shadow-sm transition-all"
                   />
                 </div>
               </div>
@@ -237,7 +237,7 @@ import FloatingImageTool from '../../components/editor/FloatingImageTool';
                         <div className="absolute inset-0 bg-slate-200 dark:bg-slate-600 rounded-[4px] shadow-lg transform -rotate-3 -translate-x-2 -translate-y-1 group-hover:-rotate-6 transition-all duration-500 border-[6px] border-white dark:border-slate-200 overflow-hidden opacity-80 z-10">
                            {album.photos[1] && <img src={album.photos[1].url} className="w-full h-full object-cover grayscale-[50%]" alt="" />}
                         </div>
-                        <div className="absolute inset-0 bg-white dark:bg-slate-200 rounded-[4px] shadow-2xl border-[6px] border-white dark:border-slate-200 overflow-hidden z-20 transform group-hover:-translate-y-2 group-hover:scale-105 transition-all duration-500">
+                        <div className="absolute inset-0 bg-white dark:bg-slate-200 rounded-[4px] shadow-lg border-[6px] border-white dark:border-slate-200 overflow-hidden z-20 transform group-hover:-translate-y-2 group-hover:scale-105 transition-all duration-500">
                           <img src={album.cover} alt={album.title} className="w-full h-full object-cover" />
                         </div>
                       </div>
@@ -260,30 +260,30 @@ import FloatingImageTool from '../../components/editor/FloatingImageTool';
               <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-4 border-b border-slate-300/50 dark:border-slate-700/50 pb-6">
                 <div>
                   <button onClick={() => setCurrentAlbum(null)} className="group flex items-center gap-1.5 text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-500 mb-4 transition-colors">
-                    <div className="bg-white/40 dark:bg-slate-800/50 p-1.5 rounded-lg border border-white/50 shadow-sm"><X size={16} /></div> 返回画廊
+                    <div className="paper-card p-1.5 rounded-lg border border-[var(--card-border)] shadow-sm"><X size={16} /></div> 返回画廊
                   </button>
                   <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-wider mb-2">{currentAlbum.title}</h1>
                 </div>
-                <button onClick={() => setAlbumModal({ isOpen: true, mode: 'edit', data: currentAlbum })} className="px-5 py-2.5 rounded-2xl bg-white/40 dark:bg-slate-800/40 border border-white/50 text-xs font-black uppercase text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all shadow-sm">相册属性</button>
+                <button onClick={() => setAlbumModal({ isOpen: true, mode: 'edit', data: currentAlbum })} className="px-5 py-2.5 rounded-2xl paper-card border border-[var(--card-border)] text-xs font-black uppercase text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all shadow-sm">相册属性</button>
               </div>
 
               <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
 
-                <div onClick={() => setPhotoModal({ isOpen: true, mode: 'add', data: {} })} className="break-inside-avoid group cursor-pointer border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-[32px] min-h-[200px] flex flex-col items-center justify-center bg-white/10 dark:bg-slate-800/10 hover:border-indigo-500 transition-all duration-500">
+                <div onClick={() => setPhotoModal({ isOpen: true, mode: 'add', data: {} })} className="break-inside-avoid group cursor-pointer border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-[32px] min-h-[200px] flex flex-col items-center justify-center bg-white/10 hover:border-indigo-500 transition-all duration-500">
                    <Plus size={32} className="text-slate-400 group-hover:text-indigo-500 transition-all" />
                    <span className="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-400">添加碎片</span>
                 </div>
 
                 {currentAlbum.photos.map((photo, index) => (
-                  <div key={index} className="break-inside-avoid relative group rounded-2xl overflow-hidden shadow-lg bg-white/20 dark:bg-slate-800/20 border border-white/30 dark:border-white/10 transition-all duration-500 hover:scale-[1.02] cursor-pointer">
+                  <div key={index} className="break-inside-avoid relative group rounded-2xl overflow-hidden shadow-lg bg-white/20 border border-[var(--card-border)] transition-all duration-500 hover:scale-[1.02] cursor-pointer">
 
                     <div className="absolute top-3 left-3 z-30 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
-                      <button onClick={(e) => { e.stopPropagation(); setPhotoModal({ isOpen: true, mode: 'edit', index, data: photo }); }} className="w-7 h-7 rounded-lg bg-white/80 backdrop-blur-md text-slate-700 flex items-center justify-center shadow-sm hover:bg-indigo-500 hover:text-white transition-all"><Pencil size={12}/></button>
-                      <button onClick={(e) => { e.stopPropagation(); setDeleteModal({ isOpen: true, type: 'photo', photoIndex: index, title: '这张照片' }); }} className="w-7 h-7 rounded-lg bg-white/80 backdrop-blur-md text-red-500 flex items-center justify-center shadow-sm hover:bg-red-500 hover:text-white transition-all"><Trash2 size={12}/></button>
+                      <button onClick={(e) => { e.stopPropagation(); setPhotoModal({ isOpen: true, mode: 'edit', index, data: photo }); }} className="w-7 h-7 rounded-lg paper-card-strong text-slate-700 flex items-center justify-center shadow-sm hover:bg-indigo-500 hover:text-white transition-all"><Pencil size={12}/></button>
+                      <button onClick={(e) => { e.stopPropagation(); setDeleteModal({ isOpen: true, type: 'photo', photoIndex: index, title: '这张照片' }); }} className="w-7 h-7 rounded-lg paper-card-strong text-red-500 flex items-center justify-center shadow-sm hover:bg-red-500 hover:text-white transition-all"><Trash2 size={12}/></button>
                     </div>
 
                     <img onClick={() => setSelectedImage(photo)} src={photo.url} alt="" className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105" />
-                    {photo.caption && <div className="p-4 bg-white/30 dark:bg-black/20 backdrop-blur-sm text-xs font-bold dark:text-slate-200">{photo.caption}</div>}
+                    {photo.caption && <div className="p-4 bg-white/30 dark:bg-black/20 text-xs font-bold dark:text-slate-200">{photo.caption}</div>}
                   </div>
                 ))}
               </div>
@@ -293,10 +293,10 @@ import FloatingImageTool from '../../components/editor/FloatingImageTool';
       </div>
 
       {selectedImage && (
-        <div className="fixed inset-0 z-[300] bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-4 sm:p-10 cursor-zoom-out animate-fade-in" onClick={() => setSelectedImage(null)}>
+        <div className="fixed inset-0 z-[300] bg-black/95 flex flex-col items-center justify-center p-4 sm:p-10 cursor-zoom-out animate-fade-in" onClick={() => setSelectedImage(null)}>
           <button className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors bg-white/10 hover:bg-white/20 rounded-full p-2"><X size={24} /></button>
-          <img src={selectedImage.url} alt="全屏照片" className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" onClick={(e) => e.stopPropagation()} />
-          {selectedImage.caption && <div className="absolute bottom-10 px-6 py-3 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-white text-sm font-medium tracking-wide shadow-2xl">{selectedImage.caption}</div>}
+          <img src={selectedImage.url} alt="全屏照片" className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-lg" onClick={(e) => e.stopPropagation()} />
+          {selectedImage.caption && <div className="absolute bottom-10 px-6 py-3 bg-white/10 border border-[var(--card-border)] rounded-full text-white text-sm font-medium tracking-wide shadow-lg">{selectedImage.caption}</div>}
         </div>
       )}
 

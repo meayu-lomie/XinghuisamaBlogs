@@ -50,7 +50,7 @@ function DraftsContent() {
     fetchDrafts();
   }, []);
 
-  // 🗑️ 核心逻辑：执行真实的销毁操作
+  // 核心逻辑：执行真实的销毁操作
   const confirmDelete = async () => {
     if (!deleteModal.id) return;
     const id = deleteModal.id;
@@ -67,7 +67,7 @@ function DraftsContent() {
 
       const data = await res.json();
       if (data.success) {
-        showToast("🗑️ 草稿已被彻底销毁", "success");
+        showToast("草稿已被彻底销毁", "success");
         setDrafts(prev => prev.filter(draft => draft.id !== id));
       } else {
         showToast(`销毁失败: ${data.message}`, "error");
@@ -96,7 +96,7 @@ function DraftsContent() {
     <div className="min-h-screen relative pb-20">
 
       {/* ---------------------------------------------------------
-          💎 自定义绝美确认弹窗 (与杂谈页保持高度统一)
+          自定义绝美确认弹窗 (与杂谈页保持高度统一)
       --------------------------------------------------------- */}
       <AnimatePresence>
         {deleteModal.isOpen && (
@@ -104,18 +104,18 @@ function DraftsContent() {
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setDeleteModal({ isOpen: false, id: null, title: null })}
-              className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
+              className="absolute inset-0 bg-slate-900/40"
             />
 
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-sm bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[40px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border border-white/50 dark:border-white/10 p-10 text-center overflow-hidden"
+              className="relative w-full max-w-sm paper-card-strong rounded-2xl shadow-lg border border-[var(--card-border)] p-10 text-center overflow-hidden"
             >
               <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-red-500 to-transparent opacity-50" />
 
-              <div className="w-20 h-20 bg-red-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <AlertTriangle className="w-10 h-10 text-red-500" />
               </div>
 
@@ -151,7 +151,7 @@ function DraftsContent() {
           <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
               <h1 className="text-4xl font-black text-slate-800 dark:text-white mb-3 tracking-wider flex items-center gap-3">
-                📝 创作草稿箱
+                创作草稿箱
                 <span className="text-sm font-bold bg-indigo-500 text-white px-3 py-1 rounded-full">{drafts.length}</span>
               </h1>
               <p className="text-slate-500 dark:text-slate-400 font-medium text-sm flex items-center gap-2">
@@ -165,7 +165,7 @@ function DraftsContent() {
                 placeholder="检索草稿..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3 pl-12 text-sm outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm"
+                className="w-full paper-card border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3 pl-12 text-sm outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm"
               />
               <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
             </div>
@@ -192,7 +192,7 @@ function DraftsContent() {
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
                     key={draft.id}
                   >
-                    <div className="group bg-white/60 dark:bg-slate-800/50 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-3xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 overflow-hidden relative">
+                    <div className="group paper-card border border-[var(--card-border)] rounded-2xl p-6 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 overflow-hidden relative">
 
                       <div className="flex justify-between items-start mb-4 relative z-10">
                         <div className="flex items-center gap-2">
@@ -226,7 +226,7 @@ function DraftsContent() {
               </AnimatePresence>
 
               {filteredDrafts.length === 0 && (
-                <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-3xl">
+                <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl">
                   <p className="text-slate-500 font-bold">搜索不到相关草稿，换个关键词试试？</p>
                 </div>
               )}

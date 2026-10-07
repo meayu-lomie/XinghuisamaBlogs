@@ -127,11 +127,11 @@ function EditorContent() {
             setContent(data.draft.content || '');
 
             setTimeout(() => setHasUnsavedChanges(false), 500);
-            showToast("✅ 已读取本地源数据", "success");
+            showToast("已读取本地源数据", "success");
           } else {
-             showToast(data.message || "❌ 未找到草稿或原文件", "error");
+             showToast(data.message || "未找到草稿或原文件", "error");
           }
-        } catch (e) { showToast("❌ 读取失败", "error"); }
+        } catch (e) { showToast("读取失败", "error"); }
       };
       loadDraft();
     }
@@ -164,7 +164,7 @@ function EditorContent() {
 
   const handleSave = async (isPublish: boolean, shouldExitAfterSave: boolean = false) => {
     if (!title.trim() && docType !== 'about') {
-      showToast("⚠️ 请填写标题", "warning"); return;
+      showToast("请填写标题", "warning"); return;
     }
     const payload = {
       id: docType === 'about' ? 'about' : (currentDocId === 'new' ? null : currentDocId),
@@ -182,7 +182,7 @@ function EditorContent() {
         value: payload
       });
       setHasUnsavedChanges(false);
-      showToast("🚀 已加入待处理队列！", "info");
+      showToast("已加入待处理队列！", "info");
       if (shouldExitAfterSave) router.back();
       return;
     }
@@ -198,13 +198,13 @@ function EditorContent() {
       if (data.success) {
         setLastSaved(new Date().toLocaleTimeString());
         setHasUnsavedChanges(false);
-        showToast("💾 草稿已落盘", "success");
+        showToast("草稿已落盘", "success");
         if (shouldExitAfterSave) {
           setExitModalOpen(false);
           router.back();
         }
       }
-    } catch (e) { showToast("❌ 保存失败", "error"); }
+    } catch (e) { showToast("保存失败", "error"); }
     finally { setIsSaving(false); }
   };
 
@@ -214,17 +214,17 @@ function EditorContent() {
       <AnimatePresence>
         {exitModalOpen && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setExitModalOpen(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" />
-            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative w-full max-w-sm bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[40px] shadow-2xl border border-white/50 dark:border-white/10 p-10 text-center overflow-hidden">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setExitModalOpen(false)} className="absolute inset-0 bg-slate-900/40" />
+            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }} className="relative w-full max-w-sm paper-card-strong rounded-2xl shadow-lg border border-[var(--card-border)] p-10 text-center overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-50" />
-              <div className="w-20 h-20 bg-yellow-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6"><AlertTriangle className="w-10 h-10 text-yellow-500" /></div>
+              <div className="w-20 h-20 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6"><AlertTriangle className="w-10 h-10 text-yellow-500" /></div>
               <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">存在未保存的数据</h3>
               <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-8 leading-relaxed">你的研究尚未记录，<br />直接离开将会导致这些数据消散在虚空中。</p>
 
               <div className="flex flex-col gap-3">
                 <button
                   onClick={() => handleSave(false, true)}
-                  className="w-full py-4 bg-indigo-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-indigo-500/30 hover:bg-indigo-600 transition-all flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-indigo-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg hover:bg-indigo-600 transition-all flex items-center justify-center gap-2"
                 >
                   <Save size={16} /> 存为草稿并离开
                 </button>
@@ -247,13 +247,13 @@ function EditorContent() {
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setPolishModal({ open: false, original: '', polished: '' })}
-              className="absolute inset-0 bg-slate-900/50 backdrop-blur-md"
+              className="absolute inset-0 bg-slate-900/50"
             />
             <motion.div
               initial={{ scale: 0.92, opacity: 0, y: 24 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.92, opacity: 0, y: 24 }}
-              className="relative w-full max-w-5xl h-[82vh] bg-white/85 dark:bg-slate-900/85 backdrop-blur-2xl rounded-[40px] shadow-2xl border border-white/50 dark:border-white/10 flex flex-col overflow-hidden"
+              className="relative w-full max-w-5xl h-[82vh] paper-card-strong rounded-2xl shadow-lg border border-[var(--card-border)] flex flex-col overflow-hidden"
             >
-              <div className="shrink-0 px-10 pt-8 pb-6 border-b border-white/30 dark:border-white/10 flex justify-between items-center">
+              <div className="shrink-0 px-10 pt-8 pb-6 border-b border-white/30 flex justify-between items-center">
                 <div>
                   <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                     <Sparkles size={20} className="text-emerald-500" /> AI 润色预览
@@ -279,13 +279,13 @@ function EditorContent() {
               <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 p-6 overflow-hidden min-h-0">
                 <div className="flex flex-col min-h-0">
                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">原文</p>
-                  <div className="flex-1 overflow-y-auto custom-scrollbar bg-white/50 dark:bg-black/20 rounded-2xl p-5 border border-white/30 dark:border-white/10">
+                  <div className="flex-1 overflow-y-auto custom-scrollbar paper-card rounded-2xl p-5 border border-[var(--card-border)]">
                     <div className="prose prose-slate dark:prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: polishModal.original }} />
                   </div>
                 </div>
                 <div className="flex flex-col min-h-0">
                   <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-2">润色后</p>
-                  <div className="flex-1 overflow-y-auto custom-scrollbar bg-white/50 dark:bg-black/20 rounded-2xl p-5 border border-emerald-500/20 dark:border-emerald-500/10">
+                  <div className="flex-1 overflow-y-auto custom-scrollbar paper-card rounded-2xl p-5 border border-emerald-500/20 dark:border-emerald-500/10">
                     <div className="prose prose-slate dark:prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: polishModal.polished }} />
                   </div>
                 </div>
@@ -307,13 +307,13 @@ function EditorContent() {
 
           <button
             onClick={handleBackClick}
-            className="absolute -top-14 left-2 px-5 py-2.5 bg-white/40 dark:bg-slate-800/60 backdrop-blur-md border border-white/50 dark:border-white/10 rounded-2xl shadow-lg flex items-center gap-2 text-slate-700 dark:text-slate-200 font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all group z-50"
+            className="absolute -top-14 left-2 px-5 py-2.5 paper-card border border-[var(--card-border)] rounded-2xl shadow-lg flex items-center gap-2 text-slate-700 dark:text-slate-200 font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all group z-50"
           >
             <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform text-indigo-500" />
             返回上一级
           </button>
 
-          <section className="flex-1 min-w-0 bg-white/30 dark:bg-slate-800/40 rounded-[50px] shadow-2xl border border-white/30 dark:border-white/10 flex flex-col overflow-hidden min-[1400px]:min-h-0 min-h-[70vh]">
+          <section className="flex-1 min-w-0 bg-white/30 rounded-2xl shadow-lg border border-[var(--card-border)] flex flex-col overflow-hidden min-[1400px]:min-h-0 min-h-[70vh]">
             <RichTextEditor
               ref={editorRef}
               title={title}
@@ -324,7 +324,7 @@ function EditorContent() {
               onPolishClick={handlePolish}
             />
           </section>
-          <aside className="w-[360px] shrink-0 bg-white/30 dark:bg-slate-800/40 rounded-[50px] shadow-2xl border border-white/30 dark:border-white/10 flex flex-col overflow-hidden min-[1400px]:min-h-0">
+          <aside className="w-[360px] shrink-0 bg-white/30 rounded-2xl shadow-lg border border-[var(--card-border)] flex flex-col overflow-hidden min-[1400px]:min-h-0">
             <MetaMatrix
               type={docType as any} tags={tags} setTags={setTags} cover={cover} setCover={setCover} summary={summary} setSummary={setSummary} mood={mood} setMood={setMood}
               allHistoryPostTags={historyPostTags} allHistoryChatterTags={historyChatterTags} isLoadingTags={isLoadingTags}

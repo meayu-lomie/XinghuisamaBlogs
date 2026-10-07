@@ -12,7 +12,7 @@ import { useToast } from '../ToastProvider';
  */
 
 const inputCls =
-  'w-full bg-white/50 dark:bg-slate-800/50 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono dark:text-slate-200';
+  'w-full paper-card rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 text-sm font-mono dark:text-slate-200';
 const labelCls =
   'text-xs font-black uppercase text-slate-400 tracking-widest mb-2 flex items-center gap-2';
 
@@ -117,7 +117,7 @@ export default function ModelSection() {
       exit={{ opacity: 0, y: -20 }}
       className="flex flex-col gap-6"
     >
-      <div className="bg-white/40 dark:bg-slate-900/40 border border-white/50 dark:border-slate-800/50 rounded-[40px] p-8 shadow-xl">
+      <div className="paper-card border border-[var(--card-border)] dark:border-slate-800/50 rounded-2xl p-8 shadow-md">
         <div className="flex justify-between items-center mb-8 border-b border-white/30 dark:border-slate-700/50 pb-6">
           <div>
             <h2 className="text-2xl font-black text-slate-800 dark:text-white">模型设置</h2>
@@ -128,7 +128,7 @@ export default function ModelSection() {
           <button
             onClick={save}
             disabled={saving}
-            className="px-6 py-3 bg-indigo-500 text-white rounded-2xl font-black text-sm shadow-lg shadow-indigo-500/30 flex items-center gap-2 hover:bg-indigo-600 transition-colors disabled:opacity-50"
+            className="px-6 py-3 bg-indigo-500 text-white rounded-2xl font-black text-sm shadow-lg flex items-center gap-2 hover:bg-indigo-600 transition-colors disabled:opacity-50"
           >
             {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} 保存修改
           </button>

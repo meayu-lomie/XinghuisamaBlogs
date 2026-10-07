@@ -71,12 +71,11 @@ export default function Navbar() {
 
   const navLinks = [
     { name: '首页', href: '/' },
-    { name: '项目', href: '/projects' },
+    { name: '杂谈', href: '/chatter' },
+    { name: '说说', href: '/moments' },
     { name: '时间线', href: '/timeline' },
     { name: '照片墙', href: '/photowall' },
-    { name: '说说', href: '/moments' },
-    { name: '杂谈', href: '/chatter' },
-    { name: '标签', href: '/tags' },
+    { name: '项目', href: '/projects' },
     { name: '关于', href: '/about' },
   ];
 
@@ -86,12 +85,12 @@ export default function Navbar() {
   return (
     <>
       {/* PC端导航栏 */}
-      <header className={`hidden md:block w-full fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${showNav ? 'translate-y-0' : '-translate-y-full'} bg-white/40 dark:bg-slate-900/50 backdrop-blur-xl border-white/20 dark:border-white/5 shadow-sm`}>
+      <header className={`hidden md:block w-full fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${showNav ? 'translate-y-0' : '-translate-y-full'} bg-[color-mix(in_oklab,var(--paper)_88%,transparent)] border-[var(--rule)] shadow-sm`}>
         <div className="w-[90%] max-w-6xl mx-auto h-16 flex items-center justify-between px-4 sm:px-[30px] box-border">
           <Link href="/" className="text-xl font-black text-slate-800 dark:text-white tracking-tighter hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300">
             {siteConfig.navTitle || siteConfig.authorName}
             <span className="text-indigo-500 mx-1">{siteConfig.navSuffix || 'の'}</span>
-            {siteConfig.navAfter || '宝藏之地'}
+            {siteConfig.navAfter || '拾光集'}
           </Link>
           <nav className="flex items-center gap-5 text-sm font-bold">
             {/* PC端依然使用全量的 navLinks */}
@@ -126,12 +125,12 @@ export default function Navbar() {
               setIsMobileMenuOpen(true);
             }
           }}
-          className={`fixed top-1/2 right-0 -translate-y-1/2 w-12 h-28 bg-indigo-500/80 backdrop-blur-xl rounded-l-full shadow-[-5px_0_20px_color-mix(in_srgb,var(--accent)_40%,transparent)] z-[60] flex items-center justify-center transition-all duration-500 border-y border-l border-white/30 touch-none ${isMobileMenuOpen ? 'translate-x-full opacity-0 pointer-events-none' : 'translate-x-0 opacity-100'}`}
+          className={`fixed top-1/2 right-0 -translate-y-1/2 w-12 h-28 bg-indigo-500 rounded-l-full shadow-md z-[60] flex items-center justify-center transition-all duration-500 border-y border-l border-[var(--card-border)] touch-none ${isMobileMenuOpen ? 'translate-x-full opacity-0 pointer-events-none' : 'translate-x-0 opacity-100'}`}
         >
           <div className="flex flex-col gap-1.5 items-center justify-center mr-2">
-            <div className="w-1.5 h-1.5 bg-white/90 rounded-full"></div>
-            <div className="w-1.5 h-1.5 bg-white/90 rounded-full"></div>
-            <div className="w-1.5 h-1.5 bg-white/90 rounded-full"></div>
+            <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+            <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+            <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
           </div>
         </motion.button>
 
@@ -144,7 +143,7 @@ export default function Navbar() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[65]"
+                className="fixed inset-0 bg-slate-900/60 z-[65]"
               />
 
               <motion.div
@@ -158,7 +157,7 @@ export default function Navbar() {
                   ref={wheelRef}
                   style={{ rotate: smoothRotation }}
                   onPan={handlePan}
-                  className="w-full h-full rounded-full border border-white/30 dark:border-slate-500/50 bg-white/40 dark:bg-slate-800/50 backdrop-blur-3xl shadow-[0_0_50px_rgba(0,0,0,0.3)] pointer-events-auto relative cursor-grab active:cursor-grabbing"
+                  className="w-full h-full rounded-full border border-[var(--card-border)] dark:border-slate-500/50 paper-card shadow-[0_0_50px_rgba(0,0,0,0.3)] pointer-events-auto relative cursor-grab active:cursor-grabbing"
                 >
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-700 border-4 border-slate-300 dark:border-slate-500 flex items-center justify-center shadow-inner z-10">
                     <button onClick={() => setIsMobileMenuOpen(false)} className="w-12 h-12 rounded-full bg-indigo-500 flex items-center justify-center text-white font-black shadow-lg hover:bg-red-500 hover:rotate-90 transition-all duration-300 active:scale-95">
@@ -187,7 +186,7 @@ export default function Navbar() {
                             className={`flex items-center justify-center w-full h-full rounded-full transition-all duration-300 ${
                               isActive 
                                 ? 'bg-indigo-500 text-white shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_80%,transparent)] scale-110'
-                                : 'bg-white/90 dark:bg-slate-800 text-slate-800 dark:text-slate-200 shadow-md hover:scale-110 border border-white/50 dark:border-slate-600'
+                                : 'paper-card-strong text-slate-800 dark:text-slate-200 shadow-md hover:scale-110 border border-[var(--card-border)] dark:border-slate-600'
                             }`}
                           >
                             <span className="text-[11px] font-black">{link.name}</span>

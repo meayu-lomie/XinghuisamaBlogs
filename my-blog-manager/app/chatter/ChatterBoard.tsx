@@ -45,7 +45,7 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
     });
   }, [chatters, searchQuery, activeTag]);
 
-  // 🗑️ 真正的执行删除逻辑
+  // 真正的执行删除逻辑
 // ... 保持其他部分不变 ...
   const confirmDelete = async () => {
     if (!deleteModal.slug) return;
@@ -64,13 +64,13 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
 
       const data = await res.json();
       if (data.success) {
-        showToast("🗑️ 物理文件已彻底销毁", "success");
+        showToast("物理文件已彻底销毁", "success");
         setChatters(prev => prev.filter(c => c.slug !== slug));
       } else {
-        showToast("❌ 销毁失败: " + data.message, "error");
+        showToast("销毁失败: " + data.message, "error");
       }
     } catch (err) {
-      showToast("❌ 无法连接到 Python 引擎", "error");
+      showToast("无法连接到 Python 引擎", "error");
     } finally {
       setDeleteModal({ isOpen: false, slug: null, title: null });
     }
@@ -81,7 +81,7 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 py-10 pt-28 relative z-10">
 
       {/* ---------------------------------------------------------
-          💎 自定义绝美确认弹窗 (Custom Modal)
+          自定义绝美确认弹窗 (Custom Modal)
       --------------------------------------------------------- */}
       <AnimatePresence>
         {deleteModal.isOpen && (
@@ -90,7 +90,7 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setDeleteModal({ isOpen: false, slug: null, title: null })}
-              className="absolute inset-0 bg-slate-900/40 backdrop-blur-md"
+              className="absolute inset-0 bg-slate-900/40"
             />
 
             {/* 弹窗主体 */}
@@ -98,11 +98,11 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
               initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-sm bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[40px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] border border-white/50 dark:border-white/10 p-10 text-center overflow-hidden"
+              className="relative w-full max-w-sm paper-card-strong rounded-2xl shadow-lg border border-[var(--card-border)] p-10 text-center overflow-hidden"
             >
               <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-red-500 to-transparent opacity-50" />
 
-              <div className="w-20 h-20 bg-red-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <AlertTriangle className="w-10 h-10 text-red-500" />
               </div>
 
@@ -151,9 +151,9 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
       <div className="mb-12 flex flex-col items-center gap-8">
         <div className="relative w-full max-w-lg group">
           <input
-            type="text" placeholder="搜寻被遗忘的思绪..." value={searchQuery}
+            type="text" placeholder="搜索杂谈..." value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl border border-white/40 dark:border-white/5 rounded-2xl px-6 py-4 pl-14 text-slate-800 dark:text-white shadow-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder-slate-400 font-medium"
+            className="w-full paper-card border border-[var(--card-border)] rounded-2xl px-6 py-4 pl-14 text-slate-800 dark:text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder-slate-400 font-medium"
           />
           <Search className="w-6 h-6 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
         </div>
@@ -163,8 +163,8 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
             <button key={tag} onClick={() => setActiveTag(tag)}
               className={`px-5 py-2 rounded-xl text-xs font-black transition-all duration-500 border ${
                 activeTag === tag 
-                ? 'bg-indigo-500 text-white border-indigo-500 shadow-lg shadow-indigo-500/30 scale-105' 
-                : 'bg-white/30 dark:bg-slate-800/30 text-slate-600 dark:text-slate-400 border-white/20 dark:border-white/5 hover:bg-white/60 dark:hover:bg-slate-700/60'
+                ? 'bg-indigo-500 text-white border-indigo-500 shadow-lg scale-105' 
+                : 'bg-white/30 text-slate-600 dark:text-slate-400 border-white/20 hover:paper-card dark:hover:bg-slate-700/60'
               }`}
             >
               {tag === "全部" ? tag : `# ${tag}`}
@@ -178,7 +178,7 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
         {/* 新增项 */}
         <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="break-inside-avoid">
           <Link href="/editor?type=chatter"
-            className="group flex flex-col items-center justify-center min-h-[250px] rounded-[32px] border-2 border-dashed border-slate-300 dark:border-slate-700 bg-white/10 dark:bg-slate-800/10 hover:bg-white/30 dark:hover:bg-indigo-500/5 hover:border-indigo-500 transition-all duration-500"
+            className="group flex flex-col items-center justify-center min-h-[250px] rounded-[32px] border-2 border-dashed border-slate-300 dark:border-slate-700 bg-white/10 hover:bg-white/30 dark:hover:bg-indigo-500/5 hover:border-indigo-500 transition-all duration-500"
           >
             <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-indigo-500 group-hover:text-white group-hover:rotate-90 transition-all duration-500 shadow-sm">
               <Plus size={32} />
@@ -214,7 +214,7 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
               </div>
 
               <Link href={`/chatter/${chatter.slug}`}
-                className="block rounded-[32px] bg-white/40 dark:bg-slate-800/40 backdrop-blur-2xl border border-white/50 dark:border-white/5 shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden"
+                className="block rounded-[32px] paper-card border border-[var(--card-border)] shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden"
               >
                 {chatter.cover && (
                   <div className="w-full h-52 overflow-hidden relative">
@@ -246,7 +246,7 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
                   {chatter.tags && chatter.tags.length > 0 && (
                     <div className="mt-6 flex flex-wrap gap-2">
                       {chatter.tags.map(t => (
-                        <span key={t} className="text-[9px] font-black text-slate-500 dark:text-slate-400 bg-slate-500/5 dark:bg-white/5 px-2.5 py-1 rounded-md border border-slate-500/10 dark:border-white/5">
+                        <span key={t} className="text-[9px] font-black text-slate-500 dark:text-slate-400 bg-slate-500/5 dark:bg-white/5 px-2.5 py-1 rounded-md border border-slate-500/10">
                           #{t}
                         </span>
                       ))}

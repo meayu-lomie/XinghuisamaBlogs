@@ -449,3 +449,56 @@ textarea::placeholder {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+
+/* ========================================================
+   2c. 色板重映射：slate 灰 → 纸张墨色系
+   --------------------------------------------------------
+   原主题大量使用 slate-* 作正文/边框/卡底，冷蓝灰与纸张暖墨
+   色调冲突。同 indigo→accent 的做法整体重定义，所有 slate
+   工具类（文字、边框、卡底、divide、placeholder）一次性跟随
+   纸墨主题。变量全部基于 --ink/--paper/--card，自动适配
+   宣纸/手账两套主题与明暗切换。
+   ======================================================== */
+:root {
+  --color-slate-50:  color-mix(in oklab, var(--ink) 4%,  var(--paper));
+  --color-slate-100: color-mix(in oklab, var(--ink) 8%,  var(--paper));
+  --color-slate-200: color-mix(in oklab, var(--ink) 13%, var(--paper));
+  --color-slate-300: color-mix(in oklab, var(--ink) 20%, var(--paper));
+  --color-slate-400: var(--ink-faint);
+  --color-slate-500: color-mix(in oklab, var(--ink) 52%, var(--paper));
+  --color-slate-600: color-mix(in oklab, var(--ink) 68%, var(--paper));
+  --color-slate-700: color-mix(in oklab, var(--ink) 84%, var(--paper));
+  --color-slate-800: var(--ink);
+  --color-slate-900: var(--ink);
+  --color-slate-950: var(--ink);
+}
+
+/* 暗色下反向：文字档变亮墨，卡底档变纸深色 */
+.dark {
+  --color-slate-50:  color-mix(in oklab, var(--ink) 8%,  var(--paper));
+  --color-slate-100: color-mix(in oklab, var(--ink) 14%, var(--paper));
+  --color-slate-200: var(--ink);
+  --color-slate-300: color-mix(in oklab, var(--ink) 84%, var(--paper));
+  --color-slate-400: var(--ink-soft);
+  --color-slate-500: color-mix(in oklab, var(--ink-soft) 70%, var(--ink-faint));
+  --color-slate-600: color-mix(in oklab, var(--ink) 16%, var(--paper));
+  --color-slate-700: color-mix(in oklab, var(--ink) 10%, var(--paper));
+  --color-slate-800: var(--card);
+  --color-slate-900: color-mix(in oklab, var(--card) 72%, #000);
+  --color-slate-950: color-mix(in oklab, var(--card) 55%, #000);
+}
+
+/* ========================================================
+   2d. 纸片卡工具类：92% 纸色微透（纸片压在背景上，缝隙微透）
+   只定义底色与边框；圆角与阴影保留在各处原类上，便于微调。
+   ======================================================== */
+@utility paper-card {
+  background-color: color-mix(in oklab, var(--card) 92%, transparent);
+  border: 1px solid var(--card-border);
+}
+
+/* 高实底版本：弹窗、确认框等需要压住下层内容的场景 */
+@utility paper-card-strong {
+  background-color: color-mix(in oklab, var(--card) 98%, transparent);
+  border: 1px solid var(--card-border);
+}

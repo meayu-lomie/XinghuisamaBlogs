@@ -63,13 +63,13 @@ export default function MetaMatrix({
                 <span className="text-[9px] font-black uppercase tracking-widest">Click to Upload</span>
               </div>
             )}
-            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center backdrop-blur-sm transition-opacity">
+            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
               <span className="text-white text-xs font-bold tracking-widest">更换封面</span>
             </div>
           </div>
           <input
             type="text" value={cover} onChange={(e) => setCover(e.target.value)} placeholder="或手动粘贴 URL..."
-            className="w-full bg-white/10 dark:bg-black/20 rounded-2xl px-5 py-3.5 text-xs text-slate-800 dark:text-slate-200 border border-white/10 outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+            className="w-full bg-white/10 dark:bg-black/20 rounded-2xl px-5 py-3.5 text-xs text-slate-800 dark:text-slate-200 border border-[var(--card-border)] outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
           />
         </div>
 
@@ -77,7 +77,7 @@ export default function MetaMatrix({
         {type !== 'about' && (
           <div className="flex flex-col animate-in fade-in slide-in-from-bottom duration-500">
             <Label icon={Tag} text="Relevant Tags" color="border-pink-500" />
-            <div className="flex flex-wrap gap-2 mb-4 p-3 bg-black/5 dark:bg-white/5 rounded-2xl border border-white/5 shadow-inner">
+            <div className="flex flex-wrap gap-2 mb-4 p-3 bg-black/5 dark:bg-white/5 rounded-2xl border border-[var(--card-border)] shadow-inner">
               {tags.map(t => (
                 <span key={t} className="px-3 py-1.5 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[10px] font-black rounded-xl flex items-center gap-2 shadow-sm border border-indigo-500/10">
                   #{t}
@@ -118,7 +118,7 @@ export default function MetaMatrix({
             <Label icon={Smile} text="Mood Today" color="border-yellow-500" />
             <input
               type="text" value={mood} onChange={(e) => setMood(e.target.value)} placeholder="输入心情词..."
-              className="w-full bg-white/10 dark:bg-black/20 rounded-2xl px-5 py-4 text-xs text-slate-800 dark:text-slate-200 border border-white/10 outline-none focus:ring-2 focus:ring-yellow-500 mb-4 shadow-inner"
+              className="w-full bg-white/10 dark:bg-black/20 rounded-2xl px-5 py-4 text-xs text-slate-800 dark:text-slate-200 border border-[var(--card-border)] outline-none focus:ring-2 focus:ring-yellow-500 mb-4 shadow-inner"
             />
             <div className="flex flex-wrap gap-2">
               {allHistoryMoods.map(h => (
@@ -142,7 +142,7 @@ export default function MetaMatrix({
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
               placeholder="记录一下这篇内容的核心思绪..."
-              className="w-full bg-white/10 dark:bg-black/20 rounded-[32px] px-6 py-5 text-xs text-slate-800 dark:text-slate-200 border border-white/10 outline-none focus:ring-2 focus:ring-emerald-500 resize-none shadow-inner leading-relaxed placeholder:text-slate-500 font-medium"
+              className="w-full bg-white/10 dark:bg-black/20 rounded-[32px] px-6 py-5 text-xs text-slate-800 dark:text-slate-200 border border-[var(--card-border)] outline-none focus:ring-2 focus:ring-emerald-500 resize-none shadow-inner leading-relaxed placeholder:text-slate-500 font-medium"
             />
             <p className="mt-2 text-[9px] text-slate-400 italic px-2">提示：摘要将显示在首页卡片和搜索预览中。</p>
           </div>
@@ -150,7 +150,7 @@ export default function MetaMatrix({
       </div>
 
       {/* 底部按钮 */}
-      <div className="shrink-0 p-8 border-t border-white/10 bg-white/5 backdrop-blur-md">
+      <div className="shrink-0 p-8 border-t border-white/10 bg-white/5">
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400">
             <Clock size={12} />
@@ -159,13 +159,13 @@ export default function MetaMatrix({
           <div className="flex gap-3">
             <button
               onClick={() => onSave(false)} disabled={isSaving}
-              className="flex-1 py-3.5 bg-white/20 hover:bg-white/30 text-slate-800 dark:text-white font-black text-[10px] uppercase tracking-widest rounded-2xl border border-white/30 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 shadow-sm"
+              className="flex-1 py-3.5 bg-white/20 hover:bg-white/30 text-slate-800 dark:text-white font-black text-[10px] uppercase tracking-widest rounded-2xl border border-[var(--card-border)] transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 shadow-sm"
             >
               <Save size={14} /> 存为草稿
             </button>
             <button
               onClick={() => onSave(true)} disabled={isSaving}
-              className="flex-1 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-xl shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+              className="flex-1 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
             >
               <Send size={14} /> 正式发布
             </button>

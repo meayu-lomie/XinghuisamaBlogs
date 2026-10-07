@@ -19,11 +19,11 @@ export default function TimelineNode({ post, index }: { post: any, index: number
       <div className="order-1 w-5/12 hidden md:block"></div>
 
       {/* 中间的圆形节点 */}
-      <div className="z-20 flex items-center justify-center order-1 bg-white dark:bg-slate-900 shadow-xl w-6 h-6 rounded-full border-4 border-indigo-400 ring-4 ring-indigo-200/50 dark:ring-indigo-900/30 transition-colors duration-1000"></div>
+      <div className="z-20 flex items-center justify-center order-1 bg-white dark:bg-slate-900 shadow-md w-6 h-6 rounded-full border-4 border-indigo-400 ring-4 ring-indigo-200/50 dark:ring-indigo-900/30 transition-colors duration-1000"></div>
 
       {/* 卡片实体 */}
       <Link href={`/${post.type === 'chatter' ? 'chatter' : 'posts'}/${post.slug}`} className="order-1 w-full md:w-5/12 group">
-        <div className="bg-white/50 dark:bg-slate-800/50 backdrop-blur-lg rounded-3xl shadow-lg border border-white/60 dark:border-white/10 transition-all duration-500 hover:scale-[1.03] hover:bg-white/70 dark:hover:bg-slate-800/70 hover:shadow-2xl overflow-hidden flex flex-col">
+        <div className="paper-card rounded-2xl shadow-lg border border-[var(--card-border)] transition-all duration-500 hover:scale-[1.03] hover:paper-card-strong dark:hover:bg-slate-800/70 hover:shadow-2xl overflow-hidden flex flex-col">
 
           {/* 上半部分：封面图 */}
           <div className="w-full h-40 sm:h-48 overflow-hidden relative bg-slate-200 dark:bg-slate-700">

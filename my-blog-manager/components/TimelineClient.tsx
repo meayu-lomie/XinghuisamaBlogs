@@ -97,7 +97,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
               setIsDropdownOpen(true);
             }}
             onFocus={() => setIsDropdownOpen(true)}
-            className="w-full bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl border border-white/40 dark:border-white/5 rounded-2xl px-6 py-4 pl-14 text-slate-800 dark:text-white shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder-slate-400 font-medium relative z-20"
+            className="w-full paper-card border border-[var(--card-border)] rounded-2xl px-6 py-4 pl-14 text-slate-800 dark:text-white shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder-slate-400 font-medium relative z-20"
           />
           <Search className="w-6 h-6 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors z-20" />
 
@@ -108,7 +108,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: 0.98 }}
                 transition={{ duration: 0.2 }}
-                className="absolute top-full left-0 right-0 mt-3 bg-white/80 dark:bg-slate-900/90 backdrop-blur-2xl border border-slate-200/50 dark:border-slate-700/50 rounded-2xl shadow-2xl overflow-hidden max-h-[360px] overflow-y-auto z-[100]"
+                className="absolute top-full left-0 right-0 mt-3 paper-card-strong border border-slate-200/50 dark:border-slate-700/50 rounded-2xl shadow-lg overflow-hidden max-h-[360px] overflow-y-auto z-[100]"
               >
                 {searchResults.length > 0 ? (
                   <div className="flex flex-col py-2">
@@ -135,7 +135,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
                   </div>
                 ) : (
                   <div className="px-6 py-8 text-center text-slate-500 dark:text-slate-400 text-sm font-medium">
-                    赛博空间里找不到这个印记 🌌
+                    时间线里还没有这段记录
                   </div>
                 )}
               </motion.div>
@@ -143,20 +143,20 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
           </AnimatePresence>
         </div>
 
-        <div className="w-full flex flex-col md:flex-row justify-between items-center gap-6 bg-white/30 dark:bg-slate-800/30 backdrop-blur-md p-4 rounded-3xl border border-white/20 dark:border-white/5">
+        <div className="w-full flex flex-col md:flex-row justify-between items-center gap-6 bg-white/30 p-4 rounded-2xl border border-[var(--card-border)]">
           <div className="flex flex-wrap justify-center md:justify-start gap-2 flex-1">
-            <button onClick={() => setSelectedTag('All')} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${selectedTag === 'All' ? 'bg-indigo-500 text-white shadow-md' : 'bg-white/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-400 hover:bg-indigo-500 hover:text-white'}`}>
+            <button onClick={() => setSelectedTag('All')} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${selectedTag === 'All' ? 'bg-indigo-500 text-white shadow-md' : 'paper-card text-slate-600 dark:text-slate-400 hover:bg-indigo-500 hover:text-white'}`}>
               全部档案
             </button>
             {tags.map(tag => (
-              <button key={tag.name} onClick={() => setSelectedTag(tag.name)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${selectedTag === tag.name ? 'bg-indigo-500 text-white shadow-md' : 'bg-white/50 dark:bg-slate-700/50 text-slate-600 dark:text-slate-400 hover:bg-indigo-500 hover:text-white'}`}>
+              <button key={tag.name} onClick={() => setSelectedTag(tag.name)} className={`px-4 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${selectedTag === tag.name ? 'bg-indigo-500 text-white shadow-md' : 'paper-card text-slate-600 dark:text-slate-400 hover:bg-indigo-500 hover:text-white'}`}>
                 {tag.name} <span className="opacity-50 ml-1">{tag.count}</span>
               </button>
             ))}
           </div>
 
           {/* 🌟 核心魔法 2：隐藏手机端的视图切换按钮 (hidden md:flex) */}
-          <div className="hidden md:flex bg-white/50 dark:bg-slate-900/50 p-1 rounded-2xl shadow-inner shrink-0">
+          <div className="hidden md:flex paper-card p-1 rounded-2xl shadow-inner shrink-0">
             <button onClick={() => setViewMode('timeline')} className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all duration-300 ${viewMode === 'timeline' ? 'bg-white dark:bg-slate-700 text-indigo-500 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
               <ListTree size={16} />
               <span>中枢链路</span>
@@ -198,7 +198,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 pt-4 pb-10">
                 {timelinePosts.map((post, idx) => (
                   <motion.div key={post.slug} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3, delay: idx * 0.05 }}>
-                    <div className="bg-white/60 dark:bg-slate-800/70 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-2xl md:rounded-3xl overflow-hidden shadow-lg flex flex-col h-full group relative hover:-translate-y-1 transition-transform duration-300">
+                    <div className="paper-card border border-[var(--card-border)] dark:border-slate-700/50 rounded-2xl md:rounded-2xl overflow-hidden shadow-lg flex flex-col h-full group relative hover:-translate-y-1 transition-transform duration-300">
 
                     <Link href={`/${post.type === 'chatter' ? 'chatter' : 'posts'}/${post.slug}`} className="block flex-1 flex flex-col cursor-pointer">
                         {/* 🌟 图片高度自适应：手机变矮，电脑变高 */}
@@ -206,7 +206,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
                           <img src={post.cover} alt={post.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                           {/* 🌟 日期标签微缩 */}
-                          <span className="absolute bottom-2 left-2 md:bottom-3 md:left-4 text-white/90 text-[9px] md:text-xs font-mono font-bold bg-black/40 backdrop-blur-sm px-1.5 py-0.5 md:px-2 md:py-1 rounded flex items-center gap-1">
+                          <span className="absolute bottom-2 left-2 md:bottom-3 md:left-4 text-white/90 text-[9px] md:text-xs font-mono font-bold bg-black/40 px-1.5 py-0.5 md:px-2 md:py-1 rounded flex items-center gap-1">
                             <Calendar size={10} className="md:w-3 md:h-3"/> {post.type === 'chatter' ? '杂谈 · ' : ''}{post.date.split(' ')[0]}
                           </span>
                         </div>
@@ -273,7 +273,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
 
               {timelinePosts.length === 0 && (
                  <div className="text-center py-20 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-sm">
-                    这个频段没有接收到任何信号 📡
+                    这里还没有留下痕迹
                  </div>
               )}
             </div>

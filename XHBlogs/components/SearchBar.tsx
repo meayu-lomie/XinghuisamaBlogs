@@ -97,7 +97,7 @@ export default function SearchBar({ posts = [], moments = [] }: { posts?: Post[]
         {/* 先渲染 Input */}
         <input
           type="text"
-          className="w-full pl-14 pr-6 py-4 bg-white/50 dark:bg-slate-800/50 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-3xl shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-800 dark:text-slate-200 transition-all placeholder-slate-500 dark:placeholder-slate-400 font-medium text-lg relative z-0"
+          className="w-full pl-14 pr-6 py-4 paper-card border border-[var(--card-border)] rounded-2xl shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-800 dark:text-slate-200 transition-all placeholder-slate-500 dark:placeholder-slate-400 font-medium text-lg relative z-0"
           placeholder="搜寻杂谈与说说..."
           value={searchQuery}
           onChange={(e) => {
@@ -135,7 +135,7 @@ export default function SearchBar({ posts = [], moments = [] }: { posts?: Post[]
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.98 }}
             transition={{ duration: 0.2 }}
-            className="absolute top-full left-0 right-0 mt-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl border border-white/50 dark:border-slate-700/50 rounded-3xl shadow-2xl overflow-hidden max-h-[450px] overflow-y-auto z-20"
+            className="absolute top-full left-0 right-0 mt-4 paper-card-strong border border-[var(--card-border)] dark:border-slate-700/50 rounded-2xl shadow-lg overflow-hidden max-h-[450px] overflow-y-auto z-20"
           >
             {totalCount > 0 ? (
               <div className="flex flex-col py-3">
@@ -155,7 +155,7 @@ export default function SearchBar({ posts = [], moments = [] }: { posts?: Post[]
                         <Highlight text={post.title} query={searchQuery} />
                       </h4>
                       {post.date && (
-                        <span className="text-[10px] font-mono text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-2 py-1 rounded-md shrink-0 mt-1">
+                        <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-2 py-1 rounded-md shrink-0 mt-1">
                           {String(post.date).split(/[ T]/)[0]}
                         </span>
                       )}
@@ -214,7 +214,7 @@ export default function SearchBar({ posts = [], moments = [] }: { posts?: Post[]
                   </svg>
                 </div>
                 <p className="text-slate-500 dark:text-slate-400 font-medium">
-                  数据海中未发现关于 "<span className="text-indigo-500 font-bold">{searchQuery}</span>" 的踪迹
+                  没有找到与 "<span className="text-indigo-500 font-bold">{searchQuery}</span>" 相关的内容
                 </p>
               </div>
             )}

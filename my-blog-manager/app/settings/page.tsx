@@ -48,7 +48,7 @@ function SettingsContent() {
         const data = await res.json();
 
         if (data.success && data.data) {
-          console.log("✅ 成功从后端拉取到真实配置:", data.data);
+          console.log("成功从后端拉取到真实配置:", data.data);
           setFormData((prev: any) => ({
             ...prev,
             ...data.data,
@@ -59,11 +59,11 @@ function SettingsContent() {
             footerBadges: data.data.footerBadges ? [...data.data.footerBadges] : prev.footerBadges,
           }));
         } else {
-          console.error("❌ 后端返回失败:", data.message);
+          console.error("后端返回失败:", data.message);
           showToast("读取后端配置失败，当前显示为本地静态数据", "warning");
         }
       } catch (error) {
-        console.error("❌ 请求后端配置通道断开:", error);
+        console.error("请求后端配置通道断开:", error);
         showToast("无法连接到 Python 后端服务", "error");
       }
     };
@@ -106,11 +106,11 @@ function SettingsContent() {
         <main className="w-[95%] max-w-7xl mx-auto mt-24 flex flex-col md:flex-row gap-8 items-start relative z-10">
 
           <div className="w-full md:w-72 shrink-0 flex flex-col gap-4">
-            <div className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-white/50 dark:border-slate-800/50 rounded-3xl p-4 shadow-xl">
+            <div className="paper-card border border-[var(--card-border)] dark:border-slate-800/50 rounded-2xl p-4 shadow-md">
               <p className="text-[10px] font-black text-slate-400 uppercase mb-4 ml-2 tracking-widest">系统管理维度</p>
               <nav className="flex flex-col gap-2">
                 {menuItems.map((item) => (
-                  <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 font-bold text-sm ${activeTab === item.id ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 translate-x-1' : 'text-slate-600 dark:text-slate-300 hover:bg-white/50 dark:hover:bg-slate-800/50'}`}>
+                  <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 font-bold text-sm ${activeTab === item.id ? 'bg-indigo-500 text-white shadow-lg translate-x-1' : 'text-slate-600 dark:text-slate-300 hover:paper-card dark:hover:bg-slate-800/50'}`}>
                   <span>{item.name}</span>
                   </button>
                 ))}

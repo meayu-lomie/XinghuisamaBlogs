@@ -63,7 +63,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
     }
     handleUpdate('bgImages', [...formData.bgImages, formData.newBgUrl]);
     handleUpdate('newBgUrl', '');
-    showToast("✅ 成功添加背景图！", "success");
+    showToast("成功添加背景图！", "success");
   };
 
   // 【核心功能】：真实的图床上传逻辑
@@ -120,7 +120,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
   const confirmAddPendingImage = () => {
     if (pendingImageUrl) {
       handleUpdate('bgImages', [...formData.bgImages, pendingImageUrl]);
-      showToast("✅ 已成功加入视觉背景库！", "success");
+      showToast("已成功加入视觉背景库！", "success");
       setPendingImageUrl(null);
     }
   };
@@ -141,21 +141,21 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
   };
 
   return (
-    <motion.section initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/50 dark:border-slate-800/50 rounded-[40px] p-8 shadow-2xl flex flex-col gap-8 relative overflow-hidden">
+    <motion.section initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="paper-card border border-[var(--card-border)] dark:border-slate-800/50 rounded-2xl p-8 shadow-lg flex flex-col gap-8 relative overflow-hidden">
 
       <header className="flex justify-between items-end relative z-10">
         <div>
-          <h2 className="text-xl font-black text-slate-800 dark:text-white flex items-center gap-2">🌌 视觉背景配置</h2>
+          <h2 className="text-xl font-black text-slate-800 dark:text-white flex items-center gap-2">视觉背景配置</h2>
           <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase">管理网站的全局轮播背景图 ({formData.bgImages?.length || 0} 张)</p>
         </div>
         {/* 👈 修复暂存参数：传入真正的 key 和 value */}
-        <button onClick={() => pushToQueue('视觉背景图', 'bgImages', formData.bgImages)} className="px-6 py-2 bg-indigo-500 text-white rounded-xl text-xs font-black shadow-lg shadow-indigo-500/20 active:scale-95 transition-all">
+        <button onClick={() => pushToQueue('视觉背景图', 'bgImages', formData.bgImages)} className="px-6 py-2 bg-indigo-500 text-white rounded-xl text-xs font-black shadow-lg active:scale-95 transition-all">
           暂存背景修改
         </button>
       </header>
 
       {/* 🌟 全站背景轮播开关 */}
-      <div className="relative z-10 flex items-center justify-between gap-4 bg-white/50 dark:bg-slate-800/50 rounded-3xl px-6 py-5 border border-white/40 dark:border-slate-700/50 shadow-sm">
+      <div className="relative z-10 flex items-center justify-between gap-4 paper-card rounded-2xl px-6 py-5 border border-[var(--card-border)] dark:border-slate-700/50 shadow-sm">
         <div className="min-w-0">
           <p className="text-sm font-black text-slate-800 dark:text-white">全站背景轮播</p>
           <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mt-1">
@@ -176,14 +176,14 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
-        <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-3xl p-6 custom-scrollbar max-h-[450px] overflow-y-auto">
+        <div className="bg-slate-100/50 rounded-2xl p-6 custom-scrollbar max-h-[450px] overflow-y-auto">
           <div className="grid grid-cols-2 gap-4">
             <AnimatePresence>
               {formData.bgImages?.map((url: string, index: number) => (
-                <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} key={index} className="relative group rounded-2xl overflow-hidden aspect-video shadow-md border border-white/20">
+                <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} key={index} className="relative group rounded-2xl overflow-hidden aspect-video shadow-md border border-[var(--card-border)]">
                   <img src={url} alt={`bg-${index}`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                    <button onClick={() => removeBg(index)} className="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center font-bold shadow-xl hover:bg-red-600 scale-0 group-hover:scale-100 transition-transform">✕</button>
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button onClick={() => removeBg(index)} className="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center font-bold shadow-md hover:bg-red-600 scale-0 group-hover:scale-100 transition-transform">✕</button>
                   </div>
                 </motion.div>
               ))}
@@ -195,7 +195,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
         </div>
 
         <div className="space-y-6 flex flex-col relative">
-          <div className="bg-white/50 dark:bg-slate-800/50 rounded-3xl p-5 border border-white/40 dark:border-slate-700/50 shadow-sm">
+          <div className="paper-card rounded-2xl p-5 border border-[var(--card-border)] dark:border-slate-700/50 shadow-sm">
             <p className="text-[10px] font-black text-slate-400 uppercase mb-3">粘贴网络图片 URL</p>
             <div className="flex gap-2">
               <input type="text" placeholder="https://..." value={formData.newBgUrl} onChange={e => handleUpdate('newBgUrl', e.target.value)} className="flex-1 bg-white dark:bg-slate-900 border-none rounded-xl px-4 py-2 text-xs outline-none shadow-inner" />
@@ -206,13 +206,13 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
           <div
             onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}
             onClick={() => !isUploading && fileInputRef.current?.click()}
-            className={`flex-1 min-h-[200px] border-2 border-dashed rounded-3xl flex flex-col items-center justify-center gap-4 cursor-pointer transition-all duration-300 relative overflow-hidden
+            className={`flex-1 min-h-[200px] border-2 border-dashed rounded-2xl flex flex-col items-center justify-center gap-4 cursor-pointer transition-all duration-300 relative overflow-hidden
               ${isDragging ? 'border-indigo-500 bg-indigo-500/10 scale-[1.02]' : 'border-slate-300 dark:border-slate-600 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 hover:border-indigo-400'}
             `}
           >
             <input type="file" ref={fileInputRef} onChange={e => e.target.files && handleFileUpload(e.target.files[0])} className="hidden" accept="image/*" />
 
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl shadow-xl transition-all duration-300 ${isDragging ? 'bg-indigo-500 text-white rotate-12' : 'bg-white dark:bg-slate-800 text-slate-500'}`}>
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl shadow-md transition-all duration-300 ${isDragging ? 'bg-indigo-500 text-white rotate-12' : 'bg-white dark:bg-slate-800 text-slate-500'}`}>
               {isUploading ? "⏳" : "☁️"}
             </div>
 
@@ -223,7 +223,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
             </div>
 
             {isUploading && (
-              <div className="absolute inset-0 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-10">
+              <div className="absolute inset-0 paper-card flex items-center justify-center z-10">
                 <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
               </div>
             )}
@@ -238,10 +238,10 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="absolute inset-0 z-50 bg-slate-900/40 backdrop-blur-md rounded-[40px] flex items-center justify-center p-6"
+            className="absolute inset-0 z-50 bg-slate-900/40 rounded-2xl flex items-center justify-center p-6"
           >
-            <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-white/20">
-              <h3 className="text-lg font-black text-slate-800 dark:text-white mb-4 text-center">✅ 图床返回成功！</h3>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-sm w-full shadow-lg border border-[var(--card-border)]">
+              <h3 className="text-lg font-black text-slate-800 dark:text-white mb-4 text-center">图床返回成功！</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 text-center">是否将此图片设为网站轮播背景？</p>
 
               <div className="w-full aspect-video rounded-xl overflow-hidden mb-6 shadow-inner border border-slate-200 dark:border-slate-700">

@@ -107,7 +107,7 @@ export default async function AboutPage() {
           <div className="flex justify-end mb-6">
             <Link
               href="/editor?id=about&type=about"
-              className="px-5 py-2.5 rounded-2xl bg-white/50 dark:bg-slate-800/50 border border-white/50 dark:border-white/10 text-xs font-black uppercase tracking-widest text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all shadow-sm flex items-center gap-2"
+              className="px-5 py-2.5 rounded-2xl paper-card border border-[var(--card-border)] text-xs font-black uppercase tracking-widest text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all shadow-sm flex items-center gap-2"
             >
               编辑关于页
             </Link>

@@ -192,23 +192,23 @@ export default function RepoSection() {
 
   return (
     <>
-      <motion.section initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/50 dark:border-slate-800/50 rounded-[40px] p-8 shadow-2xl relative z-10">
+      <motion.section initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="paper-card border border-[var(--card-border)] dark:border-slate-800/50 rounded-2xl p-8 shadow-lg relative z-10">
         <div className="flex justify-between items-center mb-8">
             <h2 className="text-xl font-black text-slate-800 dark:text-white flex items-center gap-2">部署与发布</h2>
         </div>
 
         <div className="space-y-8">
-          <div className="bg-slate-50 dark:bg-slate-800/30 p-5 rounded-3xl border border-slate-100 dark:border-slate-700/50">
+          <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 dark:border-slate-700/50">
             <div className="flex justify-between items-center mb-3">
                <label className="text-[11px] font-black text-slate-600 dark:text-slate-300 uppercase flex items-center gap-1"><ShieldCheck size={14} className="text-indigo-500" /> 1. 本地 Blog 物理路径</label>
                <button onClick={testPathConnection} disabled={isCheckingPath} className="text-[10px] bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-3 py-1 rounded-full font-bold hover:bg-indigo-500/20 transition-colors">
                  {isCheckingPath ? "探测中..." : "测试路径"}
                </button>
             </div>
-            <input type="text" value={deployData.blogPath} onChange={e => setDeployData({...deployData, blogPath: e.target.value})} className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-xs font-mono outline-none focus:ring-2 focus:ring-indigo-500" placeholder="F:/Projects/my-blog" />
+            <input type="text" value={deployData.blogPath} onChange={e => setDeployData({...deployData, blogPath: e.target.value})} className="w-full bg-white border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-xs font-mono outline-none focus:ring-2 focus:ring-indigo-500" placeholder="F:/Projects/my-blog" />
           </div>
 
-          <div className="bg-slate-50 dark:bg-slate-800/30 p-5 rounded-3xl border border-slate-100 dark:border-slate-700/50">
+          <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 dark:border-slate-700/50">
             <div className="flex justify-between items-center mb-4">
                <label className="text-[11px] font-black text-slate-600 dark:text-slate-300 uppercase flex items-center gap-1"><GitBranch size={14} className="text-indigo-500" /> 2. GitHub 仓库配置</label>
                <button onClick={testGitConnection} disabled={isCheckingGit} className="text-[10px] bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-3 py-1 rounded-full font-bold hover:bg-indigo-500/20 transition-colors">
@@ -227,11 +227,11 @@ export default function RepoSection() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase ml-1">仓库地址（SSH，存放静态页面）</label>
-                  <input type="text" value={deployData.staticRepoUrl} onChange={e => setDeployData({...deployData, staticRepoUrl: e.target.value})} className="w-full bg-white dark:bg-slate-900/50 border border-indigo-200/50 dark:border-indigo-700/50 rounded-xl px-4 py-2 text-xs mt-1 outline-none font-mono focus:ring-2 focus:ring-indigo-500" placeholder="git@github.com:..." />
+                  <input type="text" value={deployData.staticRepoUrl} onChange={e => setDeployData({...deployData, staticRepoUrl: e.target.value})} className="w-full bg-white border border-indigo-200/50 dark:border-indigo-700/50 rounded-xl px-4 py-2 text-xs mt-1 outline-none font-mono focus:ring-2 focus:ring-indigo-500" placeholder="git@github.com:..." />
                 </div>
                 <div>
                   <label className="text-[10px] font-black text-slate-400 uppercase ml-1">目标分支</label>
-                  <input type="text" value={deployData.staticBranch} onChange={e => setDeployData({...deployData, staticBranch: e.target.value})} className="w-full bg-white dark:bg-slate-900/50 border border-indigo-200/50 dark:border-indigo-700/50 rounded-xl px-4 py-2 text-xs mt-1 outline-none font-mono focus:ring-2 focus:ring-indigo-500" placeholder="gh-pages" />
+                  <input type="text" value={deployData.staticBranch} onChange={e => setDeployData({...deployData, staticBranch: e.target.value})} className="w-full bg-white border border-indigo-200/50 dark:border-indigo-700/50 rounded-xl px-4 py-2 text-xs mt-1 outline-none font-mono focus:ring-2 focus:ring-indigo-500" placeholder="gh-pages" />
                 </div>
               </div>
             </div>
@@ -247,11 +247,11 @@ export default function RepoSection() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase ml-1">仓库地址（SSH，存放源码）</label>
-                  <input type="text" value={deployData.sourceRepoUrl} onChange={e => setDeployData({...deployData, sourceRepoUrl: e.target.value})} className="w-full bg-white dark:bg-slate-900/50 border border-indigo-200/50 dark:border-indigo-700/50 rounded-xl px-4 py-2 text-xs mt-1 outline-none font-mono focus:ring-2 focus:ring-indigo-500" placeholder="git@github-source:..." />
+                  <input type="text" value={deployData.sourceRepoUrl} onChange={e => setDeployData({...deployData, sourceRepoUrl: e.target.value})} className="w-full bg-white border border-indigo-200/50 dark:border-indigo-700/50 rounded-xl px-4 py-2 text-xs mt-1 outline-none font-mono focus:ring-2 focus:ring-indigo-500" placeholder="git@github-source:..." />
                 </div>
                 <div>
                   <label className="text-[10px] font-black text-slate-400 uppercase ml-1">源码分支</label>
-                  <input type="text" value={deployData.sourceBranch} onChange={e => setDeployData({...deployData, sourceBranch: e.target.value})} className="w-full bg-white dark:bg-slate-900/50 border border-indigo-200/50 dark:border-indigo-700/50 rounded-xl px-4 py-2 text-xs mt-1 outline-none font-mono focus:ring-2 focus:ring-indigo-500" placeholder="main" />
+                  <input type="text" value={deployData.sourceBranch} onChange={e => setDeployData({...deployData, sourceBranch: e.target.value})} className="w-full bg-white border border-indigo-200/50 dark:border-indigo-700/50 rounded-xl px-4 py-2 text-xs mt-1 outline-none font-mono focus:ring-2 focus:ring-indigo-500" placeholder="main" />
                 </div>
               </div>
             </div>
@@ -263,42 +263,42 @@ export default function RepoSection() {
                </button>
 
                <div className="flex gap-3 flex-col md:flex-row">
-                 <button onClick={() => setModalConfig({isOpen: true, type: 'deploy'})} disabled={isDeploying || isUploading} className="flex-1 flex items-center justify-center gap-2 py-4 bg-indigo-500 text-white rounded-2xl text-sm font-black shadow-lg shadow-indigo-500/30 active:scale-95 transition-all hover:bg-indigo-600">
+                 <button onClick={() => setModalConfig({isOpen: true, type: 'deploy'})} disabled={isDeploying || isUploading} className="flex-1 flex items-center justify-center gap-2 py-4 bg-indigo-500 text-white rounded-2xl text-sm font-black shadow-lg active:scale-95 transition-all hover:bg-indigo-600">
                     <Rocket size={18} className={isDeploying ? "animate-bounce" : ""} /> {isDeploying ? "编译中..." : "编译并发布静态页"}
                  </button>
 
-                 <button onClick={() => setModalConfig({isOpen: true, type: 'upload'})} disabled={isDeploying || isUploading} className="flex-1 flex items-center justify-center gap-2 py-4 bg-indigo-500 text-white rounded-2xl text-sm font-black shadow-lg shadow-indigo-500/30 active:scale-95 transition-all hover:bg-indigo-600">
+                 <button onClick={() => setModalConfig({isOpen: true, type: 'upload'})} disabled={isDeploying || isUploading} className="flex-1 flex items-center justify-center gap-2 py-4 bg-indigo-500 text-white rounded-2xl text-sm font-black shadow-lg active:scale-95 transition-all hover:bg-indigo-600">
                     <CloudUpload size={18} className={isUploading ? "animate-pulse" : ""} /> {isUploading ? "同步中..." : "仅推送源码（Vercel）"}
                  </button>
                </div>
             </div>
           </div>
 
-          <button onClick={handleSaveConfig} disabled={isSaving} className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl text-sm font-black shadow-xl active:scale-95 transition-all hover:shadow-2xl hover:-translate-y-1">
+          <button onClick={handleSaveConfig} disabled={isSaving} className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl text-sm font-black shadow-md active:scale-95 transition-all hover:shadow-2xl hover:-translate-y-1">
             <Save size={18} className="inline mr-2" /> {isSaving ? "正在保存..." : "保存配置"}
           </button>
         </div>
       </motion.section>
 
-      {/* 💎 弹窗传送门 */}
+      {/* 弹窗传送门 */}
       {mounted && createPortal(
         <AnimatePresence>
           {modalConfig.isOpen && (
             <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setModalConfig({ isOpen: false, type: null })} className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" />
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setModalConfig({ isOpen: false, type: null })} className="absolute inset-0 bg-slate-900/40" />
 
-              <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative w-full max-w-md bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[40px] shadow-2xl border border-white/50 p-10 text-center">
+              <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative w-full max-w-md paper-card-strong rounded-2xl shadow-lg border border-[var(--card-border)] p-10 text-center">
 
                 {modalConfig.type === 'ssh' && (
                   <>
-                        <div className="w-16 h-16 bg-amber-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6"><Key className="text-amber-500" size={32} /></div>
+                        <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6"><Key className="text-amber-500" size={32} /></div>
                         <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">
                           你的 {sshConfig.type === 'static' ? 'A 线 (静态库)' : 'B 线 (源码库)'} 通行证已就绪
                         </h3>
                         <p className="text-xs text-slate-500 mb-6 leading-relaxed">请将此密匙配置到对应 GitHub 仓库的 Deploy Keys 中以获取对应权限。</p>
 
                         <div className="relative group mb-8">
-                            <div className="w-full bg-slate-900 dark:bg-black rounded-2xl p-4 text-[10px] font-mono text-emerald-400 text-left break-all h-32 overflow-y-auto custom-scrollbar border border-white/10 select-all">
+                            <div className="w-full bg-slate-900 dark:bg-black rounded-2xl p-4 text-[10px] font-mono text-emerald-400 text-left break-all h-32 overflow-y-auto custom-scrollbar border border-[var(--card-border)] select-all">
                                 {sshConfig.key}
                             </div>
                             <button onClick={copyToClipboard} className="absolute top-2 right-2 p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all text-white">
@@ -326,36 +326,36 @@ export default function RepoSection() {
 
                 {modalConfig.type === 'init' && (
                     <>
-                        <div className="w-16 h-16 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6"><Wand2 className="text-indigo-500" size={32} /></div>
+                        <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6"><Wand2 className="text-indigo-500" size={32} /></div>
                         <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">执行自动化改造？</h3>
                         <p className="text-sm text-slate-500 mb-8 leading-relaxed">一键绑定 Git、安装插件并注入核心双轨配置</p>
                         <div className="flex gap-3">
                             <button onClick={() => setModalConfig({isOpen: false, type: null})} className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-black transition-colors hover:bg-slate-200">取消</button>
-                            <button onClick={executeInitEnv} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl text-xs font-black shadow-lg shadow-indigo-500/30 active:scale-95 transition-all">确认执行</button>
+                            <button onClick={executeInitEnv} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl text-xs font-black shadow-lg active:scale-95 transition-all">确认执行</button>
                         </div>
                     </>
                 )}
 
                 {modalConfig.type === 'deploy' && (
                     <>
-                        <div className="w-16 h-16 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6"><Rocket className="text-indigo-500" size={32} /></div>
+                        <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6"><Rocket className="text-indigo-500" size={32} /></div>
                         <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">执行编译并部署？</h3>
                         <p className="text-sm text-slate-500 mb-8 leading-relaxed">打包前端静态文件，并推送至你在 A 线配置的静态仓库。</p>
                         <div className="flex gap-3">
                             <button onClick={() => setModalConfig({isOpen: false, type: null})} className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-black transition-colors hover:bg-slate-200">取消</button>
-                            <button onClick={executeDeploy} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl text-xs font-black shadow-lg shadow-indigo-500/30 active:scale-95 transition-all">确认执行</button>
+                            <button onClick={executeDeploy} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl text-xs font-black shadow-lg active:scale-95 transition-all">确认执行</button>
                         </div>
                     </>
                 )}
 
                 {modalConfig.type === 'upload' && (
                     <>
-                        <div className="w-16 h-16 bg-indigo-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6"><CloudUpload className="text-indigo-500" size={32} /></div>
+                        <div className="w-16 h-16 bg-indigo-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6"><CloudUpload className="text-indigo-500" size={32} /></div>
                         <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">同步源码至 Vercel？</h3>
                         <p className="text-sm text-slate-500 mb-8 leading-relaxed">将本地源代码提交，并推送到你在 B 线配置的源码仓库，自动触发 Vercel 构建。</p>
                         <div className="flex gap-3">
                             <button onClick={() => setModalConfig({isOpen: false, type: null})} className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-black transition-colors hover:bg-slate-200">取消</button>
-                            <button onClick={executeUploadSource} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl text-xs font-black shadow-lg shadow-indigo-500/30 active:scale-95 transition-all">开始同步</button>
+                            <button onClick={executeUploadSource} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl text-xs font-black shadow-lg active:scale-95 transition-all">开始同步</button>
                         </div>
                     </>
                 )}
