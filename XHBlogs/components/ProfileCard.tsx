@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { siteConfig } from '../siteConfig';
 import { useToast } from './ToastProvider';
 
-export default function ProfileCard({ postCount, chatterCount, photoCount }: { postCount: number, chatterCount: number, photoCount: number }) {
+export default function ProfileCard({ chatterCount, momentCount, photoCount }: { chatterCount: number, momentCount: number, photoCount: number }) {
   const router = useRouter();
   const { showToast } = useToast();
 
@@ -21,7 +21,7 @@ export default function ProfileCard({ postCount, chatterCount, photoCount }: { p
       <div className="flex items-start justify-between relative z-10">
         <div className="flex items-center gap-4 md:gap-6 w-full">
           <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-xl md:rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-500 p-1 shadow-lg flex-shrink-0 transition-transform duration-500 group-hover:rotate-3">
-            <img src={siteConfig.avatarUrl} alt="avatar" className="w-full h-full rounded-lg md:rounded-xl object-cover bg-white" />
+            <img src={siteConfig.avatarUrl} alt="avatar" className="vt-avatar w-full h-full rounded-lg md:rounded-xl object-cover bg-white" />
           </div>
           <div className="flex-1 min-w-0">
             {/* 🌟 核心修复点：
@@ -40,9 +40,9 @@ export default function ProfileCard({ postCount, chatterCount, photoCount }: { p
 
       <div className="flex flex-col md:flex-row items-center md:items-end justify-between mt-6 md:mt-8 gap-5 md:gap-6 relative z-10">
         <div className="flex gap-2 sm:gap-6 w-full md:w-auto justify-between sm:justify-around md:justify-start px-2 sm:px-0">
-          <StatItem count={postCount} label="文章" color="text-indigo-600 dark:text-indigo-400" />
+          <StatItem count={chatterCount} label="杂谈" color="text-indigo-600 dark:text-indigo-400" />
           <div className="w-px h-8 md:h-10 bg-slate-300/50 dark:bg-slate-700 hidden md:block"></div>
-          <StatItem count={chatterCount} label="杂谈" color="text-purple-600 dark:text-purple-400" />
+          <StatItem count={momentCount} label="说说" color="text-purple-600 dark:text-purple-400" />
           <div className="w-px h-8 md:h-10 bg-slate-300/50 dark:bg-slate-700 hidden md:block"></div>
           <StatItem count={photoCount} label="照片" color="text-pink-600 dark:text-pink-400" />
         </div>
@@ -81,6 +81,9 @@ function SocialBtn({ type, url, onClick }: { type: string, url?: string, onClick
       default: return null;
     }
   };
+
+  // 无链接且无点击行为的社交按钮不渲染（如尚未填写的 Gitee 地址）
+  if (!url && !onClick) return null;
 
   const content = (
     <div

@@ -385,9 +385,10 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
       <div className="mb-16 flex flex-col items-center gap-8">
         <button
           onClick={() => setIsPublishOpen(true)}
-          className="group relative px-10 py-3.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl shadow-lg shadow-indigo-500/30 text-white font-black tracking-widest text-sm hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 overflow-hidden"
+          className="group relative px-10 py-3.5 bg-gradient-to-r from-indigo-600 to-indigo-500 rounded-xl shadow-lg shadow-indigo-500/30 text-white font-black tracking-widest text-sm hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-2 overflow-hidden"
         >
-          <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+          {/* hover 轻微压暗而非提亮，保证浅色主题下白字始终可读 */}
+          <div className="absolute inset-0 bg-black/15 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
           <Plus size={18} className="relative z-10" />
           <span className="relative z-10">写点什么...</span>
         </button>

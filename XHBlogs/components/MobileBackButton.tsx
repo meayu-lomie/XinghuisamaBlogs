@@ -1,7 +1,7 @@
 // src/components/MobileBackButton.tsx
 "use client";
 
-import { useRouter } from 'next/navigation';
+import { useTransitionRouter as useRouter } from 'next-view-transitions';
 import { ChevronLeft } from 'lucide-react';
 
 export default function MobileBackButton() {

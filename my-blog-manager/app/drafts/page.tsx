@@ -172,9 +172,6 @@ function DraftsContent() {
           </header>
 
           <div className="mb-8 flex gap-4">
-            <Link href="/editor?id=new&type=post" className="px-6 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-indigo-500/30 transition-all active:scale-95 flex items-center gap-2">
-              <Pencil size={16} /> 新建文章草稿
-            </Link>
             <Link href="/editor?id=new&type=chatter" className="px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-pink-500/30 transition-all active:scale-95 flex items-center gap-2">
               <Sparkles size={16} /> 新建杂谈草稿
             </Link>
@@ -199,8 +196,8 @@ function DraftsContent() {
 
                       <div className="flex justify-between items-start mb-4 relative z-10">
                         <div className="flex items-center gap-2">
-                          <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${draft.type === 'chatter' ? 'bg-pink-500/10 text-pink-600 border-pink-500/20' : 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20'}`}>
-                            {draft.type === 'chatter' ? '杂谈' : '文章'}
+                          <span className="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border bg-pink-500/10 text-pink-600 border-pink-500/20">
+                            杂谈
                           </span>
                           <span className="text-[10px] font-bold text-slate-400">
                             {formatDate(draft.lastModified)}

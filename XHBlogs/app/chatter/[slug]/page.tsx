@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import Link from 'next/link';
+import { Link } from 'next-view-transitions';
 
 // 🌟 核心升级：引入 Next.js 现代统一解析流
 import { unified } from 'unified';
@@ -19,6 +19,8 @@ import { siteConfig } from '../../../siteConfig';
 import ClientSocials from '../../../components/ClientSocials';
 import BackButton from '../../../components/BackButton';
 import Comments from '../../../components/Comments';
+import ClientTOC from '../../../components/ClientTOC';
+import CodeCopy from '../../../components/CodeCopy';
 
 export async function generateStaticParams() {
   const chattersDirectory = path.join(process.cwd(), 'chatters');
@@ -71,6 +73,20 @@ async function getChatterData(slug: string) {
 
   // ==========================================
 
+  // ---- 阅读统计：正文纯文本字数 + 阅读时长（中文按 300 字/分钟） ----
+  const plainText = content.replace(/```[\s\S]*?```/g, ' ').replace(/~~~[\s\S]*?~~~/g, ' ');
+  const charCount = plainText.replace(/\s/g, '').length;
+  const readingMinutes = Math.max(1, Math.ceil(charCount / 300));
+
+  // ---- 目录：从 markdown 提取 h1-h3 标题（跳过代码块）；id 由 ClientTOC 内部按规则生成对齐 ----
+  const tocItems: { level: number; text: string; id: string }[] = [];
+  content.split(/(```[\s\S]*?```|~~~[\s\S]*?~~~)/g).forEach((block, index) => {
+    if (index % 2 === 1) return;
+    for (const m of block.matchAll(/^(#{1,3})\s+(.+)$/gm)) {
+      tocItems.push({ level: m[1].length, text: m[2].trim(), id: '' });
+    }
+  });
+
   const processedContent = await unified()
     .use(remarkParse)
     .use(remarkGfm)
@@ -92,8 +108,32 @@ async function getChatterData(slug: string) {
     title: data.title || '碎片记录',
     date: data.date,
     mood: data.mood,
+    summary: typeof data.summary === 'string' ? data.summary : '',
     tags: data.tags && Array.isArray(data.tags) ? data.tags : [],
-    cover: data.cover || siteConfig.defaultPostCover
+    cover: data.cover || siteConfig.defaultPostCover,
+    charCount,
+    readingMinutes,
+    tocItems
+  };
+}
+
+/** 相邻文章：按日期降序，prev = 更新的一篇，next = 更早的一篇 */
+function getPrevNext(currentSlug: string) {
+  const chattersDirectory = path.join(process.cwd(), 'chatters');
+  let fileNames: string[] = [];
+  try { fileNames = fs.readdirSync(chattersDirectory).filter(f => f.endsWith('.md')); } catch(e) {}
+
+  const sorted = fileNames.map(f => {
+    const s = f.replace(/\.md$/, '');
+    const c = fs.readFileSync(path.join(chattersDirectory, f), 'utf8');
+    const { data } = matter(c);
+    return { slug: s, title: data.title || '碎片记录', date: data.date || '1970-01-01' };
+  }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  const idx = sorted.findIndex(p => p.slug === currentSlug);
+  return {
+    prev: idx > 0 ? sorted[idx - 1] : null,
+    next: idx >= 0 && idx < sorted.length - 1 ? sorted[idx + 1] : null,
   };
 }
 
@@ -127,6 +167,7 @@ export default async function ChatterDetail({ params }: { params: Promise<{ slug
   const resolvedParams = await params;
   const chatterData = await getChatterData(resolvedParams.slug);
   const recentChatters = getRecentChatters(resolvedParams.slug);
+  const { prev, next } = getPrevNext(resolvedParams.slug);
 
   const dateObj = new Date(chatterData.date || '2026-03-24');
   const yearStr = dateObj.getFullYear();
@@ -145,7 +186,7 @@ export default async function ChatterDetail({ params }: { params: Promise<{ slug
           <article className="flex-1 bg-white/60 dark:bg-slate-800/50 backdrop-blur-xl rounded-[40px] shadow-2xl border border-white/40 dark:border-white/10 overflow-hidden transition-colors duration-700">
             {chatterData.cover && (
               <div className="w-full aspect-video bg-slate-200 dark:bg-slate-700 relative group">
-                <img src={chatterData.cover} alt="封面" className="w-full h-full object-cover opacity-90 transition-transform duration-1000 group-hover:scale-105" />
+                <img src={chatterData.cover} alt="封面" className="vt-chatter-cover w-full h-full object-cover opacity-90 transition-transform duration-1000 group-hover:scale-105" />
               </div>
             )}
 
@@ -165,6 +206,11 @@ export default async function ChatterDetail({ params }: { params: Promise<{ slug
                     {chatterData.date}
                   </div>
 
+                  <div className="flex items-center gap-1.5 md:gap-2 text-slate-500 dark:text-slate-400 font-bold bg-slate-500/5 dark:bg-slate-400/10 px-3 md:px-4 py-1.5 md:py-2 rounded-2xl text-xs md:text-sm border border-slate-500/10">
+                    <svg className="w-3 h-3 md:w-4 md:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                    约 {chatterData.readingMinutes} 分钟 · {chatterData.charCount} 字
+                  </div>
+
                   {chatterData.mood && (
                     <div className="flex items-center gap-1.5 md:gap-2 text-pink-600 dark:text-pink-400 font-black bg-pink-500/5 dark:bg-pink-400/10 px-3 md:px-4 py-1.5 md:py-2 rounded-2xl text-xs md:text-sm border border-pink-500/10">
                       ✨ 心情：{chatterData.mood}
@@ -178,6 +224,17 @@ export default async function ChatterDetail({ params }: { params: Promise<{ slug
                   ))}
                 </div>
               </header>
+
+              {/* AI 摘要（发布时由模型生成并缓存进 frontmatter，无则不渲染） */}
+              {chatterData.summary && (
+                <div className="mb-8 rounded-2xl border border-indigo-500/15 border-l-4 border-l-indigo-500 bg-indigo-500/5 dark:bg-indigo-400/10 p-5">
+                  <div className="flex items-center gap-2 mb-2 text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                    AI 摘要 · Summary
+                  </div>
+                  <p className="text-sm md:text-[15px] leading-relaxed text-slate-700 dark:text-slate-300 font-medium">{chatterData.summary}</p>
+                </div>
+              )}
 
               <div className="relative">
                 <style>{`
@@ -269,10 +326,30 @@ export default async function ChatterDetail({ params }: { params: Promise<{ slug
                 `}</style>
 
                 <div
+                  id="article-content"
                   className="prose prose-slate dark:prose-invert prose-base md:prose-lg max-w-none text-slate-800 dark:text-slate-200 font-serif transition-colors duration-700 leading-relaxed scroll-smooth"
                   dangerouslySetInnerHTML={{ __html: chatterData.contentHtml }}
                 />
+                <CodeCopy containerId="article-content" />
               </div>
+
+              {/* 上一篇 / 下一篇 */}
+              {(prev || next) && (
+                <div className="mt-10 md:mt-12 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {prev ? (
+                    <Link href={`/chatter/${prev.slug}`} className="group rounded-2xl border border-white/40 dark:border-white/10 bg-white/50 dark:bg-slate-800/50 backdrop-blur-md p-5 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">← 上一篇 · Newer</span>
+                      <p className="mt-1.5 text-sm font-bold text-slate-800 dark:text-slate-200 line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{prev.title}</p>
+                    </Link>
+                  ) : <div />}
+                  {next && (
+                    <Link href={`/chatter/${next.slug}`} className="group rounded-2xl border border-white/40 dark:border-white/10 bg-white/50 dark:bg-slate-800/50 backdrop-blur-md p-5 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all text-right">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">下一篇 · Older →</span>
+                      <p className="mt-1.5 text-sm font-bold text-slate-800 dark:text-slate-200 line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{next.title}</p>
+                    </Link>
+                  )}
+                </div>
+              )}
 
               <div className="mt-10 md:mt-12">
                 <Comments />
@@ -282,9 +359,11 @@ export default async function ChatterDetail({ params }: { params: Promise<{ slug
           </article>
 
           <aside className="w-full lg:w-[320px] flex flex-col gap-6 flex-shrink-0">
+            <ClientTOC toc={chatterData.tocItems} />
+
             <div className="bg-white/60 dark:bg-slate-800/50 backdrop-blur-xl rounded-3xl p-6 border border-white/40 dark:border-white/10 shadow-xl text-center">
               <div className="w-20 h-20 mx-auto rounded-full p-1 bg-gradient-to-tr from-indigo-500 to-purple-500 shadow-md mb-4 hover:rotate-3 transition-transform">
-                <img src={siteConfig.avatarUrl} alt="avatar" className="w-full h-full rounded-full object-cover bg-white" />
+                <img src={siteConfig.avatarUrl} alt="avatar" className="vt-avatar w-full h-full rounded-full object-cover bg-white" />
               </div>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{siteConfig.authorName}</h3>
               <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium mb-4">{siteConfig.bio}</p>

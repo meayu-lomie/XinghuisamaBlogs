@@ -7,10 +7,43 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
   const { showToast } = useToast();
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isTogglingBg, setIsTogglingBg] = useState(false);
 
   // 👈 新增状态：用来存放刚刚上传成功，但还没决定是否加入背景的图片 URL
   const [pendingImageUrl, setPendingImageUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  /**
+   * 切换全站背景轮播开关。
+   * 这个开关直接写后端（不走操作队列）：队列发送的是整个表单快照，
+   * 开关值在其中容易过期；而且开关属于「立即想看到效果」的操作。
+   */
+  const toggleBgEnabled = async () => {
+    if (isTogglingBg) return;
+    const next = !formData.bgEnabled;
+    setIsTogglingBg(true);
+    try {
+      const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
+      const configData = await configRes.json();
+      const res = await fetch(`http://127.0.0.1:${configData.api_port}/api/config/update`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ updates: { bgEnabled: next } })
+      });
+      const data = await res.json();
+      if (data.success) {
+        handleUpdate('bgEnabled', next);
+        showToast(next ? '已开启全站背景轮播，刷新博客即可看到' : '已关闭全站背景轮播，刷新博客即可看到', 'success');
+      } else {
+        showToast(data.message || '切换失败', 'error');
+      }
+    } catch (e) {
+      console.error(e);
+      showToast('切换失败：后端服务未连接', 'error');
+    } finally {
+      setIsTogglingBg(false);
+    }
+  };
 
   const removeBg = (index: number) => {
     const newList = [...formData.bgImages];
@@ -120,6 +153,27 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
           暂存背景修改
         </button>
       </header>
+
+      {/* 🌟 全站背景轮播开关 */}
+      <div className="relative z-10 flex items-center justify-between gap-4 bg-white/50 dark:bg-slate-800/50 rounded-3xl px-6 py-5 border border-white/40 dark:border-slate-700/50 shadow-sm">
+        <div className="min-w-0">
+          <p className="text-sm font-black text-slate-800 dark:text-white">全站背景轮播</p>
+          <p className="text-[11px] font-bold text-slate-500 dark:text-slate-400 mt-1">
+            {formData.bgEnabled
+              ? '已开启：博客所有页面会在底层轮播展示这些背景图'
+              : '已关闭：博客只显示纸张底色，不展示背景图'}
+          </p>
+        </div>
+        <button
+          onClick={toggleBgEnabled}
+          disabled={isTogglingBg}
+          className={`shrink-0 w-16 h-9 rounded-full transition-all duration-300 relative shadow-inner disabled:opacity-60 ${formData.bgEnabled ? 'bg-indigo-500' : 'bg-slate-300 dark:bg-slate-600'}`}
+          aria-label="切换全站背景轮播"
+          aria-pressed={!!formData.bgEnabled}
+        >
+          <span className={`absolute top-1 w-7 h-7 rounded-full bg-white shadow-md transition-all duration-300 ${formData.bgEnabled ? 'left-8' : 'left-1'}`} />
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10">
         <div className="bg-slate-100/50 dark:bg-slate-800/50 rounded-3xl p-6 custom-scrollbar max-h-[450px] overflow-y-auto">

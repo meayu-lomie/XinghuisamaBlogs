@@ -9,4 +9,13 @@ export type Project = {
   tags: string[];
 };
 
-export const projectsData: Project[] = [];
+export const projectsData: Project[] = [
+  {
+    "id": "proj_1791340859496",
+    "name": "岁岁念",
+    "githubUrl": "https://github.com/meayu-lomie/gift",
+    "description": "情侣回忆录",
+    "icon": "",
+    "tags": []
+  }
+];

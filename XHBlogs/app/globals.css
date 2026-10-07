@@ -412,3 +412,34 @@ input[type=range]::-webkit-slider-thumb {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+
+/* ========================================================
+   View Transitions（路由切换视图过渡）
+   next-view-transitions 触发；不支持的浏览器自动跳过本段，
+   退回 template.tsx 的 page-enter 入场动画。
+   ======================================================== */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 250ms;
+  animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* 共享元素：首页杂谈卡封面 ↔ 杂谈详情页封面（同一页面内必须唯一） */
+.vt-chatter-cover {
+  view-transition-name: chatter-cover;
+}
+
+/* 共享元素：个人名片头像 ↔ 杂谈详情侧栏 / 关于页主头像 */
+.vt-avatar {
+  view-transition-name: avatar-photo;
+}
+
+/* 减少动效偏好：整体关闭视图过渡 */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

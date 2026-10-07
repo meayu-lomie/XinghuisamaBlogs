@@ -46,7 +46,6 @@ export default function Timeline() {
     }
   };
 
-  collect(postsDirectory, 'post');
   collect(chattersDirectory, 'chatter');
 
   posts.sort((a, b) => {

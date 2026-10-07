@@ -12,6 +12,35 @@ router = APIRouter()
 
 # 内容读写统一走博客前端目录（见 cms_core/paths.py），不再有"同步"环节
 from cms_core.paths import get_blog_root, blog_path_or_none, MANAGER_ROOT
+from cms_core.api.model_config import _load_config, _openai_chat, _gemini_chat
+
+
+def _generate_ai_summary(md_text: str) -> str:
+    """
+    发布杂谈时调用已配置的模型生成文章摘要，写入 frontmatter 的 summary 字段。
+    模型未配置、调用失败都不阻塞发布——返回空字符串即可，前端有 summary 才渲染摘要卡。
+    """
+    try:
+        cfg = _load_config()
+        if not cfg.get("apiKey") or not cfg.get("modelId"):
+            print("[drafts] AI 摘要跳过：模型未配置（API Key / 模型 ID 为空）")
+            return ""
+        excerpt = md_text[:3000]  # 截断正文，控制 token 消耗
+        prompt = (
+            "请为下面这篇博客文章生成一段简短的中文摘要，"
+            "要求不超过 80 字、只输出摘要本身、不要任何前缀、引号或解释：\n\n" + excerpt
+        )
+        if cfg.get("protocol") == "gemini":
+            summary = _gemini_chat(cfg, prompt, timeout=45)
+        else:
+            summary = _openai_chat(cfg, prompt, timeout=45, max_tokens=200)
+        summary = summary.strip().strip('"').strip('"').replace("\n", " ")
+        print(f"[drafts] AI 摘要生成成功（{len(summary)} 字）")
+        return summary[:200]
+    except Exception as e:
+        # 摘要是锦上添花的功能，失败必须如实记日志但不能拦住发布主流程
+        print(f"[drafts] AI 摘要生成失败（不影响发布）: {e}")
+        return ""
 
 
 def get_manager_drafts_dir() -> str:
@@ -39,7 +68,7 @@ async def save_draft(request: Request):
 
     draft_data = {
         "id": draft_id,
-        "type": payload.get("type", "post"),
+        "type": payload.get("type", "chatter"),
         "title": payload.get("title", ""),
         "description": payload.get("description", ""),
         "content": payload.get("content", ""),
@@ -90,7 +119,7 @@ async def get_draft(request: Request):
         return {"success": False, "message": "JSON 解析失败"}
 
     raw_id = payload.get("id", "").replace(".md", "")
-    doc_type = payload.get("type", "post")
+    doc_type = payload.get("type", "chatter")
     base_dir = get_blog_root()
     if not base_dir:
         return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
@@ -107,8 +136,7 @@ async def get_draft(request: Request):
     if raw_id == "about" or doc_type == "about":
         target_md = os.path.join(base_dir, "app", "about", "about.md")
     else:
-        folder = "posts" if doc_type == "post" else "chatters"
-        target_md = os.path.join(base_dir, folder, f"{raw_id}.md")
+        target_md = os.path.join(base_dir, "chatters", f"{raw_id}.md")
 
     if target_md and os.path.exists(target_md):
         try:
@@ -173,7 +201,6 @@ async def delete_draft(request: Request):
 
     possible_paths = [
         os.path.join(drafts_dir, f"{raw_id}.json"),
-        os.path.join(base_dir, "posts", f"{raw_id}.md"),
         os.path.join(base_dir, "chatters", f"{raw_id}.md")
     ]
 
@@ -204,7 +231,7 @@ async def sync_local_operations(request: Request):
     for op in operations:
         if op.get("type") == "publish_article":
             data = op.get("value", {})
-            doc_type = data.get("type", "post")
+            doc_type = data.get("type", "chatter")
             doc_id = data.get("id", "")
 
             final_id = doc_id
@@ -251,13 +278,19 @@ async def sync_local_operations(request: Request):
                 "cover": data.get("cover", ""),
                 "description": data.get("description", "")
             }
+
+            # AI 摘要：仅杂谈在发布时生成一次并缓存进 frontmatter（about 页不生成）
+            if doc_type != "about":
+                summary = _generate_ai_summary(md_content)
+                if summary:
+                    fm["summary"] = summary
+
             final_text = f"---\n{yaml.dump(fm, allow_unicode=True, sort_keys=False)}---\n\n{md_content}"
 
             if doc_type == "about":
                 save_path = os.path.join(base_dir, "app", "about", "about.md")
             else:
-                folder = "posts" if doc_type == "post" else "chatters"
-                save_path = os.path.join(base_dir, folder, f"{final_id}.md")
+                save_path = os.path.join(base_dir, "chatters", f"{final_id}.md")
 
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
             with open(save_path, "w", encoding="utf-8") as f:

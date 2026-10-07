@@ -17,7 +17,7 @@ function EditorContent() {
   const { showToast } = useToast();
   const { addOperation } = useOperations();
 
-  const [docType, setDocType] = useState<string>(searchParams.get('type') || 'post');
+  const [docType, setDocType] = useState<string>(searchParams.get('type') || 'chatter');
   const [currentDocId, setCurrentDocId] = useState(
     searchParams.get('type') === 'about' ? 'about' : (searchParams.get('id') || 'new')
   );

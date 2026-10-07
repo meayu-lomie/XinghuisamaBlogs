@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { Link } from 'next-view-transitions';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LatestChatterCarousel({ chatters }: { chatters: any[] }) {
@@ -41,7 +41,7 @@ export default function LatestChatterCarousel({ chatters }: { chatters: any[] })
           transition={{ duration: 0.8, ease: "easeInOut" }}
           className="absolute inset-0 z-0"
         >
-          <img src={currentChatter.cover} className="w-full h-full object-cover opacity-80 dark:opacity-60 transition-transform duration-1000 group-hover:scale-105" alt="Chatter Cover" />
+          <img src={currentChatter.cover} className="vt-chatter-cover w-full h-full object-cover opacity-80 dark:opacity-60 transition-transform duration-1000 group-hover:scale-105" alt="Chatter Cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-black/10"></div>
         </motion.div>
       </AnimatePresence>
@@ -49,11 +49,11 @@ export default function LatestChatterCarousel({ chatters }: { chatters: any[] })
       <div className="relative z-10 flex flex-col justify-center p-6 md:p-8 h-full pointer-events-none w-full md:w-[85%]">
         <div className="flex items-end gap-2 mb-2">
           <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest bg-black/30 backdrop-blur-sm px-2 py-1 rounded-md border border-white/10 shadow-sm">
-            Records
+            杂谈 · Records
           </span>
           {currentChatter.formattedDate && (
             <span className="text-[11px] font-mono text-slate-300 drop-shadow-md">
-              {currentChatter.formattedDate}
+              {currentChatter.formattedDate.split(' ')[0]}
             </span>
           )}
         </div>

@@ -264,7 +264,7 @@ import FloatingImageTool from '../../components/editor/FloatingImageTool';
                   </button>
                   <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-wider mb-2">{currentAlbum.title}</h1>
                 </div>
-                <button onClick={() => setAlbumModal({ isOpen: true, mode: 'edit', data: currentAlbum })} className="px-5 py-2.5 rounded-2xl bg-white/40 dark:bg-slate-800/40 border border-white/50 text-xs font-black uppercase text-indigo-500 hover:bg-white transition-all shadow-sm">相册属性</button>
+                <button onClick={() => setAlbumModal({ isOpen: true, mode: 'edit', data: currentAlbum })} className="px-5 py-2.5 rounded-2xl bg-white/40 dark:bg-slate-800/40 border border-white/50 text-xs font-black uppercase text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all shadow-sm">相册属性</button>
               </div>
 
               <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">

@@ -48,7 +48,6 @@ export default function TimelinePage() {
   };
 
   if (blogRoot) {
-    collect(path.join(blogRoot, 'posts'), 'post');
     collect(path.join(blogRoot, 'chatters'), 'chatter');
   }
 

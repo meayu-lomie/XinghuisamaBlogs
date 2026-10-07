@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { Link } from "next-view-transitions";
 
 export default function TimelineNode({ post, index }: { post: any, index: number }) {
   // 判断是放在左边还是右边（偶数左，奇数右）

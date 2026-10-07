@@ -122,12 +122,12 @@ def update_model_config(payload: dict = Body(...)):
 # 请求外部模型的最小封装（Python 侧只用于「测试连接」；
 # 正文润色走管理端 Next.js 的 /api/polish，两边读同一份配置）
 # ==========================================================
-def _openai_chat(cfg: dict, prompt: str, timeout: int = 30) -> str:
+def _openai_chat(cfg: dict, prompt: str, timeout: int = 30, max_tokens: int = 16) -> str:
     url = cfg["baseUrl"].rstrip("/") + "/chat/completions"
     body = json.dumps({
         "model": cfg["modelId"],
         "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": 16,
+        "max_tokens": max_tokens,
     }).encode("utf-8")
     req = urllib.request.Request(url, data=body, headers={
         "Content-Type": "application/json",

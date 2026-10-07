@@ -17,6 +17,9 @@ function SocialBtn({ type, url, onClick }: { type: string, url?: string, onClick
     }
   };
 
+  // 无链接且无点击行为的社交按钮不渲染（如尚未填写的 Gitee 地址）
+  if (!url && !onClick) return null;
+
   const content = (
     <div
       onClick={onClick}

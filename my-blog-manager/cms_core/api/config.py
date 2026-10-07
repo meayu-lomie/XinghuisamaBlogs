@@ -70,7 +70,7 @@ def get_site_config():
         root_content = content
 
         # 1. 🌟 预先提取并隔离所有已知的“嵌套对象”，防止内部属性泄露到外层！
-        known_dicts = ['social', 'giscusConfig', 'geminiConfig', 'icpConfig']
+        known_dicts = ['social', 'giscusConfig', 'icpConfig']
         for dict_name in known_dicts:
             dict_match = re.search(rf'{dict_name}\s*:\s*\{{([\s\S]+?)\}}', content)
             if dict_match:
@@ -123,16 +123,15 @@ def update_site_config(payload: Dict[str, Any] = Body(...)):
 
     # 🌟 核心防线：绝对安全的根节点白名单！
     VALID_ROOT_KEYS = {
-        "title", "authorName", "bio", "avatarUrl", "useGradient", "themeColors",
-        "bgImages", "defaultPostCover", "photoWallImage", "social",
+        "siteUrl", "title", "authorName", "bio", "avatarUrl", "useGradient", "themeColors",
+        "bgImages", "bgEnabled", "defaultPostCover", "photoWallImage", "social",
         "counts", "chatterTitle", "chatterDescription", "picBedName", "picBedUrl",
         "picBedToken", "giscusConfig", "buildDate", "footerBadges",
-        "icpConfig", "geminiConfig",
+        "icpConfig",
         "faviconUrl",
         "navTitle",
         "navSuffix",
         "navAfter",
-        "enableLevelSystem" # 👈 你加的字段在这里，完美！
     }
 
     def apply_updates(path: str) -> int:
@@ -193,6 +192,15 @@ def update_site_config(payload: Dict[str, Any] = Body(...)):
         else:
             msg = (f"已更新管理端 {n_manager} 个字段。"
                    "未找到博客前端 siteConfig.ts（请检查【项目仓库设置】里的博客路径）")
+
+        # 3. 一个字都没写进去 = 字段全被白名单拦截（多半是后端版本落后于代码），
+        #    必须如实报错，否则前端会显示"成功"的假消息
+        if n_manager == 0 and n_blog == 0:
+            return {
+                "success": False,
+                "message": f"没有字段被写入：请求的 {', '.join(updates.keys())} 不在后端白名单里，"
+                           "请重启管理端后端后再试",
+            }
 
         return {"success": True, "message": msg}
 

@@ -19,11 +19,13 @@ function SettingsContent() {
   const { showToast } = useToast();
 
   const [formData, setFormData] = useState<any>({
+    siteUrl: siteConfig.siteUrl || "",
     authorName: siteConfig.authorName || "",
     bio: siteConfig.bio || "",
     avatarUrl: siteConfig.avatarUrl || "",
     social: siteConfig.social || {},
     bgImages: [...(siteConfig.bgImages || [])],
+    bgEnabled: siteConfig.bgEnabled || false,
     giscusConfig: siteConfig.giscusConfig || {
       repo: '',
       repoId: '',
@@ -33,13 +35,6 @@ function SettingsContent() {
     buildDate: siteConfig.buildDate || "2026-03-23T00:00:00",
     icpConfig: siteConfig.icpConfig || { name: "", link: "" },
     footerBadges: [...(siteConfig.footerBadges || [])],
-    // 👇 🌟 初始化小猫 AI 配置数据
-    geminiConfig: siteConfig.geminiConfig || {
-      modelId: 'gemini-2.5-flash-lite',
-      systemPrompt: '',
-      maxOutputTokens: 150,
-      temperature: 0.85
-    }
   });
 
 
@@ -62,8 +57,6 @@ function SettingsContent() {
             buildDate: data.data.buildDate || prev.buildDate,
             icpConfig: data.data.icpConfig || prev.icpConfig,
             footerBadges: data.data.footerBadges ? [...data.data.footerBadges] : prev.footerBadges,
-            // 👇 🌟 合并后端发来的小猫配置
-            geminiConfig: { ...(prev.geminiConfig || {}), ...(data.data.geminiConfig || {}) }
           }));
         } else {
           console.error("❌ 后端返回失败:", data.message);

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BookOpen, MessageSquare, Sparkles, Activity } from 'lucide-react';
 import Comments from './Comments';
 import { siteConfig } from '../siteConfig';
-import Link from 'next/link';
+import { Link } from 'next-view-transitions';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
 type ActivityRecord = {
@@ -133,7 +133,7 @@ export default function AboutClient({
 
       <div className="px-5 sm:px-8 md:px-16 pb-10 md:pb-16 relative">
         <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white dark:border-slate-800 shadow-2xl overflow-hidden -mt-12 md:-mt-16 relative z-20 bg-white">
-          <img src={siteConfig.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
+          <img src={siteConfig.avatarUrl} alt="avatar" className="vt-avatar w-full h-full object-cover" />
         </div>
 
         {/* 🌟 核心修复区：手机端排版优雅适配 */}

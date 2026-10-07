@@ -33,7 +33,7 @@ export default function Navbar() {
 
   // 管理控制台导航：只保留内容编辑入口（展示类页面已从控制台移除）
   const navLinks = [
-    { name: '写文章', href: '/editor' },
+    { name: '写杂谈', href: '/editor' },
     { name: '草稿箱', href: '/drafts' },
     { name: '时间线', href: '/timeline' },
     { name: '说说', href: '/moments' },

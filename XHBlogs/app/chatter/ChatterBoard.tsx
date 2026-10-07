@@ -1,6 +1,6 @@
 "use client";
 import { useState, useMemo } from 'react';
-import Link from 'next/link';
+import { Link } from 'next-view-transitions';
 import { motion, AnimatePresence } from 'framer-motion';
 import { siteConfig } from '../../siteConfig';
 

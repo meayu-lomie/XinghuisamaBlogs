@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import Link from 'next/link';
+import { Link } from 'next-view-transitions';
 import { AnimatePresence, motion } from 'framer-motion';
 
 interface Post {
@@ -9,6 +9,14 @@ interface Post {
   title?: string;
   description?: string;
   tags?: string[];
+  date?: string;
+  [key: string]: any;
+}
+
+interface Moment {
+  id: string;
+  content?: string;
+  location?: string;
   date?: string;
   [key: string]: any;
 }
@@ -39,7 +47,13 @@ const Highlight = ({ text = '', query = '' }) => {
   );
 };
 
-export default function SearchBar({ posts = [] }: { posts: Post[] }) {
+const TypeBadge = ({ label }: { label: string }) => (
+  <span className="text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded-md bg-black/5 dark:bg-white/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/10 shrink-0 mt-1">
+    {label}
+  </span>
+);
+
+export default function SearchBar({ posts = [], moments = [] }: { posts?: Post[]; moments?: Moment[] }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -54,18 +68,27 @@ export default function SearchBar({ posts = [] }: { posts: Post[] }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const searchResults = useMemo(() => {
-    if (!searchQuery.trim()) return [];
+  const { chatters: chatterResults, moments: momentResults } = useMemo(() => {
+    if (!searchQuery.trim()) return { chatters: [], moments: [] };
     const query = searchQuery.toLowerCase();
 
-    return posts.filter(post => {
+    const matchedChatters = posts.filter(post => {
       const titleMatch = (post.title || '').toLowerCase().includes(query);
       const descMatch = (post.description || '').toLowerCase().includes(query);
       const tagMatch = (post.tags || []).some(tag => tag.toLowerCase().includes(query));
-
       return titleMatch || descMatch || tagMatch;
     });
-  }, [searchQuery, posts]);
+
+    const matchedMoments = moments.filter(m => {
+      const contentMatch = (m.content || '').toLowerCase().includes(query);
+      const locationMatch = (m.location || '').toLowerCase().includes(query);
+      return contentMatch || locationMatch;
+    });
+
+    return { chatters: matchedChatters, moments: matchedMoments };
+  }, [searchQuery, posts, moments]);
+
+  const totalCount = chatterResults.length + momentResults.length;
 
   return (
     <div className="relative w-full max-w-2xl mx-auto mb-10 z-[100]" ref={containerRef}>
@@ -75,7 +98,7 @@ export default function SearchBar({ posts = [] }: { posts: Post[] }) {
         <input
           type="text"
           className="w-full pl-14 pr-6 py-4 bg-white/50 dark:bg-slate-800/50 backdrop-blur-xl border border-white/40 dark:border-white/10 rounded-3xl shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-800 dark:text-slate-200 transition-all placeholder-slate-500 dark:placeholder-slate-400 font-medium text-lg relative z-0"
-          placeholder="搜寻标题、描述或标签..."
+          placeholder="搜寻杂谈与说说..."
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
@@ -86,7 +109,7 @@ export default function SearchBar({ posts = [] }: { posts: Post[] }) {
           spellCheck="false"
         />
 
-        {/* 🌟 核心修复：把放大镜放在 input 之后，并且加上 z-10 强制置顶！ */}
+        {/* 放大镜置于 input 之后并强制置顶 */}
         <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none select-none z-10">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -114,14 +137,18 @@ export default function SearchBar({ posts = [] }: { posts: Post[] }) {
             transition={{ duration: 0.2 }}
             className="absolute top-full left-0 right-0 mt-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-3xl border border-white/50 dark:border-slate-700/50 rounded-3xl shadow-2xl overflow-hidden max-h-[450px] overflow-y-auto z-20"
           >
-            {searchResults.length > 0 ? (
+            {totalCount > 0 ? (
               <div className="flex flex-col py-3">
-                {searchResults.map((post) => (
+
+                {chatterResults.length > 0 && (
+                  <div className="px-6 pt-2 pb-1 text-[10px] font-black uppercase tracking-widest text-slate-400">杂谈 · Records</div>
+                )}
+                {chatterResults.map((post) => (
                   <Link
-                    href={`/posts/${post.slug}`}
-                    key={post.slug}
+                    href={`/chatter/${post.slug}`}
+                    key={`chatter-${post.slug}`}
                     onClick={() => setIsOpen(false)}
-                    className="px-6 py-5 hover:bg-indigo-50/80 dark:hover:bg-indigo-500/10 transition-colors group border-b border-slate-100/50 dark:border-slate-800/50 last:border-0 flex flex-col gap-2"
+                    className="px-6 py-5 hover:bg-indigo-50/80 dark:hover:bg-indigo-500/10 transition-colors group border-b border-slate-100/50 dark:border-slate-800/50 flex flex-col gap-2"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <h4 className="text-lg font-bold text-slate-800 dark:text-slate-200 transition-colors line-clamp-1">
@@ -129,7 +156,7 @@ export default function SearchBar({ posts = [] }: { posts: Post[] }) {
                       </h4>
                       {post.date && (
                         <span className="text-[10px] font-mono text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-2 py-1 rounded-md shrink-0 mt-1">
-                          {post.date.split(' ')[0]}
+                          {String(post.date).split(/[ T]/)[0]}
                         </span>
                       )}
                     </div>
@@ -154,6 +181,30 @@ export default function SearchBar({ posts = [] }: { posts: Post[] }) {
                     )}
                   </Link>
                 ))}
+
+                {momentResults.length > 0 && (
+                  <div className="px-6 pt-3 pb-1 text-[10px] font-black uppercase tracking-widest text-slate-400">说说 · Moments</div>
+                )}
+                {momentResults.map((m) => (
+                  <Link
+                    href={`/moments#${m.id}`}
+                    key={`moment-${m.id}`}
+                    onClick={() => setIsOpen(false)}
+                    className="px-6 py-4 hover:bg-indigo-50/80 dark:hover:bg-indigo-500/10 transition-colors border-b border-slate-100/50 dark:border-slate-800/50 last:border-0 flex items-start gap-3"
+                  >
+                    <TypeBadge label="说说" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm text-slate-700 dark:text-slate-300 line-clamp-2 leading-relaxed">
+                        <Highlight text={m.content} query={searchQuery} />
+                      </p>
+                      <div className="flex items-center gap-2 mt-1.5">
+                        {m.date && <span className="text-[10px] font-mono text-slate-400">{String(m.date).split(/[ T]/)[0]}</span>}
+                        {m.location && <span className="text-[10px] text-slate-400">{m.location}</span>}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+
               </div>
             ) : (
               <div className="px-6 py-12 text-center flex flex-col items-center gap-3">

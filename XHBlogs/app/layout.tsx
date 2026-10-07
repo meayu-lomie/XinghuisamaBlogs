@@ -1,9 +1,11 @@
 import 'katex/dist/katex.min.css';
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Noto_Serif_SC } from "next/font/google";
+import { ViewTransitions } from 'next-view-transitions';
 import "./globals.css";
 import { ThemeProvider } from "../components/ThemeProvider";
 import Navbar from "../components/Navbar";
+import BackgroundSlideshow from "../components/BackgroundSlideshow";
 import { siteConfig } from "../siteConfig";
 import MobileBackButton from '../components/MobileBackButton';
 
@@ -18,6 +20,7 @@ const notoSerif = Noto_Serif_SC({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.siteUrl),
   title: siteConfig.title,
   description: siteConfig.bio,
   icons: {
@@ -28,7 +31,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-CN" className={`${geistSans.variable} ${geistMono.variable} ${notoSerif.variable} h-full antialiased theme-xuan`} suppressHydrationWarning>
+    // ViewTransitions：路由切换时启用视图过渡（250ms，不支持该 API 的浏览器自动跳过）
+    <ViewTransitions>
+      <html lang="zh-CN" className={`${geistSans.variable} ${geistMono.variable} ${notoSerif.variable} h-full antialiased theme-xuan`} suppressHydrationWarning>
       <head>
         {/* 首屏先定主题，避免刷新时闪白 */}
         <script
@@ -39,6 +44,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         />
       </head>
       <body className="w-screen overflow-x-hidden min-h-full flex flex-col relative font-serif">
+        {/* 全站背景轮播（在【视觉背景配置】里开关控制） */}
+        {siteConfig.bgEnabled && siteConfig.bgImages?.length > 0 && (
+          <BackgroundSlideshow images={siteConfig.bgImages} />
+        )}
         <ThemeProvider>
             <div id="app-mount-root" className="flex-1 flex flex-col">
               {/* 导航栏放在 layout 里：切页时不再卸载重建，
@@ -56,5 +65,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </ThemeProvider>
       </body>
     </html>
+    </ViewTransitions>
   );
 }

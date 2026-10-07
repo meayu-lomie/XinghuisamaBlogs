@@ -1,6 +1,6 @@
 "use client";
 
-import Link from 'next/link';
+import { Link } from 'next-view-transitions';
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, PanInfo } from 'framer-motion';
@@ -76,6 +76,7 @@ export default function Navbar() {
     { name: '照片墙', href: '/photowall' },
     { name: '说说', href: '/moments' },
     { name: '杂谈', href: '/chatter' },
+    { name: '标签', href: '/tags' },
     { name: '关于', href: '/about' },
   ];
 

@@ -1,14 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import Link from 'next/link';
+import { Link } from 'next-view-transitions';
 import SearchBar from '../components/SearchBar';
 import { siteConfig } from '../siteConfig';
 import ProfileCard from '../components/ProfileCard';
- import { albums } from '../data/albums';
- import { ToastProvider } from '../components/ToastProvider';
+import { albums } from '../data/albums';
+import { ToastProvider } from '../components/ToastProvider';
 
-import LatestPostsCarousel from '../components/LatestPostsCarousel';
+import LatestMomentsCarousel from '../components/LatestMomentsCarousel';
 import LatestChatterCarousel from '../components/LatestChatterCarousel';
 
 function formatUpdateTime(dateString: string) {
@@ -27,21 +27,24 @@ function formatUpdateTime(dateString: string) {
 }
 
 export default function Home() {
-  const postsDirectory = path.join(process.cwd(), 'posts');
-  let allPosts: any[] = [];
+  // 站点只保留「杂谈」与「说说」两种内容类型
+
+  // ---- 杂谈（chatters）----
+  const chattersDirectory = path.join(process.cwd(), 'chatters');
+  let allChatters: any[] = [];
   try {
-    if (fs.existsSync(postsDirectory)) {
-      const fileNames = fs.readdirSync(postsDirectory).filter(f => f.endsWith('.md'));
-      allPosts = fileNames.map(fileName => {
-        const fullPath = path.join(postsDirectory, fileName);
+    if (fs.existsSync(chattersDirectory)) {
+      const chatterFiles = fs.readdirSync(chattersDirectory).filter(f => f.endsWith('.md'));
+      allChatters = chatterFiles.map(fileName => {
+        const fullPath = path.join(chattersDirectory, fileName);
         const { data, content } = matter(fs.readFileSync(fullPath, 'utf8'));
         const rawDate = data.date || '1970-01-01';
+        const cover = data.cover || siteConfig.defaultPostCover;
         return {
           slug: fileName.replace(/\.md$/, ''),
-          ...data,
-          title: data.title || '',
-          description: data.description || '',
-          content: content || '',
+          title: data.title || '碎片记录',
+          description: data.description || content.substring(0, 60),
+          cover: cover,
           date: rawDate,
           formattedDate: formatUpdateTime(rawDate)
         };
@@ -53,30 +56,38 @@ export default function Home() {
       });
     }
   } catch (e) {}
-  const top5Posts = allPosts.length > 0 ? allPosts.slice(0, 5) : [{ slug: 'none', title: '暂无文章', description: '快去写第一篇吧！', cover: siteConfig.defaultPostCover, date: '', formattedDate: '' }];
+  const top5Chatters = allChatters.length > 0
+    ? allChatters.slice(0, 5)
+    : [{ slug: 'none', title: '暂无记录', description: '记录一段思绪...', cover: siteConfig.defaultPostCover, date: '', formattedDate: '' }];
 
-  const chattersDirectory = path.join(process.cwd(), 'chatters');
-  let allChatters: any[] = [];
+  // ---- 说说（moments）----
+  const momentsDirectory = path.join(process.cwd(), 'moments');
+  let allMoments: any[] = [];
   try {
-    if (fs.existsSync(chattersDirectory)) {
-      const chatterFiles = fs.readdirSync(chattersDirectory).filter(f => f.endsWith('.md'));
-      allChatters = chatterFiles.map(fileName => {
-        const fullPath = path.join(chattersDirectory, fileName);
+    if (fs.existsSync(momentsDirectory)) {
+      const momentFiles = fs.readdirSync(momentsDirectory).filter(f => f.endsWith('.md'));
+      allMoments = momentFiles.map(fileName => {
+        const fullPath = path.join(momentsDirectory, fileName);
         const { data, content } = matter(fs.readFileSync(fullPath, 'utf8'));
-        const rawDate = data.date || '1970-01-01';
-        const cover = data.cover || 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop';
-        return { slug: fileName.replace(/\.md$/, ''), title: data.title || '碎片记录', description: data.description || content.substring(0, 60), cover: cover, date: rawDate, formattedDate: formatUpdateTime(rawDate) };
+        return {
+          id: fileName.replace(/\.md$/, ''),
+          date: data.date || '1970-01-01',
+          location: data.location || '',
+          images: data.images || [],
+          content: content.trim()
+        };
       }).sort((a, b) => {
         const dateA = new Date(a.date).getTime();
         const dateB = new Date(b.date).getTime();
         if (dateB !== dateA) return dateB - dateA;
-        return b.slug.localeCompare(a.slug);
+        return b.id.localeCompare(a.id);
       });
     }
   } catch (e) {}
-  const top5Chatters = allChatters.length > 0 ? allChatters.slice(0, 5) : [{ slug: 'none', title: '暂无记录', description: '记录一段思绪...', cover: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1000&auto=format&fit=crop', date: '', formattedDate: '' }];
+  const top5Moments = allMoments.slice(0, 5);
 
   const chatterCount = allChatters.length;
+  const momentCount = allMoments.length;
   const realPhotoCount = albums.reduce((total, album) => total + album.photos.length, 0);
   const latestAlbum = albums.length > 0 ? albums[0] : { id: '', title: '照片墙', description: '查看摄影', cover: siteConfig.photoWallImage, date: '' };
 
@@ -86,23 +97,31 @@ export default function Home() {
         <div>
           {/* 🌟 调整整体容器的内边距，适应手机端更小的屏幕 */}
           <div className="w-full max-w-6xl mx-auto mt-24 sm:mt-28 px-4 sm:px-6 lg:px-10 relative z-10">
-            <SearchBar posts={allPosts} />
+            <SearchBar posts={allChatters} moments={allMoments} />
 
             <main className="flex flex-col gap-6 w-full mt-6">
 
-              {/* 第一行：个人信息（播放器已移除，占满整行） */}
+              {/* 第一行：个人信息（占满整行） */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
                 <div className="col-span-1 lg:col-span-12 flex flex-col">
-                    <ProfileCard postCount={allPosts.length} chatterCount={chatterCount} photoCount={realPhotoCount}/>
+                    <ProfileCard chatterCount={chatterCount} momentCount={momentCount} photoCount={realPhotoCount}/>
                 </div>
               </div>
 
-              {/* 第二行：文章轮播 + 照片墙 + 说说 + 主题切换 */}
+              {/* 第二行：最近说说轮播 + 照片墙 + 杂谈轮播 */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
 
-                {/* 左侧：文章轮播 (电脑端占4列，手机端排最上面) */}
+                {/* 左侧：最近说说 (电脑端占4列，手机端排最上面) */}
                 <div className="col-span-1 lg:col-span-4 flex flex-col min-h-[300px]">
-                  <LatestPostsCarousel posts={top5Posts} />
+                  {top5Moments.length > 0 ? (
+                    <LatestMomentsCarousel moments={top5Moments} />
+                  ) : (
+                    <Link href="/moments" className="rounded-3xl bg-white/40 dark:bg-slate-800/50 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-xl min-h-[420px] h-full flex flex-col items-center justify-center gap-3 group">
+                      <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest bg-black/30 backdrop-blur-sm px-2 py-1 rounded-md border border-white/10">说说 · Moments</span>
+                      <p className="text-slate-600 dark:text-slate-300 font-bold">还没有说说</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">去记录第一个瞬间吧</p>
+                    </Link>
+                  )}
                 </div>
 
                 {/* 右侧：组合面板 (电脑端占8列) */}
@@ -118,9 +137,7 @@ export default function Home() {
                     </div>
                   </Link>
 
-                  {/* 底层网格：说说轮播 + 主题切换器 */}
-                  {/* 手机上单列，平板上分3列比例分布 */}
-                  {/* 说说轮播占满整行（主题切换已移至导航栏） */}
+                  {/* 杂谈轮播占满整行 */}
                   <div className="w-full flex-1 min-h-[200px]">
                     <LatestChatterCarousel chatters={top5Chatters} />
                   </div>
