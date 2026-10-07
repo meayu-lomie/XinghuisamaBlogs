@@ -1,10 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import Navbar from '../../components/Navbar';
-import PageTransition from '../../components/PageTransition';
 import MomentList from './MomentList';
 import { siteConfig } from '../../siteConfig';
+import { getBlogRoot } from '../../lib/blog-paths';
 
 export const metadata = {
   title: "说说 | " + siteConfig.authorName + " の 博客",
@@ -15,11 +14,18 @@ export default function MomentsPage() {
   let allMoments: any[] = [];
 
   try {
-    // 🌟 终极防漏绝招：同时扫描两个可能的文件夹，把所有的说说都抓出来！
-    const possibleDirs = [
-      path.join(process.cwd(), 'posts', 'moments'),
-      path.join(process.cwd(), 'moments')
-    ];
+    // 内容只存在博客目录里（管理端写入也写那边），所以这里要读博客目录
+    const blogRoot = getBlogRoot();
+    const possibleDirs = blogRoot
+      ? [
+          path.join(blogRoot, 'posts', 'moments'),
+          path.join(blogRoot, 'moments'),
+        ]
+      : [];
+
+    if (!blogRoot) {
+      console.warn('未配置博客物理路径，无法读取说说列表');
+    }
 
     possibleDirs.forEach(dir => {
       if (fs.existsSync(dir)) {
@@ -48,14 +54,13 @@ export default function MomentsPage() {
 
   return (
     <div className="min-h-screen relative pb-10 flex flex-col">
-      <Navbar />
-      <PageTransition className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col">
         <MomentList
           moments={allMoments}
           authorName={siteConfig.authorName}
           avatarUrl={siteConfig.avatarUrl}
         />
-      </PageTransition>
+      </div>
     </div>
   );
 }

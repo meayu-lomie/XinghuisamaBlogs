@@ -7,6 +7,7 @@ import MomentComments from '../../components/MomentComments';
 import { useToast } from '../../components/ToastProvider';
 import { siteConfig } from '../../siteConfig';
 import { useOperations } from '../../context/OperationContext';
+import { toPreviewSrc } from '../../components/imagePreview';
 
 function timeAgo(dateStr: string) {
   const date = new Date(dateStr);
@@ -35,6 +36,36 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageUrlInput, setImageUrlInput] = useState('');
 
+  // AI 润色（纯文本模式）
+  const [isPolishing, setIsPolishing] = useState(false);
+  const [polishPreview, setPolishPreview] = useState<string | null>(null);
+
+  const handlePolishMoment = async () => {
+    if (isPolishing) return;
+    if (!newMoment.content.trim()) {
+      showToast('先写点什么再润色', 'warning');
+      return;
+    }
+    setIsPolishing(true);
+    try {
+      const res = await fetch('/api/polish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: newMoment.content, mode: 'text' })
+      });
+      const data = await res.json();
+      if (data.success && data.polished) {
+        setPolishPreview(data.polished);
+      } else {
+        showToast(data.message || '润色失败', 'error');
+      }
+    } catch (e) {
+      console.error(e);
+      showToast('润色请求失败', 'error');
+    } finally {
+      setIsPolishing(false);
+    }
+  };
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -81,21 +112,25 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
   };
 
   const handleFileUpload = async (files: FileList | File[]) => {
-    const picUrl = (siteConfig as any).picBedUrl || "https://pic.dusays.com";
+    const picUrl = (siteConfig as any).picBedUrl || "";
     const picToken = (siteConfig as any).picBedToken;
-    if (!picToken) { showToast("未配置图床 Token！", "error"); return; }
+    const useRemote = Boolean(picUrl && picToken);   // 两个都填了才走第三方图床
+
     setIsUploading(true);
     showToast(`正在上传 ${files.length} 张图片...`, "info");
     try {
       const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
       const configData = await configRes.json();
+      const base = `http://127.0.0.1:${configData.api_port}/api/picbed`;
       const newUrls: string[] = [];
       for (let i = 0; i < files.length; i++) {
         const uploadData = new FormData();
         uploadData.append('file', files[i]);
-        uploadData.append('url', picUrl);
-        uploadData.append('token', picToken);
-        const res = await fetch(`http://127.0.0.1:${configData.api_port}/api/picbed/upload`, {
+        if (useRemote) {
+          uploadData.append('url', picUrl);
+          uploadData.append('token', picToken);
+        }
+        const res = await fetch(useRemote ? `${base}/upload` : `${base}/local`, {
           method: 'POST',
           body: uploadData,
         });
@@ -137,7 +172,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
     }
     const payload = {
       id: `moment-${Date.now()}`,
-      date: new Date().toISOString(),
+      date: new Date().toLocaleString('sv-SE'),
       content: newMoment.content,
       location: newMoment.location,
       images: newMoment.images
@@ -149,7 +184,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
       payload: payload,
       timestamp: new Date().toLocaleString()
     });
-    showToast("✅ 队列保存成功！\n请点击右上角导航栏的 📥 收件箱更新本地", "success");
+    showToast("✅ 队列保存成功！\n请点击右上角导航栏的收件箱更新本地", "success");
     setIsPublishOpen(false);
     setNewMoment({ content: '', location: '', images: [] });
   };
@@ -169,7 +204,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
 
       const payload = {
         id: `moment-${Date.now()}`,
-        date: new Date().toISOString(),
+        date: new Date().toLocaleString('sv-SE'),
         content: newMoment.content,
         location: newMoment.location,
         images: newMoment.images
@@ -307,7 +342,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
           <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
         </div>
         <div className="flex flex-col">
-          <h3 className="text-lg font-black text-[#576b95] dark:text-[#7f99cc] tracking-wide">{authorName}</h3>
+          <h3 className="text-lg font-black text-[var(--accent)] tracking-wide">{authorName}</h3>
           <div className="flex items-center gap-2 text-[11px] text-slate-400 font-bold mt-1"><Clock size={12} /> {timeAgo(moment.date)}</div>
         </div>
       </div>
@@ -431,8 +466,40 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
                 value={newMoment.content}
                 onChange={(e) => setNewMoment(prev => ({...prev, content: e.target.value}))}
                 placeholder="这一刻的想法..."
-                className="w-full bg-white/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl p-5 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 min-h-[120px] resize-none mb-6 font-medium custom-scrollbar"
+                className="w-full bg-white/50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-700/50 rounded-2xl p-5 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 min-h-[120px] resize-none mb-3 font-medium custom-scrollbar"
               />
+
+              {/* AI 润色：按钮 + 预览提示条 */}
+              <div className="flex items-center gap-3 mb-5">
+                <button
+                  onClick={handlePolishMoment}
+                  disabled={isPolishing}
+                  className="px-4 py-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-black flex items-center gap-2 hover:bg-emerald-500 hover:text-white transition-all disabled:opacity-50"
+                  title="让 AI 帮你把这段文字润色一下"
+                >
+                  {isPolishing ? <Clock size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                  {isPolishing ? '润色中...' : 'AI 润色'}
+                </button>
+                {polishPreview && (
+                  <div className="flex-1 min-w-0 flex items-center gap-3 bg-emerald-500/5 border border-emerald-500/20 rounded-xl px-4 py-2">
+                    <span className="flex-1 min-w-0 truncate text-xs font-bold text-emerald-700 dark:text-emerald-300" title={polishPreview}>
+                      润色结果：{polishPreview}
+                    </span>
+                    <button
+                      onClick={() => { setNewMoment({ ...newMoment, content: polishPreview }); setPolishPreview(null); }}
+                      className="shrink-0 px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-[10px] font-black uppercase hover:bg-emerald-600 transition-colors"
+                    >
+                      应用
+                    </button>
+                    <button
+                      onClick={() => setPolishPreview(null)}
+                      className="shrink-0 px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-[10px] font-black uppercase hover:bg-slate-300 transition-colors"
+                    >
+                      丢弃
+                    </button>
+                  </div>
+                )}
+              </div>
 
               <div className="flex items-center gap-4 mb-6">
                 <div className="relative flex-1 group">
@@ -495,7 +562,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
                 <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 mb-8">
                   {newMoment.images.map((img, idx) => (
                     <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm group">
-                      <img src={img} alt="preview" className="w-full h-full object-cover" />
+                      <img src={toPreviewSrc(img)} alt="preview" className="w-full h-full object-cover" />
                       <button
                         onClick={(e) => { e.stopPropagation(); setNewMoment(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== idx) })) }}
                         className="absolute top-1.5 right-1.5 w-6 h-6 flex items-center justify-center bg-black/60 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500"

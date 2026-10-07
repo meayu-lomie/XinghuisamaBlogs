@@ -1,19 +1,29 @@
-"use client";
-
-import { motion } from "framer-motion";
+/**
+ * 页面切换入场过渡。
+ *
+ * 为什么用 CSS 动画而不是 JS 动画库：
+ * 这是「预定性动效」——每次切页都是同一套入场动作，不需要 JS 参与时序。
+ * CSS 动画跑在合成层、不占用主线程，页面在忙着加载数据时也不会掉帧；
+ * 而 JS 驱动的入场动画在 App Router 的路由切换期间可能错过启动时机
+ * （实测过：元素停在初始状态导致内容不可见）。
+ *
+ * 动画定义见 globals.css 的 @utility page-enter（含 @keyframes）。
+ * 减少动效偏好用 motion-reduce: 变体换成纯淡入。
+ */
 import { ReactNode } from "react";
 
-export default function PageTransition({ children }: { children: ReactNode }) {
+export default function PageTransition({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <motion.div
-      // 刚加载页面时：往下偏 20px，完全透明
-      initial={{ y: 20, opacity: 0 }}
-      // 加载完毕后：回到原位，完全不透明
-      animate={{ y: 0, opacity: 1 }}
-      // 动画怎么演：用优雅的弹性物理动画，持续 0.8 秒
-      transition={{ ease: "easeOut", duration: 0.8 }}
+    <div
+      className={`page-enter motion-reduce:page-enter-soft${className ? ` ${className}` : ""}`}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }

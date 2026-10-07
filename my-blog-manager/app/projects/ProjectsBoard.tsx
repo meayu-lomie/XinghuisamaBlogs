@@ -3,12 +3,12 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BackButton from '../../components/BackButton';
-import { projectsData as initialProjects, Project } from '../../data/projects';
+ import type { Project } from '../../data/projects';
 import { Plus, Pencil, Trash2, AlertTriangle, Save, Edit3, X, Sparkles, Code2 } from 'lucide-react';
 import { useOperations } from '../../context/OperationContext';
 import { useToast } from '../../components/ToastProvider';
 
-export default function ProjectsBoard() {
+ export default function ProjectsBoard({ initialProjects }: { initialProjects: Project[] }) {
   const { addOperation } = useOperations();
   const { showToast } = useToast();
 

@@ -1,9 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import Navbar from '../../components/Navbar';
-import PageTransition from '../../components/PageTransition';
 import ChatterBoard from './ChatterBoard';
+import { getBlogDir } from '../../lib/blog-paths';
 
 export const metadata = {
   title: "杂谈 | XingHuiSama の 博客",
@@ -11,15 +10,20 @@ export const metadata = {
 };
 
 export default function ChatterPage() {
-  const chattersDirectory = path.join(process.cwd(), 'chatters');
+  // 内容只存在博客目录里（管理端写入也写那边），所以这里要读博客目录
+  const chattersDirectory = getBlogDir('chatters');
   let chatters: any[] = [];
 
   try {
-    if (!fs.existsSync(chattersDirectory)) {
-      fs.mkdirSync(chattersDirectory);
+    if (!chattersDirectory) {
+      console.warn('未配置博客物理路径，无法读取杂谈列表');
+    } else if (!fs.existsSync(chattersDirectory)) {
+      fs.mkdirSync(chattersDirectory, { recursive: true });
     }
 
-    const fileNames = fs.readdirSync(chattersDirectory).filter(fileName => fileName.endsWith('.md'));
+    const fileNames = chattersDirectory
+      ? fs.readdirSync(chattersDirectory).filter(fileName => fileName.endsWith('.md'))
+      : [];
 
     chatters = fileNames.map(fileName => {
       const slug = fileName.replace(/\.md$/, '');
@@ -42,10 +46,9 @@ export default function ChatterPage() {
 
   return (
     <div className="min-h-screen relative pb-10">
-      <Navbar />
-      <PageTransition>
+      <div>
         <ChatterBoard chatters={chatters} />
-      </PageTransition>
+      </div>
     </div>
   );
 }

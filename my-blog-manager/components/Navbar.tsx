@@ -6,41 +6,19 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOperations } from '../context/OperationContext';
 import { useToast } from './ToastProvider';
-import { AlertTriangle } from 'lucide-react';
 import { siteConfig } from '../siteConfig';
 
+import NavThemeSwitch from './NavThemeSwitch';
 export default function Navbar() {
   const [showNav, setShowNav] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isOpBoxOpen, setIsOpBoxOpen] = useState(false);
 
-  const [syncModalOpen, setSyncModalOpen] = useState(false);
-  const [targetBlogPath, setTargetBlogPath] = useState("");
 
   const pathname = usePathname();
   const { operations, removeOperation, clearOperations } = useOperations();
   const { showToast } = useToast();
 
-  useEffect(() => {
-    const fetchPath = async () => {
-      try {
-        const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
-        const config = await configRes.json();
-        const res = await fetch(`http://127.0.0.1:${config.api_port}/api/deploy/config`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.blogPath) {
-            setTargetBlogPath(data.blogPath);
-            localStorage.setItem('targetBlogPath', data.blogPath);
-          }
-        }
-      } catch (e) {
-        const path = localStorage.getItem('targetBlogPath') || "F:/Projects/my-blog";
-        setTargetBlogPath(path);
-      }
-    };
-    fetchPath();
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,20 +31,17 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
-  // 🌟 这里新增了 /tree 路由
+  // 管理控制台导航：只保留内容编辑入口（展示类页面已从控制台移除）
   const navLinks = [
-    { name: '首页', href: '/' },
-    { name: '项目', href: '/projects' },
-    { name: '归档', href: '/timeline' },
-    { name: '照片墙', href: '/photowall' },
-    { name: '音乐', href: '/music' },
+    { name: '写文章', href: '/editor' },
+    { name: '草稿箱', href: '/drafts' },
+    { name: '时间线', href: '/timeline' },
     { name: '说说', href: '/moments' },
     { name: '杂谈', href: '/chatter' },
-    { name: '🌳 灵境', href: '/tree' }, // <--- 新增的入口在这里喵！
-    { name: '📝 草稿箱', href: '/drafts' },
-    { name: '友链', href: '/friends' },
+    { name: '照片墙', href: '/photowall' },
+    { name: '项目', href: '/projects' },
     { name: '关于', href: '/about' },
-    { name: '⚙️ 设置', href: '/settings' },
+    { name: '设置', href: '/settings' },
   ];
 
   const handleMinimize = () => {
@@ -108,10 +83,6 @@ export default function Navbar() {
               apiUrl = `${apiBase}/api/gallery/sync`;
               body = { albums: op.value };
               break;
-            case 'sync_friends':
-              apiUrl = `${apiBase}/api/friends/sync`;
-              body = { friends: op.value };
-              break;
             case 'sync_projects':
               apiUrl = `${apiBase}/api/projects/sync`;
               body = { projects: op.value };
@@ -130,7 +101,7 @@ export default function Navbar() {
               break;
           }
 
-          showToast(`🚀 正在请求后端: ${apiUrl}`, "info");
+          showToast(`正在请求后端: ${apiUrl}`, "info");
 
           const res = await fetch(apiUrl, {
             method: 'POST',
@@ -153,42 +124,8 @@ export default function Navbar() {
           window.location.reload();
         }, 2000);
 
-      } catch (error: any) {
-        showToast(`后端连接异常: ${error.message}`, "error");
-      }
-    };
-
-  const handleSyncBlogClick = () => {
-    if (!targetBlogPath) {
-       const fallback = localStorage.getItem('targetBlogPath') || "F:/Projects/my-blog";
-       setTargetBlogPath(fallback);
-    }
-    setIsOpBoxOpen(false);
-    setSyncModalOpen(true);
-  };
-
-  const executeSyncBlog = async () => {
-    setSyncModalOpen(false);
-
-    try {
-      const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
-      const configData = await configRes.json();
-      showToast("🚀 正在镜像数据至目标项目，请稍候...", "info");
-
-      const res = await fetch(`http://127.0.0.1:${configData.api_port}/api/sync/execute`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ blogPath: targetBlogPath })
-      });
-
-      const data = await res.json();
-      if (data.success) {
-        showToast(data.message, "success");
-      } else {
-        showToast(`❌ 同步失败: ${data.message}`, "error");
-      }
     } catch (error) {
-      showToast("无法连接到 Python 桌面核心引擎进行同步", "error");
+      showToast("无法连接到后端引擎", "error");
     }
   };
 
@@ -214,9 +151,18 @@ export default function Navbar() {
               ))}
             </nav>
 
+            {/* 主题切换：版式 + 明暗 */}
+            <span className="pl-4 border-l" style={{ borderColor: 'var(--rule)' }}>
+              <NavThemeSwitch />
+            </span>
+
             <div className="relative">
-              <button onClick={() => setIsOpBoxOpen(!isOpBoxOpen)} className="relative w-10 h-10 rounded-xl bg-white/50 dark:bg-slate-800/50 flex items-center justify-center text-lg hover:scale-105 transition-all border border-white/20 shadow-sm cursor-pointer">
-                📥
+              <button
+                onClick={() => setIsOpBoxOpen(!isOpBoxOpen)}
+                title="待写入的改动"
+                className="relative h-10 px-4 rounded-xl bg-white/50 dark:bg-slate-800/50 flex items-center justify-center text-xs font-bold whitespace-nowrap hover:scale-105 transition-all border border-white/20 shadow-sm cursor-pointer"
+              >
+                收件箱
                 {operations.length > 0 && (
                   <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -251,28 +197,46 @@ export default function Navbar() {
                       )}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                      <button onClick={handleSyncBlogClick} className="py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-black hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                        🔄 同步 Blog
-                      </button>
-                      <button onClick={handleUpdateLocal} className="py-2.5 rounded-xl bg-indigo-500 text-white text-xs font-black shadow-lg shadow-indigo-500/30 hover:bg-indigo-600 transition-colors">
-                        🚀 更新本地
-                      </button>
-                    </div>
+                    {/* 只有"更新本地"一步：内容直接写进博客前端目录，不再需要同步 */}
+                    <button onClick={handleUpdateLocal} className="w-full py-2.5 rounded-xl bg-indigo-500 text-white text-xs font-black shadow-lg shadow-indigo-500/30 hover:bg-indigo-600 transition-colors">
+                      写入博客
+                    </button>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
-            <div className="flex items-center gap-2 ml-2 pl-6 border-l border-slate-300/50 dark:border-slate-600/50">
-              <button onClick={handleMinimize} className="w-3.5 h-3.5 rounded-full bg-yellow-400 hover:bg-yellow-500 flex items-center justify-center group transition-colors shadow-sm cursor-pointer z-[101]">
-                <span className="opacity-0 group-hover:opacity-100 text-[8px] text-yellow-900 font-black">-</span>
+            {/* 窗口控件（Windows 风格） */}
+            <div className="flex items-center ml-2 pl-4 border-l" style={{ borderColor: 'var(--rule)' }}>
+              <button
+                onClick={handleMinimize}
+                title="最小化"
+                aria-label="最小化"
+                className="window-ctl"
+              >
+                <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+                  <path d="M0 5h10" stroke="currentColor" strokeWidth="1" />
+                </svg>
               </button>
-              <button onClick={handleMaximize} className="w-3.5 h-3.5 rounded-full bg-green-400 hover:bg-green-500 flex items-center justify-center group transition-colors shadow-sm cursor-pointer z-[101]">
-                <span className="opacity-0 group-hover:opacity-100 text-[8px] text-green-900 font-black">+</span>
+              <button
+                onClick={handleMaximize}
+                title="最大化"
+                aria-label="最大化"
+                className="window-ctl"
+              >
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+                  <rect x="0.5" y="0.5" width="9" height="9" stroke="currentColor" strokeWidth="1" />
+                </svg>
               </button>
-              <button onClick={handleClose} className="w-3.5 h-3.5 rounded-full bg-red-400 hover:bg-red-500 flex items-center justify-center group transition-colors shadow-sm cursor-pointer z-[101]">
-                <span className="opacity-0 group-hover:opacity-100 text-[8px] text-red-900 font-black">×</span>
+              <button
+                onClick={handleClose}
+                title="关闭"
+                aria-label="关闭"
+                className="window-ctl window-ctl-close"
+              >
+                <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+                  <path d="M0 0l10 10M10 0L0 10" stroke="currentColor" strokeWidth="1" />
+                </svg>
               </button>
             </div>
 
@@ -280,28 +244,6 @@ export default function Navbar() {
         </div>
       </header>
 
-      <AnimatePresence>
-        {syncModalOpen && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSyncModalOpen(false)} className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" />
-            <motion.div initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative w-full max-w-sm bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[40px] shadow-2xl border border-white/50 p-10 text-center">
-              <div className="w-16 h-16 bg-amber-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-                <AlertTriangle className="text-amber-500" size={32} />
-              </div>
-              <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">系统镜像覆盖</h3>
-              <p className="text-sm text-slate-500 mb-8 leading-relaxed text-balance">
-                确认将管理端数据覆盖至<br />
-                <span className="font-bold text-amber-500 break-all">{targetBlogPath}</span> 吗？<br />
-                <span className="text-xs opacity-80 text-red-400 font-bold mt-2 block">此操作将清空目标项目的旧文章与配置！</span>
-              </p>
-              <div className="flex gap-3">
-                <button onClick={() => setSyncModalOpen(false)} className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-black uppercase transition-colors hover:bg-slate-200 dark:hover:bg-slate-700">取消</button>
-                <button onClick={executeSyncBlog} className="flex-1 py-4 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-amber-500/30 transition-all">确认覆盖</button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </>
   );
 }

@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 同步前的自动备份（本地保留，不提交）
+_sync_backup/

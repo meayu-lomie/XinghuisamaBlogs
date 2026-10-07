@@ -1,8 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import Navbar from '../../components/Navbar';
-import PageTransition from '../../components/PageTransition';
 import ChatterBoard from './ChatterBoard';
 import { siteConfig } from '@/siteConfig';
 
@@ -15,7 +13,7 @@ export const metadata = {
 export default function ChatterPage() {
   // 注意：这里我们假设你的 md 文件放在根目录的 chatters 文件夹里
   const chattersDirectory = path.join(process.cwd(), 'chatters');
-  let chatters = [];
+  let chatters: any[] = [];
 
   try {
     // 确保文件夹存在
@@ -46,11 +44,10 @@ export default function ChatterPage() {
 
   return (
     <div className="min-h-screen relative pb-10">
-      <Navbar />
-      <PageTransition>
+      <div>
         {/* 将解析好的数据传递给客户端组件进行瀑布流渲染 */}
         <ChatterBoard chatters={chatters} />
-      </PageTransition>
+      </div>
     </div>
   );
 }

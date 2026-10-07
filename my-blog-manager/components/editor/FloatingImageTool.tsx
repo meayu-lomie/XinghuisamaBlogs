@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '../ToastProvider';
 import { siteConfig } from '../../siteConfig';
+import { toPreviewSrc } from '../imagePreview';
 
 interface FloatingImageToolProps {
   isOpen: boolean;
@@ -20,28 +21,32 @@ export default function FloatingImageTool({ isOpen, onClose, onInsert }: Floatin
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 处理文件上传逻辑 (保持不变)
+  // 上传逻辑：把图片存进博客前端的 public/images/，插入本地相对路径。
+  //（若日后在设置里填了 Lsky Pro 的 URL+Token，则优先走第三方图床）
   const handleFileUpload = async (file: File) => {
-    const picUrl = (siteConfig as any).picBedUrl || "https://pic.dusays.com";
+    const picUrl = (siteConfig as any).picBedUrl || "";
     const picToken = (siteConfig as any).picBedToken;
-
-    if (!picToken) {
-      showToast("未配置图床 Token！", "error");
-      return;
-    }
+    const useRemote = Boolean(picUrl && picToken);   // 两个都填了才走第三方
 
     setIsUploading(true);
-    showToast("正在将图片传送至云端...", "success");
+    showToast(
+      useRemote ? "正在将图片传送至云端图床..." : "正在保存到本地图片目录...",
+      "success"
+    );
 
     try {
       const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
       const configData = await configRes.json();
+      const base = `http://127.0.0.1:${configData.api_port}/api/picbed`;
+
       const uploadData = new FormData();
       uploadData.append('file', file);
-      uploadData.append('url', picUrl);
-      uploadData.append('token', picToken);
+      if (useRemote) {
+        uploadData.append('url', picUrl);
+        uploadData.append('token', picToken);
+      }
 
-      const res = await fetch(`http://127.0.0.1:${configData.api_port}/api/picbed/upload`, {
+      const res = await fetch(useRemote ? `${base}/upload` : `${base}/local`, {
         method: 'POST',
         body: uploadData,
       });
@@ -49,7 +54,12 @@ export default function FloatingImageTool({ isOpen, onClose, onInsert }: Floatin
       const data = await res.json();
       if (data.success && data.url) {
         setUploadedUrl(data.url);
-        showToast("✅ 上传成功！", "success");
+        showToast(
+          useRemote
+            ? "✅ 上传成功！"
+            : "✅ 已保存到本地图片目录",
+          "success"
+        );
       } else {
         showToast(`上传失败: ${data.message || '未知错误'}`, "error");
       }
@@ -138,7 +148,7 @@ export default function FloatingImageTool({ isOpen, onClose, onInsert }: Floatin
                   className={`w-full h-36 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center gap-3 cursor-pointer transition-all shadow-inner ${isDragging ? 'border-emerald-500 bg-emerald-50/80 dark:bg-emerald-900/40' : 'border-slate-300/80 dark:border-slate-600/80 hover:bg-white/60 dark:hover:bg-slate-800/60'}`}
                 >
                   <input type="file" ref={fileInputRef} onChange={e => e.target.files && handleFileUpload(e.target.files[0])} accept="image/*" className="hidden" />
-                  <div className="text-4xl drop-shadow-sm">{isUploading ? '⏳' : '📥'}</div>
+                  <div className="text-4xl drop-shadow-sm">{isUploading ? '上传中' : '上传'}</div>
                   <div className="text-center">
                     <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{isUploading ? '正在极速上传...' : '点击或拖拽图片'}</p>
                   </div>
@@ -166,7 +176,7 @@ export default function FloatingImageTool({ isOpen, onClose, onInsert }: Floatin
               // 预览与确认插入区
               <div className="flex flex-col gap-4">
                 <div className="w-full h-36 rounded-2xl overflow-hidden bg-white/50 dark:bg-slate-950/50 border border-white/40 dark:border-slate-700/50 flex items-center justify-center p-2 shadow-inner group relative">
-                  <img src={uploadedUrl} alt="preview" className="max-w-full max-h-full object-contain rounded-xl drop-shadow-md" />
+                  <img src={toPreviewSrc(uploadedUrl)} alt="preview" className="max-w-full max-h-full object-contain rounded-xl drop-shadow-md" />
                   {/* 🌟 重新选择按钮 */}
                   <button
                     onClick={() => { setUploadedUrl(''); setExternalUrl(''); }}

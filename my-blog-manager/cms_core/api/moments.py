@@ -3,6 +3,8 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List, Optional
 
+from cms_core.paths import get_blog_root
+
 router = APIRouter()
 
 
@@ -17,14 +19,10 @@ class MomentPayload(BaseModel):
 @router.post("/save")
 def save_moment(payload: MomentPayload):
     try:
-        # 🌟 绝对路径修复魔法 🌟
-        # 1. 获取当前 moments.py 文件所在的绝对路径 (也就是 cms_core/api 目录)
-        current_dir = os.path.dirname(os.path.abspath(__file__))
+        project_root = get_blog_root()
+        if not project_root:
+            return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
 
-        # 2. 往上退两级，定位到你的博客管理端根目录 (my-blog-manager)
-        project_root = os.path.abspath(os.path.join(current_dir, "..", ".."))
-
-        # 3. 🎯 精准指向你指定的 moments 文件夹！
         MOMENTS_DIR = os.path.join(project_root, "moments")
 
         if not os.path.exists(MOMENTS_DIR):
@@ -72,8 +70,9 @@ class DeletePayload(BaseModel):
 @router.post("/delete")
 def delete_moment(payload: DeletePayload):
     try:
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        project_root = os.path.abspath(os.path.join(current_dir, "..", ".."))
+        project_root = get_blog_root()
+        if not project_root:
+            return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
         MOMENTS_DIR = os.path.join(project_root, "moments")
 
         file_path = os.path.join(MOMENTS_DIR, f"{payload.id}.md")

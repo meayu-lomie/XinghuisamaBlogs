@@ -8,14 +8,9 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  // 👇 终极大招 1：屏蔽所有 TypeScript 类型报错！
+  // 👇 屏蔽 TypeScript 类型报错（Next 16 已移除 build 期 ESLint 检查，无需再配）
   typescript: {
     ignoreBuildErrors: true,
-  },
-
-  // 👇 终极大招 2：顺手把 ESLint 语法检查也屏蔽了，防止它出来捣乱！
-  eslint: {
-    ignoreDuringBuilds: true,
   },
 };
 

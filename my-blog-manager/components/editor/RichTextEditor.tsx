@@ -27,7 +27,8 @@ import {
   AlignLeft, AlignCenter, AlignRight, List, ListOrdered, ListTodo,
   Highlighter, Code2, Heading1, Heading2, Heading3,
   Type, ImageIcon, Quote, RemoveFormatting, ChevronDown,
-  Pipette, Hash, Check, Link2, Superscript as SupIcon, Subscript as SubIcon, Minus, Palette, Lock
+  Pipette, Hash, Check, Link2, Superscript as SupIcon, Subscript as SubIcon, Minus, Palette, Lock,
+  Sparkles
 } from 'lucide-react';
 
 const lowlight = createLowlight(all);
@@ -108,10 +109,10 @@ const CustomColorPicker = ({ activeColor, onSelect, onConfirm, recentColors, onC
     </>
   );
 };
-
 export interface RichTextEditorHandle {
   insertImage: (url: string) => void;
   getContent: () => string;
+  setContent: (html: string) => void;
 }
 
 interface EditorProps {
@@ -119,11 +120,12 @@ interface EditorProps {
   setTitle: (val: string) => void;
   initialContent?: string;
   onOpenImageTool: () => void;
+  onPolishClick?: () => void;
   isTitleLocked?: boolean;
   onChange?: () => void;
 }
 
-const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, setTitle, initialContent, onOpenImageTool, isTitleLocked, onChange }, ref) => {
+const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, setTitle, initialContent, onOpenImageTool, onPolishClick, isTitleLocked, onChange }, ref) => {
   const [textColors, setTextColors] = useState<string[]>(['#6366F1', '#000000']);
   const [highlightColors, setHighlightColors] = useState<string[]>(['#FEF08A', '#BBF7D0']);
   const [showTextPicker, setShowTextPicker] = useState(false);
@@ -180,6 +182,12 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, s
       html = html.replace(/<p><br><\/p>/gi, '<br>&zwj;');
 
       return html;
+    },
+    setContent: (html: string) => {
+      if (editor) {
+        editor.commands.setContent(html, { emitUpdate: true });
+        if (onChange) onChange();
+      }
     }
   }), [editor, onChange]);
 
@@ -187,7 +195,7 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, s
     if (!editor || !initialContent) return;
     if (loadedContentRef.current !== initialContent) {
       const safeContent = initialContent.replace(/~~([\s\S]*?)~~/g, '<s>$1</s>');
-      editor.commands.setContent(safeContent, false);
+      editor.commands.setContent(safeContent, { emitUpdate: false });
       loadedContentRef.current = initialContent;
     }
   }, [editor, initialContent]);
@@ -236,8 +244,8 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, s
         .editor-content-area s, .editor-content-area del { text-decoration-line: line-through !important; opacity: 0.6; }
 
         .editor-content-area blockquote {
-          border-left: 4px solid #6366f1 !important;
-          background-color: rgba(99, 102, 241, 0.05) !important;
+          border-left: 4px solid var(--accent) !important;
+          background-color: color-mix(in srgb, var(--accent) 5%, transparent) !important;
           padding: 1rem 1.5rem !important;
           margin: 1.5rem 0 !important;
           border-radius: 0 1.25rem 1.25rem 0 !important;
@@ -249,8 +257,8 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, s
           color: inherit !important;
         }
         .dark .editor-content-area blockquote {
-          border-left-color: #818cf8 !important;
-          background-color: rgba(129, 140, 248, 0.1) !important;
+          border-left-color: var(--accent) !important;
+          background-color: color-mix(in srgb, var(--accent) 10%, transparent) !important;
           color: #94a3b8 !important;
         }
 
@@ -262,7 +270,7 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, s
         }
         
         .editor-content-area p code {
-           background-color: rgba(99, 102, 241, 0.1) !important; color: #6366f1 !important; padding: 0.2rem 0.4rem !important; border-radius: 0.5rem !important; font-size: 0.85em !important;
+           background-color: color-mix(in srgb, var(--accent) 10%, transparent) !important; color: var(--accent) !important; padding: 0.2rem 0.4rem !important; border-radius: 0.5rem !important; font-size: 0.85em !important;
         }
 
         .editor-content-area pre code .hljs-comment, .editor-content-area pre code .hljs-quote { color: #5c6370; font-style: italic; }
@@ -345,6 +353,11 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, s
           <Btn onClick={() => editor.chain().focus().toggleSubscript().run()} active={editor.isActive('subscript')}><SubIcon size={16}/></Btn>
           <Btn onClick={toggleLink} active={editor.isActive('link')}><Link2 size={16}/></Btn>
           <Btn onClick={onOpenImageTool}><ImageIcon size={16} className="text-indigo-500"/></Btn>
+          {onPolishClick && (
+            <Btn onClick={onPolishClick} title="AI 润色">
+              <Sparkles size={16} className="text-emerald-500" />
+            </Btn>
+          )}
         </div>
 
         {editor.isActive('image') && <div className="flex items-center gap-1 ml-4 bg-indigo-500/10 p-1 px-3 rounded-2xl border border-indigo-500/20 border-dashed animate-in slide-in-from-left">{['25%', '50%', '75%', '100%'].map(s => <button key={s} onClick={() => editor.chain().focus().updateAttributes('image', { width: s }).run()} className="px-2 py-1 text-[9px] font-bold hover:bg-white rounded-lg transition-all">{s}</button>)}</div>}

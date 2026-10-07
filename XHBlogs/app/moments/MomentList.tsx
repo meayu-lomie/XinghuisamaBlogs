@@ -105,7 +105,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
           <img src={avatarUrl} alt="avatar" className="w-full h-full object-cover" />
         </div>
         <div className="flex flex-col">
-          <h3 className="text-base md:text-lg font-black text-[#576b95] dark:text-[#7f99cc] tracking-wide">{authorName}</h3>
+          <h3 className="text-base md:text-lg font-black text-[var(--accent)] tracking-wide">{authorName}</h3>
           <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-[11px] text-slate-400 font-bold mt-0.5 md:mt-1"><Clock size={10} className="md:w-3 md:h-3" /> {timeAgo(moment.date)}</div>
         </div>
       </div>

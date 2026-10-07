@@ -2,22 +2,14 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import Link from 'next/link';
-
-import Navbar from '../components/Navbar';
-import PageTransition from '../components/PageTransition';
 import SearchBar from '../components/SearchBar';
 import { siteConfig } from '../siteConfig';
-import CloudPlayer from '../components/CloudPlayer';
-import ThemeToggleBlock from '../components/ThemeToggleBlock';
 import ProfileCard from '../components/ProfileCard';
-import SiteDashboard from '../components/SiteDashboard';
-import { albums } from '../data/albums';
-import LyricBar from '../components/LyricBar';
-import { ToastProvider } from '../components/ToastProvider';
+ import { albums } from '../data/albums';
+ import { ToastProvider } from '../components/ToastProvider';
 
 import LatestPostsCarousel from '../components/LatestPostsCarousel';
 import LatestChatterCarousel from '../components/LatestChatterCarousel';
-import DanmakuBackground from '../components/DanmakuBackground';
 
 function formatUpdateTime(dateString: string) {
   if (!dateString || dateString === '1970-01-01') return '刚刚更新';
@@ -91,28 +83,19 @@ export default function Home() {
   return (
     <ToastProvider>
       <div className="min-h-screen relative pb-10">
-        <Navbar />
-        <PageTransition>
+        <div>
           {/* 🌟 调整整体容器的内边距，适应手机端更小的屏幕 */}
           <div className="w-full max-w-6xl mx-auto mt-24 sm:mt-28 px-4 sm:px-6 lg:px-10 relative z-10">
             <SearchBar posts={allPosts} />
 
             <main className="flex flex-col gap-6 w-full mt-6">
 
-              {/* 第一行：个人信息 + 播放器 */}
+              {/* 第一行：个人信息（播放器已移除，占满整行） */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
-                {/* 手机上占满1列，电脑上占7列 */}
-                <div className="col-span-1 lg:col-span-7 flex flex-col">
+                <div className="col-span-1 lg:col-span-12 flex flex-col">
                     <ProfileCard postCount={allPosts.length} chatterCount={chatterCount} photoCount={realPhotoCount}/>
                 </div>
-                {/* 手机上占满1列，电脑上占5列 */}
-                <div className="col-span-1 lg:col-span-5 flex flex-col">
-                    <CloudPlayer/>
-                </div>
               </div>
-
-              {/* 歌词栏 */}
-              <div className="w-full mt-[-10px]"><LyricBar/></div>
 
               {/* 第二行：文章轮播 + 照片墙 + 说说 + 主题切换 */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full">
@@ -137,23 +120,16 @@ export default function Home() {
 
                   {/* 底层网格：说说轮播 + 主题切换器 */}
                   {/* 手机上单列，平板上分3列比例分布 */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full flex-1">
-                    <div className="sm:col-span-2 flex flex-col min-h-[200px]">
-                      <LatestChatterCarousel chatters={top5Chatters} />
-                    </div>
-                    <div className="sm:col-span-1 flex flex-col min-h-[120px]">
-                      <ThemeToggleBlock />
-                    </div>
+                  {/* 说说轮播占满整行（主题切换已移至导航栏） */}
+                  <div className="w-full flex-1 min-h-[200px]">
+                    <LatestChatterCarousel chatters={top5Chatters} />
                   </div>
 
                 </div>
               </div>
-
-              {/* 底部数据面板 */}
-              <div className="w-full mt-4"><SiteDashboard/></div>
             </main>
           </div>
-        </PageTransition>
+        </div>
       </div>
     </ToastProvider>
   );

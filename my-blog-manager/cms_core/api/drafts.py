@@ -10,14 +10,13 @@ from markdownify import markdownify as md
 
 router = APIRouter()
 
-# 🌟 终极物理锁死防线：绝对定位到 my-blog-manager 根目录，无视任何全局目录切换！
-CURRENT_API_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_API_DIR, "..", ".."))
+# 内容读写统一走博客前端目录（见 cms_core/paths.py），不再有"同步"环节
+from cms_core.paths import get_blog_root, blog_path_or_none, MANAGER_ROOT
 
 
 def get_manager_drafts_dir() -> str:
-    # 🌟 修复：用 PROJECT_ROOT 替换 os.getcwd()
-    drafts_dir = os.path.join(PROJECT_ROOT, "manager_data", "drafts")
+    # 草稿仍留在后端自己的 manager_data 下（草稿属于"未发布"状态，不该进博客仓库）
+    drafts_dir = os.path.join(MANAGER_ROOT, "manager_data", "drafts")
     if not os.path.exists(drafts_dir):
         os.makedirs(drafts_dir)
     return drafts_dir
@@ -92,10 +91,11 @@ async def get_draft(request: Request):
 
     raw_id = payload.get("id", "").replace(".md", "")
     doc_type = payload.get("type", "post")
-    # 🌟 修复：用 PROJECT_ROOT 替换 os.getcwd()
-    base_dir = PROJECT_ROOT
-    drafts_dir = get_manager_drafts_dir()
+    base_dir = get_blog_root()
+    if not base_dir:
+        return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
 
+    drafts_dir = get_manager_drafts_dir()
     # 1. 优先从草稿箱读取 JSON
     file_path = os.path.join(drafts_dir, f"{raw_id}.json")
     if os.path.exists(file_path):
@@ -166,8 +166,9 @@ async def delete_draft(request: Request):
         return {"success": False, "message": "JSON 解析失败"}
 
     raw_id = payload.get("id", "").replace(".md", "").replace(".json", "")
-    # 🌟 修复：用 PROJECT_ROOT 替换 os.getcwd()
-    base_dir = PROJECT_ROOT
+    base_dir = get_blog_root()
+    if not base_dir:
+        return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
     drafts_dir = get_manager_drafts_dir()
 
     possible_paths = [
@@ -194,8 +195,9 @@ async def delete_draft(request: Request):
 async def sync_local_operations(request: Request):
     payload = await request.json()
     operations = payload.get("operations", [])
-    # 🌟 修复：用 PROJECT_ROOT 替换 os.getcwd()
-    base_dir = PROJECT_ROOT
+    base_dir = get_blog_root()
+    if not base_dir:
+        return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
     drafts_dir = get_manager_drafts_dir()
     results = []
 
@@ -275,8 +277,9 @@ async def sync_local_operations(request: Request):
 
 @router.get("/all_tags")
 async def get_all_historical_tags():
-    # 🌟 修复：用 PROJECT_ROOT 替换 os.getcwd()
-    base_dir = PROJECT_ROOT
+    base_dir = get_blog_root()
+    if not base_dir:
+        return {"success": True, "postTags": [], "chatterTags": []}
     scan_dirs = {"post": os.path.join(base_dir, "posts"), "chatter": os.path.join(base_dir, "chatters")}
     tag_collections = {"post": set(), "chatter": set()}
     fm_regex = re.compile(r'---\s*\n(.*?)\n---\s*', re.DOTALL)

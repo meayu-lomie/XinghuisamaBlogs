@@ -14,19 +14,16 @@ import rehypeKatex from 'rehype-katex';
 
 // 引入高亮主题
 import 'highlight.js/styles/atom-one-dark.css';
-
-import Navbar from '../../../components/Navbar';
-import PageTransition from '../../../components/PageTransition';
 import { siteConfig } from '../../../siteConfig';
 import ClientSocials from '../../../components/ClientSocials';
 import ClientTOC from '../../../components/ClientTOC';
 import BackButton from '../../../components/BackButton';
 import Comments from '../../../components/Comments';
-import SidebarLyric from '../../../components/SidebarLyric';
+import { getBlogDir } from '../../../lib/blog-paths';
 
 export async function generateStaticParams() {
-  const postsDirectory = path.join(process.cwd(), 'posts');
-  if (!fs.existsSync(postsDirectory)) return [];
+  const postsDirectory = getBlogDir('posts');
+  if (!postsDirectory || !fs.existsSync(postsDirectory)) return [];
 
   const filenames = fs.readdirSync(postsDirectory);
 
@@ -52,7 +49,7 @@ function extractToc(content: string) {
 }
 
 async function getPostData(slug: string) {
-  const fullPath = path.join(process.cwd(), 'posts', `${slug}.md`);
+  const fullPath = getBlogDir('posts', `${slug}.md`);
   const fileContents = fs.readFileSync(fullPath, 'utf8');
   let { data, content } = matter(fileContents);
 
@@ -112,9 +109,9 @@ async function getPostData(slug: string) {
 }
 
 function getRecentPosts(currentSlug: string) {
-  const postsDirectory = path.join(process.cwd(), 'posts');
+  const postsDirectory = getBlogDir('posts');
   let fileNames: string[] = [];
-  try { fileNames = fs.readdirSync(postsDirectory).filter(f => f.endsWith('.md')); } catch(e) {}
+  try { if (postsDirectory) fileNames = fs.readdirSync(postsDirectory).filter(f => f.endsWith('.md')); } catch(e) {}
   if (!fileNames) return [];
   return fileNames.map(f => {
     const s = f.replace(/\.md$/, '');
@@ -131,8 +128,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
 
   return (
     <div className="min-h-screen relative pb-20">
-      <Navbar />
-      <PageTransition>
+      <div>
         <main className="w-[95%] md:w-[90%] max-w-6xl mx-auto mt-24 md:mt-28 flex flex-col lg:flex-row gap-6 md:gap-8 relative z-10">
 
           <article className="flex-1 bg-white/60 dark:bg-slate-800/50 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/40 dark:border-white/10 overflow-hidden transition-colors duration-700">
@@ -283,8 +279,6 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
               <ClientSocials />
             </div>
 
-            <SidebarLyric />
-
             <div className="bg-white/60 dark:bg-slate-800/50 backdrop-blur-xl rounded-3xl p-6 border border-white/40 dark:border-white/10 shadow-xl">
               <h3 className="font-black text-slate-900 dark:text-white mb-4 border-l-4 border-indigo-500 pl-2 text-sm">RECOMMENDED</h3>
               <div className="space-y-4">
@@ -302,7 +296,7 @@ export default async function Post({ params }: { params: Promise<{ slug: string 
             )}
           </aside>
         </main>
-      </PageTransition>
+      </div>
     </div>
   );
 }

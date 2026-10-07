@@ -79,7 +79,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
     <div className="w-full max-w-5xl mx-auto mt-28 px-4 sm:px-10 relative z-10">
 
       <div className="text-center mb-12 relative z-20">
-        <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">归档与探索</h1>
+        <h1 className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter mb-4">时间线</h1>
         <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center justify-center gap-2 italic">
           <Sparkles size={16} className="text-indigo-500" /> 总计 {posts.length} 篇研究记录
         </p>
@@ -114,7 +114,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
                   <div className="flex flex-col py-2">
                     {searchResults.map((post) => (
                       <Link
-                        href={`/posts/${post.slug}`}
+                        href={`/${post.type === 'chatter' ? 'chatter' : 'posts'}/${post.slug}`}
                         key={post.slug}
                         onClick={() => setIsDropdownOpen(false)}
                         className="px-6 py-4 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors group border-b border-slate-100/50 dark:border-slate-800/50 last:border-0 flex flex-col gap-1.5"
@@ -184,8 +184,8 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
           >
             <style dangerouslySetInnerHTML={{ __html: `
               .cyber-scrollbar::-webkit-scrollbar { width: 8px; md:width: 12px; }
-              .cyber-scrollbar::-webkit-scrollbar-track { background: rgba(99, 102, 241, 0.05); border-radius: 12px; margin-top: 20px; margin-bottom: 56px; }
-              .cyber-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #818cf8 0%, #c084fc 100%); border-radius: 12px; border: 2px solid transparent; background-clip: padding-box; }
+              .cyber-scrollbar::-webkit-scrollbar-track { background: color-mix(in srgb, var(--accent) 5%, transparent); border-radius: 12px; margin-top: 20px; margin-bottom: 56px; }
+              .cyber-scrollbar::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--accent) 0%, #c084fc 100%); border-radius: 12px; border: 2px solid transparent; background-clip: padding-box; }
               .fade-edges { -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%); }
             `}} />
 
@@ -200,14 +200,14 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
                   <motion.div key={post.slug} initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.3, delay: idx * 0.05 }}>
                     <div className="bg-white/60 dark:bg-slate-800/70 backdrop-blur-xl border border-white/50 dark:border-slate-700/50 rounded-2xl md:rounded-3xl overflow-hidden shadow-lg flex flex-col h-full group relative hover:-translate-y-1 transition-transform duration-300">
 
-                      <Link href={`/posts/${post.slug}`} className="block flex-1 flex flex-col cursor-pointer">
+                    <Link href={`/${post.type === 'chatter' ? 'chatter' : 'posts'}/${post.slug}`} className="block flex-1 flex flex-col cursor-pointer">
                         {/* 🌟 图片高度自适应：手机变矮，电脑变高 */}
                         <div className="relative h-28 sm:h-36 md:h-40 overflow-hidden">
                           <img src={post.cover} alt={post.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                           {/* 🌟 日期标签微缩 */}
                           <span className="absolute bottom-2 left-2 md:bottom-3 md:left-4 text-white/90 text-[9px] md:text-xs font-mono font-bold bg-black/40 backdrop-blur-sm px-1.5 py-0.5 md:px-2 md:py-1 rounded flex items-center gap-1">
-                            <Calendar size={10} className="md:w-3 md:h-3"/> {post.date.split(' ')[0]}
+                            <Calendar size={10} className="md:w-3 md:h-3"/> {post.type === 'chatter' ? '杂谈 · ' : ''}{post.date.split(' ')[0]}
                           </span>
                         </div>
 

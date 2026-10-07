@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '../ToastProvider';
+import { toPreviewSrc } from '../imagePreview';
 
 export default function BackgroundSection({ formData, handleUpdate, pushToQueue }: any) {
   const { showToast } = useToast();
@@ -34,39 +35,42 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
 
   // 【核心功能】：真实的图床上传逻辑
   const handleFileUpload = async (file: File) => {
-    const picUrl = formData.picBedUrl || "https://pic.dusays.com";
+    const picUrl = formData.picBedUrl || "";
     const picToken = formData.picBedToken;
+    const useRemote = Boolean(picUrl && picToken);   // 两个都填了才走第三方图床
 
-    if (!picToken) {
-      showToast("⛔ 无法上传！请先在【图库配置管理】中填写图床 Token", "error");
-      return;
-    }
     if (!file.type.startsWith('image/')) {
       showToast("只能上传图片文件哦！", "warning");
       return;
     }
 
     setIsUploading(true);
-    showToast("正在将图片传送至图床引擎...", "info");
+    showToast(
+      useRemote ? "正在将图片传送至图床引擎..." : "正在保存到本地图片目录...",
+      "info"
+    );
 
     try {
       const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
       const configData = await configRes.json();
+      const base = `http://127.0.0.1:${configData.api_port}/api/picbed`;
 
       // 构建 multipart/form-data
       const uploadData = new FormData();
       uploadData.append('file', file);
-      uploadData.append('url', picUrl);
-      uploadData.append('token', picToken);
+      if (useRemote) {
+        uploadData.append('url', picUrl);
+        uploadData.append('token', picToken);
+      }
 
-      const res = await fetch(`http://127.0.0.1:${configData.api_port}/api/picbed/upload`, {
+      const res = await fetch(useRemote ? `${base}/upload` : `${base}/local`, {
         method: 'POST',
         body: uploadData,
       });
 
       const data = await res.json();
       if (data.success && data.url) {
-        showToast("🎉 图片上传成功！请确认是否加入背景库", "success");
+        showToast("图片上传成功，请确认是否加入背景库", "success");
         // 👈 上传成功，拿到真实 URL，触发确认面板
         setPendingImageUrl(data.url);
       } else {
@@ -138,7 +142,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
 
         <div className="space-y-6 flex flex-col relative">
           <div className="bg-white/50 dark:bg-slate-800/50 rounded-3xl p-5 border border-white/40 dark:border-slate-700/50 shadow-sm">
-            <p className="text-[10px] font-black text-slate-400 uppercase mb-3">🔗 粘贴网络图片 URL</p>
+            <p className="text-[10px] font-black text-slate-400 uppercase mb-3">粘贴网络图片 URL</p>
             <div className="flex gap-2">
               <input type="text" placeholder="https://..." value={formData.newBgUrl} onChange={e => handleUpdate('newBgUrl', e.target.value)} className="flex-1 bg-white dark:bg-slate-900 border-none rounded-xl px-4 py-2 text-xs outline-none shadow-inner" />
               <button onClick={addBgUrl} className="px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-black shadow-lg shadow-emerald-500/20 active:scale-95">添加</button>
@@ -187,7 +191,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 text-center">是否将此图片设为网站轮播背景？</p>
 
               <div className="w-full aspect-video rounded-xl overflow-hidden mb-6 shadow-inner border border-slate-200 dark:border-slate-700">
-                <img src={pendingImageUrl} alt="preview" className="w-full h-full object-cover" />
+                <img src={toPreviewSrc(pendingImageUrl)} alt="preview" className="w-full h-full object-cover" />
               </div>
 
               <div className="flex gap-3">
@@ -195,7 +199,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
                   不了，仅上传
                 </button>
                 <button onClick={confirmAddPendingImage} className="flex-1 py-3 bg-pink-500 text-white rounded-xl text-xs font-black shadow-lg shadow-pink-500/30 hover:bg-pink-600 active:scale-95 transition-all">
-                  ✨ 加入背景库
+                  加入背景库
                 </button>
               </div>
             </div>

@@ -1,55 +1,65 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from 'react';
 
-const ThemeContext = createContext({ isDark: true, toggleTheme: () => {} });
+// 主题风格：宣纸 / 手账
+export type ThemeStyle = 'xuan' | 'journal';
+
+type ThemeContextValue = {
+  isDark: boolean;
+  toggleTheme: () => void;
+  style: ThemeStyle;
+  setStyle: (s: ThemeStyle) => void;
+};
+
+const ThemeContext = createContext<ThemeContextValue>({
+  isDark: false,
+  toggleTheme: () => {},
+  style: 'xuan',
+  setStyle: () => {},
+});
+
+const STYLE_CLASSES: ThemeStyle[] = ['xuan', 'journal'];
+
+/** 把主题状态写到 html 上；首屏由 layout 内联脚本先设一次，这里只负责后续切换 */
+function applyTheme(isDark: boolean, style: ThemeStyle) {
+  const root = document.documentElement;
+  root.classList.toggle('dark', isDark);
+  STYLE_CLASSES.forEach((s) => root.classList.toggle(`theme-${s}`, s === style));
+}
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  // 默认设为 true，这样在读取到配置前，如果是夜间模式就不会闪烁
-  const [isDark, setIsDark] = useState(true);
-  const [mounted, setMounted] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+  const [style, setStyleState] = useState<ThemeStyle>('xuan');
 
   useEffect(() => {
-    // 标记组件已挂载，避免 hydration 报错
-    setMounted(true);
+    // 控制台用独立 key，避免与博客前端的主题设置互相干扰
+    const savedMode = localStorage.getItem('manager-theme');
+    const savedStyle = localStorage.getItem('manager-style') as ThemeStyle | null;
 
-    // 从 localStorage 读取真实状态
-    const savedTheme = localStorage.getItem('blog-theme');
-    // 如果没有记录，默认给深色模式（流萤飞舞）
-    const isDarkMode = savedTheme !== 'light';
-    setIsDark(isDarkMode);
+    const nextDark = savedMode === 'dark';
+    const nextStyle: ThemeStyle =
+      savedStyle === 'journal' || savedStyle === 'xuan' ? savedStyle : 'xuan';
 
-    const root = document.documentElement;
-    if (isDarkMode) {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
+    setIsDark(nextDark);
+    setStyleState(nextStyle);
+    applyTheme(nextDark, nextStyle);
   }, []);
 
-  // 极其重要：监听 isDark 状态，只要它变了，立刻强制更新 html 标签，防止路由切换丢失
-  useEffect(() => {
-    if (!mounted) return;
-    const root = document.documentElement;
-    if (isDark) {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-  }, [isDark, mounted]);
-
   const toggleTheme = () => {
-    const newDark = !isDark;
-    setIsDark(newDark);
-    localStorage.setItem('blog-theme', newDark ? 'dark' : 'light');
+    const nextDark = !isDark;
+    setIsDark(nextDark);
+    applyTheme(nextDark, style);
+    localStorage.setItem('manager-theme', nextDark ? 'dark' : 'light');
   };
 
-  // 在客户端挂载完成前，为了防止闪屏，先隐藏内容
-  if (!mounted) {
-    return <div className="invisible">{children}</div>;
-  }
+  const setStyle = (nextStyle: ThemeStyle) => {
+    setStyleState(nextStyle);
+    applyTheme(isDark, nextStyle);
+    localStorage.setItem('manager-style', nextStyle);
+  };
 
   return (
-    <ThemeContext.Provider value={{ isDark, toggleTheme }}>
+    <ThemeContext.Provider value={{ isDark, toggleTheme, style, setStyle }}>
       {children}
     </ThemeContext.Provider>
   );

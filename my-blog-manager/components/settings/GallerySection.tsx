@@ -60,7 +60,7 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
 
   return (
     <motion.section initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/50 dark:border-slate-800/50 rounded-[40px] p-8 shadow-2xl">
-      <h2 className="text-xl font-black text-slate-800 dark:text-white mb-8">🖼️ 图床引擎设置</h2>
+      <h2 className="text-xl font-black text-slate-800 dark:text-white mb-8">图床引擎设置</h2>
 
       <div className="max-w-xl space-y-6">
         <div>

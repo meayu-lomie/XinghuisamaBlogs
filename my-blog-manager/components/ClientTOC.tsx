@@ -148,7 +148,7 @@ export default function ClientTOC({ toc }: { toc: TocItem[] }) {
               `}
             >
               {isActive && (
-                <span className="absolute left-[-5px] top-[50%] -translate-y-[50%] w-[6px] h-[6px] rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]"></span>
+                <span className="absolute left-[-5px] top-[50%] -translate-y-[50%] w-[6px] h-[6px] rounded-full bg-indigo-500 shadow-[0_0_8px_color-mix(in_srgb,var(--accent)_80%,transparent)]"></span>
               )}
               {displayText}
             </button>

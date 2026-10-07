@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 模型设置（含 API Key，绝不入库）
+data/model_config.json

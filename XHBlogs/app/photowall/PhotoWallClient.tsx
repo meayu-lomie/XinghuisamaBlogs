@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useMemo, useEffect } from 'react';
-import Navbar from '../../components/Navbar';
-import PageTransition from '../../components/PageTransition';
 import { albums, Album } from '../../data/albums';
 
 export default function PhotoWallClient() {
@@ -41,9 +39,8 @@ export default function PhotoWallClient() {
 
   return (
     <div className="min-h-screen relative pb-32">
-      <Navbar />
 
-      <PageTransition>
+      <div>
         <div className="w-full max-w-7xl mx-auto mt-28 px-4 sm:px-10 relative z-10">
 
           {!currentAlbum && (
@@ -193,7 +190,7 @@ export default function PhotoWallClient() {
           )}
 
         </div>
-      </PageTransition>
+      </div>
 
       {selectedImage && (
         <div

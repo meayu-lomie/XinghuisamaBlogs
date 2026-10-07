@@ -4,6 +4,8 @@ import re
 import json
 from typing import Dict, Any
 
+from cms_core.paths import get_blog_root
+
 router = APIRouter()
 
 # ---------------------------------------------------------
@@ -14,6 +16,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_API_DIR, "..", ".."))
 
 
 def get_config_path():
+    """后端自己的 siteConfig.ts"""
     possible_paths = [
         os.path.join(PROJECT_ROOT, 'siteConfig.ts'),
         os.path.join(PROJECT_ROOT, 'src', 'siteConfig.ts'),
@@ -26,6 +29,15 @@ def get_config_path():
 
     print(f"❌ 警告：在 Manager 目录未找到 siteConfig.ts！正在搜索的根目录是: {PROJECT_ROOT}")
     return None
+
+
+def get_blog_config_path():
+    """博客前端的 siteConfig.ts（真正的展示来源）"""
+    root = get_blog_root()
+    if not root:
+        return None
+    p = os.path.join(root, "siteConfig.ts")
+    return p if os.path.exists(p) else None
 
 
 def dict_to_ts_string(data, indent=2):
@@ -58,7 +70,7 @@ def get_site_config():
         root_content = content
 
         # 1. 🌟 预先提取并隔离所有已知的“嵌套对象”，防止内部属性泄露到外层！
-        known_dicts = ['social', 'gitalkConfig', 'geminiConfig', 'icpConfig']
+        known_dicts = ['social', 'giscusConfig', 'geminiConfig', 'icpConfig']
         for dict_name in known_dicts:
             dict_match = re.search(rf'{dict_name}\s*:\s*\{{([\s\S]+?)\}}', content)
             if dict_match:
@@ -72,14 +84,7 @@ def get_site_config():
                     # 将转义的 \\n 恢复为真实的换行，供前端显示
                     sub_dict[m.group(1)] = m.group(3).replace('\\n', '\n')
 
-                # Gitalk 的管理员数组特供处理
-                if dict_name == 'gitalkConfig':
-                    admin_match = re.search(r'admin\s*:\s*\[(.*?)\]', dict_str)
-                    if admin_match:
-                        admin_raw = admin_match.group(1)
-                        sub_dict['admin'] = [x.strip(" \"'") for x in admin_raw.split(',') if x.strip(" \"'")]
-                    else:
-                        sub_dict['admin'] = []
+
 
                 parsed_config[dict_name] = sub_dict
 
@@ -119,66 +124,35 @@ def update_site_config(payload: Dict[str, Any] = Body(...)):
     # 🌟 核心防线：绝对安全的根节点白名单！
     VALID_ROOT_KEYS = {
         "title", "authorName", "bio", "avatarUrl", "useGradient", "themeColors",
-        "bgImages", "defaultPostCover", "photoWallImage", "cloudMusicIds", "social",
+        "bgImages", "defaultPostCover", "photoWallImage", "social",
         "counts", "chatterTitle", "chatterDescription", "picBedName", "picBedUrl",
-        "picBedToken", "danmakuList", "gitalkConfig", "buildDate", "footerBadges",
+        "picBedToken", "giscusConfig", "buildDate", "footerBadges",
         "icpConfig", "geminiConfig",
         "faviconUrl",
         "navTitle",
         "navSuffix",
         "navAfter",
-        "friendLinkApplyFormat",
         "enableLevelSystem" # 👈 你加的字段在这里，完美！
     }
 
-    try:
-        with open(config_path, 'r', encoding='utf-8') as f:
+    def apply_updates(path: str) -> int:
+        """把 updates 应用到指定文件，返回成功改动的字段数"""
+        with open(path, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        print("\n" + "=" * 50)
-        print(f"🔥 启动物理引擎，目标文件: {config_path}")
-        updated_count = 0
+        print(f"🔥 写入目标文件: {path}")
+        count = 0
 
         for key, value in updates.items():
-
-            # 拦截非白名单字段，彻底防止二次覆写灾难
+            # 拦截非白名单字段，防止误写危险字段
             if key not in VALID_ROOT_KEYS:
-                print(f"  🛑 拦截非根节点危险字段 -> [{key}]")
+                print(f"  🛑 拦截非根节点字段 -> [{key}]")
                 continue
 
-            # 专属通道 1：Gitalk 特殊格式组装
-            if key == "gitalkConfig":
-                admin_list = value.get("admin", [])
-                if isinstance(admin_list, str):
-                    admin_list = [admin_list]
-                admin_str = '["' + '", "'.join(admin_list) + '"]'
-
-                # 安全转义客户端凭据
-                cid = json.dumps(value.get('clientID', ''), ensure_ascii=False)
-                csec = json.dumps(value.get('clientSecret', ''), ensure_ascii=False)
-                repo = json.dumps(value.get('repo', ''), ensure_ascii=False)
-                owner = json.dumps(value.get('owner', ''), ensure_ascii=False)
-
-                gitalk_ts_code = f"""{{
-    clientID: {cid},
-    clientSecret: {csec},
-    repo: {repo},
-    owner: {owner},
-    admin: {admin_str},
-  }}"""
-                pattern = rf"({key}\s*:\s*)\{{[\s\S]*?\}}"
-                if re.search(pattern, content):
-                    content = re.sub(pattern, lambda m: m.group(1) + gitalk_ts_code, content, count=1)
-                    print(f"  ✅ 成功修改并落盘(专列) -> [{key}]")
-                    updated_count += 1
-                continue
-
-            # ================= 原有的通用处理逻辑 =================
-            # 🌟 核心修复：这里原本就支持将 bool 转换成 'true' 或 'false' 字符串写入，所以 POST 没问题！
             if isinstance(value, str):
                 val_str = json.dumps(value, ensure_ascii=False)
             elif isinstance(value, bool):
-                val_str = str(value).lower() # 👈 这里完美的把 bool 变成了 'true' / 'false'
+                val_str = str(value).lower()   # bool 转 'true' / 'false'
             elif isinstance(value, dict):
                 val_str = dict_to_ts_string(value, indent=2)
             else:
@@ -189,23 +163,39 @@ def update_site_config(payload: Dict[str, Any] = Body(...)):
             elif isinstance(value, list):
                 pattern = rf"({key}\s*:\s*)\[[\s\S]*?\]"
             else:
-                # 写入正则也能匹配布尔值和数字，所以替换没有问题
                 pattern = rf"({key}\s*:\s*)(['\"`][\s\S]*?['\"`]|true|false|\d+)"
 
             if re.search(pattern, content):
                 content = re.sub(pattern, lambda m: m.group(1) + val_str, content, count=1)
-                print(f"  ✅ 成功修改并落盘 -> [{key}]")
-                updated_count += 1
+                print(f"  ✅ 已更新 -> [{key}]")
+                count += 1
 
-        # 写入物理磁盘
-        with open(config_path, 'w', encoding='utf-8') as f:
+        with open(path, 'w', encoding='utf-8') as f:
             f.write(content)
+        return count
 
-        print(f"🔥 任务圆满完成，共刷新 {updated_count} 个字段")
+    try:
+        # 1. 写后端自己的配置（设置页读取的就是它）
+        n_manager = apply_updates(config_path)
+
+        # 2. 同步写博客前端的配置 —— 否则设置页改的站点信息在博客上看不到
+        blog_config = get_blog_config_path()
+        n_blog = 0
+        if blog_config:
+            n_blog = apply_updates(blog_config)
+        else:
+            print("⚠️ 未找到博客前端的 siteConfig.ts，本次只更新了管理端配置")
+
         print("=" * 50 + "\n")
 
-        return {"success": True, "message": "本地 siteConfig.ts 修改成功！"}
+        if blog_config:
+            msg = f"已更新管理端 {n_manager} 个字段、博客前端 {n_blog} 个字段"
+        else:
+            msg = (f"已更新管理端 {n_manager} 个字段。"
+                   "未找到博客前端 siteConfig.ts（请检查【项目仓库设置】里的博客路径）")
+
+        return {"success": True, "message": msg}
 
     except Exception as e:
-        print(f"❌ 物理写入发生灾难性错误: {str(e)}")
+        print(f"❌ 写入发生错误: {str(e)}")
         return {"success": False, "message": f"文件读写错误: {str(e)}"}

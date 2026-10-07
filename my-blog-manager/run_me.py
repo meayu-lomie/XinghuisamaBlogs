@@ -3,6 +3,14 @@ import sys
 import subprocess
 import importlib.util
 
+# Windows 控制台默认是 GBK，直接 print emoji 会抛 UnicodeEncodeError 导致脚本崩溃。
+# 这里强制标准输出/错误用 UTF-8，让带 emoji 的提示能正常打印。
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
 # 1. 后端 Python 依赖清单
 PYTHON_PACKAGES = {
     "webview": "pywebview",

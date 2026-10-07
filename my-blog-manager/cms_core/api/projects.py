@@ -4,12 +4,15 @@ from fastapi import APIRouter, Request
 
 router = APIRouter()
 
-# 🌟 核心修复：去掉了多余的 "src"，精准定位到你的真实目录
-CURRENT_API_DIR = os.path.dirname(os.path.abspath(__file__))  # cms_core/api/
-PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_API_DIR, "..", ".."))  # 回退两级到根目录
+# 目标文件改为博客前端的 data/projects.ts（唯一真相源）
+from cms_core.paths import get_blog_root
 
-# 👇 就是这里！直接指向 data/projects.ts
-TARGET_FILE = os.path.join(PROJECT_ROOT, "data", "projects.ts")
+
+def projects_ts_path() -> str:
+    root = get_blog_root()
+    if not root:
+        return ""
+    return os.path.join(root, "data", "projects.ts")
 
 
 @router.post("/sync")
@@ -18,7 +21,11 @@ async def sync_projects(request: Request):
         payload = await request.json()
         projects_list = payload.get("projects", [])
 
-        print(f"🚀 尝试物理写入项目矩阵: {TARGET_FILE}")
+        target = projects_ts_path()
+        if not target:
+            return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
+
+        print(f"🚀 尝试物理写入项目矩阵: {target}")
 
         # 序列化
         json_str = json.dumps(projects_list, ensure_ascii=False, indent=2)
@@ -38,8 +45,8 @@ async def sync_projects(request: Request):
         )
 
         # 执行覆盖写入
-        os.makedirs(os.path.dirname(TARGET_FILE), exist_ok=True)
-        with open(TARGET_FILE, "w", encoding="utf-8") as f:
+        os.makedirs(os.path.dirname(target), exist_ok=True)
+        with open(target, "w", encoding="utf-8") as f:
             f.write(ts_content)
 
         print("✅ 项目矩阵物理落盘成功！")

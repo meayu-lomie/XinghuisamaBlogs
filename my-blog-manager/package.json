@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@giscus/react": "^3.1.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "@tiptap/extension-code-block-lowlight": "^3.23.4",
@@ -28,7 +29,6 @@
     "@tiptap/react": "^3.20.5",
     "@tiptap/starter-kit": "^3.20.5",
     "framer-motion": "^12.38.0",
-    "gitalk": "^1.8.0",
     "gray-matter": "^4.0.3",
     "highlight.js": "^11.11.1",
     "katex": "^0.16.45",

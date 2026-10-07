@@ -43,6 +43,32 @@ async def save_deploy_config(request: Request):
         return {"success": False, "message": f"保存失败: {str(e)}"}
 
 
+# 物理路径校验（原先在 sync 模块里，同步环节移除后搬到这里）
+@router.post("/check-path")
+async def check_blog_path(request: Request):
+    """检测博客前端路径是否合法且具备基本结构"""
+    try:
+        payload = await request.json()
+        target_path = (payload.get("blogPath") or "").strip()
+
+        if not target_path or not os.path.exists(target_path):
+            return {"success": False, "message": "目标物理路径不存在，请检查输入！"}
+
+        # 防呆：必须是 Next.js 项目（含 package.json），避免误选到别处
+        if not os.path.exists(os.path.join(target_path, "package.json")):
+            return {"success": False,
+                    "message": "该路径下没有 package.json，看起来不是博客前端项目，已拦截。"}
+
+        missing = [d for d in ["posts", "data", "app"]
+                   if not os.path.exists(os.path.join(target_path, d))]
+        if missing:
+            return {"success": True,
+                    "message": f"路径可用，但缺少这些目录：{', '.join(missing)}（保存后会按需创建）"}
+
+        return {"success": True, "message": "路径校验通过，目录结构完整"}
+    except Exception as e:
+        return {"success": False, "message": f"校验异常: {str(e)}"}
+
 # 🔑 核心大升级：根据 type 动态获取/生成不同的 SSH 密匙，并自动配置路由！
 @router.get("/ssh/key")
 async def get_my_ssh_key(type: str = "static"):
