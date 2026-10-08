@@ -1,8 +1,11 @@
 import Link from 'next/link';
 import { collectTags } from '../../lib/tags-data';
 
+import { siteConfig } from '../../siteConfig';
+
 export const metadata = {
-  title: '标签 | Meayu の 拾光集',
+  title: '标签 | ' + siteConfig.title,
+  description: '按话题检索全部杂谈',
 };
 
 export default function TagsPage() {
@@ -13,7 +16,7 @@ export default function TagsPage() {
     <div className="w-[95%] md:w-[90%] max-w-6xl mx-auto mt-24 md:mt-28 pb-20 relative z-10">
       <div className="mb-10 text-center">
         <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight">标签</h1>
-        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 font-medium">Tags · 按话题检索杂谈</p>
+        <p className="mt-2 text-sm text-slate-500 dark:text-slate-400 font-medium">按话题检索杂谈 · Tags</p>
       </div>
 
       {tags.length === 0 ? (

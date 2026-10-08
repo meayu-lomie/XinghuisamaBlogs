@@ -9,6 +9,9 @@ import { siteConfig } from '../../siteConfig';
  * 站点地址优先取 siteConfig.siteUrl，未配置时回退到当前请求的 origin。
  */
 
+// 与 sitemap / robots 保持一致：构建期生成静态订阅源
+export const dynamic = 'force-static';
+
 const xmlEscape = (s: string) =>
   String(s)
     .replace(/&/g, '&amp;')
@@ -28,7 +31,7 @@ export async function GET(request: Request) {
       .forEach((f) => {
         const { data, content } = matter(fs.readFileSync(path.join(dir, f), 'utf8'));
         const slug = f.replace(/\.md$/, '');
-        const title = xmlEscape(data.title || '碎片记录');
+        const title = xmlEscape(data.title || '无标题');
         const link = `${base}/chatter/${encodeURIComponent(slug)}`;
         const description = xmlEscape(
           data.description || content.replace(/[#>*`~\[\]!]/g, '').trim().slice(0, 120)

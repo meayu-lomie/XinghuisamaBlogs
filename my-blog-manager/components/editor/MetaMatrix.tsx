@@ -45,7 +45,7 @@ export default function MetaMatrix({
     <div className="flex flex-col h-full overflow-hidden relative">
       {/* 头部标题 */}
       <div className="shrink-0 p-8 pb-4 flex flex-col border-b border-white/10 bg-white/5">
-        <span className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em]">{type} Mode</span>
+        <span className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em]">{type === 'about' ? '关于 · About Mode' : '杂谈 · Chatter Mode'}</span>
         <h2 className="text-xl font-black text-slate-900 dark:text-white">属性设置</h2>
       </div>
 
@@ -53,14 +53,14 @@ export default function MetaMatrix({
 
         {/* 1. 封面图区 */}
         <div className="flex flex-col">
-          <Label icon={ImageIcon} text="Cover Image" color="border-indigo-500" />
-          <div onClick={onOpenImageTool} className="w-full aspect-video bg-black/10 dark:bg-black/40 rounded-[32px] border-2 border-dashed border-white/10 flex items-center justify-center overflow-hidden mb-4 group relative cursor-pointer shadow-inner transition-all">
+          <Label icon={ImageIcon} text="封面 · Cover Image" color="border-indigo-500" />
+          <div onClick={onOpenImageTool} className="w-full aspect-video bg-black/10 dark:bg-black/40 rounded-2xl border-2 border-dashed border-white/10 flex items-center justify-center overflow-hidden mb-4 group relative cursor-pointer shadow-inner transition-all">
             {cover ? (
               <img src={cover} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
             ) : (
               <div className="flex flex-col items-center gap-2 text-slate-400">
                 <CloudUpload size={28} className="opacity-30 group-hover:opacity-100 group-hover:text-indigo-400 transition-all" />
-                <span className="text-[9px] font-black uppercase tracking-widest">Click to Upload</span>
+                <span className="text-[9px] font-black uppercase tracking-widest">点击上传 · Click to Upload</span>
               </div>
             )}
             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
@@ -76,7 +76,7 @@ export default function MetaMatrix({
         {/* 2. 标签区 */}
         {type !== 'about' && (
           <div className="flex flex-col animate-in fade-in slide-in-from-bottom duration-500">
-            <Label icon={Tag} text="Relevant Tags" color="border-pink-500" />
+            <Label icon={Tag} text="标签 · Relevant Tags" color="border-pink-500" />
             <div className="flex flex-wrap gap-2 mb-4 p-3 bg-black/5 dark:bg-white/5 rounded-2xl border border-[var(--card-border)] shadow-inner">
               {tags.map(t => (
                 <span key={t} className="px-3 py-1.5 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[10px] font-black rounded-xl flex items-center gap-2 shadow-sm border border-indigo-500/10">
@@ -115,7 +115,7 @@ export default function MetaMatrix({
         {/* 3. 心情区 */}
         {type === 'chatter' && setMood && (
           <div className="flex flex-col animate-in fade-in slide-in-from-bottom duration-700">
-            <Label icon={Smile} text="Mood Today" color="border-yellow-500" />
+            <Label icon={Smile} text="今日心情 · Mood Today" color="border-yellow-500" />
             <input
               type="text" value={mood} onChange={(e) => setMood(e.target.value)} placeholder="输入心情词..."
               className="w-full bg-white/10 dark:bg-black/20 rounded-2xl px-5 py-4 text-xs text-slate-800 dark:text-slate-200 border border-[var(--card-border)] outline-none focus:ring-2 focus:ring-yellow-500 mb-4 shadow-inner"
@@ -133,16 +133,16 @@ export default function MetaMatrix({
           </div>
         )}
 
-        {/* 🌟 4. 摘要区 (补回丢失的代码) */}
+        {/* 4. 摘要区 (补回丢失的代码) */}
         {type !== 'about' && (
           <div className="flex flex-col animate-in fade-in slide-in-from-bottom duration-700">
-            <Label icon={FileText} text="Description" color="border-emerald-500" />
+            <Label icon={FileText} text="摘要 · Description" color="border-emerald-500" />
             <textarea
               rows={6}
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
-              placeholder="记录一下这篇内容的核心思绪..."
-              className="w-full bg-white/10 dark:bg-black/20 rounded-[32px] px-6 py-5 text-xs text-slate-800 dark:text-slate-200 border border-[var(--card-border)] outline-none focus:ring-2 focus:ring-emerald-500 resize-none shadow-inner leading-relaxed placeholder:text-slate-500 font-medium"
+              placeholder="用一两句话概括这篇内容"
+              className="w-full bg-white/10 dark:bg-black/20 rounded-2xl px-6 py-5 text-xs text-slate-800 dark:text-slate-200 border border-[var(--card-border)] outline-none focus:ring-2 focus:ring-emerald-500 resize-none shadow-inner leading-relaxed placeholder:text-slate-500 font-medium"
             />
             <p className="mt-2 text-[9px] text-slate-400 italic px-2">提示：摘要将显示在首页卡片和搜索预览中。</p>
           </div>
@@ -165,7 +165,7 @@ export default function MetaMatrix({
             </button>
             <button
               onClick={() => onSave(true)} disabled={isSaving}
-              className="flex-1 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+              className="flex-1 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
             >
               <Send size={14} /> 正式发布
             </button>

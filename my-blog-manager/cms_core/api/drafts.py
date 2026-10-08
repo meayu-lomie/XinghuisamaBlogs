@@ -11,7 +11,7 @@ from markdownify import markdownify as md
 router = APIRouter()
 
 # 内容读写统一走博客前端目录（见 cms_core/paths.py），不再有"同步"环节
-from cms_core.paths import get_blog_root, blog_path_or_none, MANAGER_ROOT
+from cms_core.paths import get_blog_root, blog_path_or_none, MANAGER_ROOT, safe_id
 from cms_core.api.model_config import _load_config, _openai_chat, _gemini_chat
 
 
@@ -59,9 +59,11 @@ async def save_draft(request: Request):
         return {"success": False, "message": "后端无法解析传来的 JSON 数据"}
 
     drafts_dir = get_manager_drafts_dir()
-    draft_id = payload.get("id")
+    # id 来自请求体，会被拼成文件名，先净化防止 ../ 穿越
+    raw_id = payload.get("id")
+    draft_id = safe_id(raw_id) if raw_id and raw_id != 'new' else ""
 
-    if not draft_id or draft_id == 'new':
+    if not draft_id:
         draft_id = f"draft_{int(time.time() * 1000)}"
     elif payload.get("type") == "about":
         draft_id = "about"
@@ -118,7 +120,8 @@ async def get_draft(request: Request):
     except Exception:
         return {"success": False, "message": "JSON 解析失败"}
 
-    raw_id = payload.get("id", "").replace(".md", "")
+    # id 会被拼成文件名，先净化防止 ../ 穿越
+    raw_id = safe_id(payload.get("id", "").replace(".md", ""))
     doc_type = payload.get("type", "chatter")
     base_dir = get_blog_root()
     if not base_dir:
@@ -147,7 +150,7 @@ async def get_draft(request: Request):
             tags = []
             md_body = raw_content
 
-            # 🌟 拆解 YAML Front Matter
+            # 拆解 YAML Front Matter
             if raw_content.strip().startswith("---"):
                 parts = raw_content.split("---", 2)
                 if len(parts) >= 3:
@@ -165,7 +168,7 @@ async def get_draft(request: Request):
                     except:
                         pass
 
-            # 🌟 将 Markdown 转换为编辑器认识的 HTML
+            # 将 Markdown 转换为编辑器认识的 HTML
             html_content = markdown.markdown(md_body, extensions=['fenced_code', 'tables', 'nl2br'])
 
             draft_data = {
@@ -193,7 +196,8 @@ async def delete_draft(request: Request):
     except Exception:
         return {"success": False, "message": "JSON 解析失败"}
 
-    raw_id = payload.get("id", "").replace(".md", "").replace(".json", "")
+    # id 会被拼成文件名，先净化防止 ../ 穿越
+    raw_id = safe_id(payload.get("id", "").replace(".md", "").replace(".json", ""))
     base_dir = get_blog_root()
     if not base_dir:
         return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
@@ -214,7 +218,7 @@ async def delete_draft(request: Request):
                 continue
 
     if deleted_count > 0:
-        return {"success": True, "message": f"已彻底销毁相关文件"}
+        return {"success": True, "message": "已删除相关文件"}
     return {"success": False, "message": "未找到相关文件"}
 
 
@@ -232,32 +236,33 @@ async def sync_local_operations(request: Request):
         if op.get("type") == "publish_article":
             data = op.get("value", {})
             doc_type = data.get("type", "chatter")
-            doc_id = data.get("id", "")
+            # 净化后的 id 同时用于文件名与草稿清理，保证两者指向同一份草稿
+            doc_id = safe_id(data.get("id", ""))
 
             final_id = doc_id
             if not final_id or final_id == 'new':
                 final_id = f"{doc_type}_{int(time.time())}"
 
             # ==========================================
-            # 🌟 核心防吞空行逻辑：在给 markdownify 之前拦截处理 HTML
+            # 防吞空行：在交给 markdownify 之前先处理 HTML
             # ==========================================
             raw_html = data.get("content", "")
 
-            # 1. 拦截前端发来的带有全角空格的空段落，或者原生空段落
+            # 1. 拦截带全角空格的空段落与原生空段落
             # 我们直接把它们替换成带有 HTML 换行符的强硬结构
             raw_html = re.sub(r'<p>&#12288;<\/p>', '<br><br>', raw_html)
             raw_html = re.sub(r'<p><\/p>', '<br><br>', raw_html)
 
-            # 2. 调用 markdownify 进行基础转换，保留 img
-            # 强制让它保留 br 标签！
+            # 2. 基础转换，保留 img
+            # 保留 br 标签
             md_content = md(raw_html, heading_style="ATX", keep=['img', 'br'])
 
-            # 3. 转换完毕后，markdownify 可能会把 <br> 留下来，
-            # 为了在 MD 中形成真实的空行，我们把保留下来的 <br> 或者 <br/> 全部替换为纯粹的 \n\n
+            # 3. markdownify 可能会把 <br> 留下来，
+            # 为了让 MD 里出现真实空行，把保留下来的 <br> 替换为 \n\n
             md_content = re.sub(r'<br\s*\/?>', '\n\n', md_content)
             # ==========================================
 
-            # 🌟 处理日期与精确时间
+            # 处理日期与精确时间
             input_date = str(data.get("date", "")).strip()
             if input_date:
                 # 如果前端只传了 "YYYY-MM-DD" (长度 <= 10)，帮它补上现在的时分秒
@@ -303,18 +308,24 @@ async def sync_local_operations(request: Request):
                 except:
                     pass
 
-            results.append(f"✅ 已发布: {fm['title']}")
+            results.append(f"已发布: {fm['title']}")
 
     return {"success": True, "message": "\n".join(results)}
 
 
+
 @router.get("/all_tags")
 async def get_all_historical_tags():
+    """收集历史标签，供编辑器标签输入框做候选。
+
+    只有「杂谈」一种内容类型（文章/post 已删除），所以只扫 chatters。
+    """
     base_dir = get_blog_root()
     if not base_dir:
-        return {"success": True, "postTags": [], "chatterTags": []}
-    scan_dirs = {"post": os.path.join(base_dir, "posts"), "chatter": os.path.join(base_dir, "chatters")}
-    tag_collections = {"post": set(), "chatter": set()}
+        return {"success": True, "chatterTags": []}
+
+    scan_dirs = {"chatter": os.path.join(base_dir, "chatters")}
+    tag_collections = {"chatter": set()}
     fm_regex = re.compile(r'---\s*\n(.*?)\n---\s*', re.DOTALL)
 
     for doc_type, dir_path in scan_dirs.items():
@@ -331,5 +342,4 @@ async def get_all_historical_tags():
                                     tag_collections[doc_type].add(str(t))
                 except:
                     continue
-    return {"success": True, "postTags": sorted(list(tag_collections["post"])),
-            "chatterTags": sorted(list(tag_collections["chatter"]))}
+    return {"success": True, "chatterTags": sorted(list(tag_collections["chatter"]))}

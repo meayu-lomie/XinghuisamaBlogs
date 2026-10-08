@@ -31,7 +31,7 @@ export default function CodeCopy({ containerId }: { containerId: string }) {
         fontSize: '11px',
         fontWeight: '700',
         lineHeight: '1.4',
-        color: '#abb2bf',
+        color: 'var(--code-fg)',
         background: 'rgba(255,255,255,0.08)',
         border: '1px solid rgba(255,255,255,0.15)',
         borderRadius: '0.375rem',

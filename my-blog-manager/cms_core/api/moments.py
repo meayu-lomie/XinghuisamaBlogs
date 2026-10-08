@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List, Optional
 
-from cms_core.paths import get_blog_root
+from cms_core.paths import get_blog_root, safe_id
 
 router = APIRouter()
 
@@ -28,13 +28,18 @@ def save_moment(payload: MomentPayload):
         if not os.path.exists(MOMENTS_DIR):
             os.makedirs(MOMENTS_DIR, exist_ok=True)
 
-        # 4. 文件名使用前端传来的唯一 id (格式如 moment-17123456789.md)
-        # 这样同一天发多条说说，文件也不会互相覆盖
-        file_path = os.path.join(MOMENTS_DIR, f"{payload.id}.md")
+        # 文件名使用前端传来的唯一 id（格式如 moment-17123456789.md），
+        # 这样同一天发多条说说，文件也不会互相覆盖。
+        # id 来自请求体，必须净化后才能拼进路径，否则可被 ../ 穿越。
+        moment_id = safe_id(payload.id)
+        if not moment_id:
+            return {"success": False, "message": "说说的 id 不合法，已取消保存"}
+
+        file_path = os.path.join(MOMENTS_DIR, f"{moment_id}.md")
 
         # 构造 Markdown Front-matter
         frontmatter_lines = ["---"]
-        frontmatter_lines.append(f'id: "{payload.id}"')
+        frontmatter_lines.append(f'id: "{moment_id}"')
         frontmatter_lines.append(f'date: "{payload.date}"')
 
         if payload.location:
@@ -50,14 +55,12 @@ def save_moment(payload: MomentPayload):
 
         file_content = "\n".join(frontmatter_lines) + "\n" + payload.content
 
-        # 写入 .md 文件
         with open(file_path, "w", encoding="utf-8") as f:
             f.write(file_content)
 
-        # 🌟 在 Python 终端里大声喊出文件到底存哪了！
-        print(f"\n[成功] 说说已落盘，精准物理路径：{file_path}\n")
+        print(f"\n[成功] 说说已落盘：{file_path}\n")
 
-        return {"success": True, "message": f"成功保存到: {file_path}"}
+        return {"success": True, "message": "说说已保存"}
 
     except Exception as e:
         print(f"\n[报错] 写入失败：{str(e)}\n")
@@ -75,11 +78,15 @@ def delete_moment(payload: DeletePayload):
             return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
         MOMENTS_DIR = os.path.join(project_root, "moments")
 
-        file_path = os.path.join(MOMENTS_DIR, f"{payload.id}.md")
+        moment_id = safe_id(payload.id)
+        if not moment_id:
+            return {"success": False, "message": "说说的 id 不合法，已取消删除"}
+
+        file_path = os.path.join(MOMENTS_DIR, f"{moment_id}.md")
 
         if os.path.exists(file_path):
             os.remove(file_path)
-            print(f"\n[删除成功] 物理文件已粉碎：{file_path}\n")
+            print(f"\n[删除成功] 物理文件已删除：{file_path}\n")
             return {"success": True, "message": "文件已删除"}
         else:
             return {"success": False, "message": "文件不存在，无法删除"}

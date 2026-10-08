@@ -5,21 +5,24 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ToastProvider, useToast } from '../../components/ToastProvider';
 import { AlertTriangle, Search, Trash2, X, Sparkles, Pencil } from 'lucide-react';
+import { useEscapeClose } from '../../lib/use-escape-close';
 
 function DraftsContent() {
   const { showToast } = useToast();
   const [drafts, setDrafts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  // 区分「后端读取失败」与「确实没有草稿」，两者提示不能混用
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  // 👇 自定义弹窗状态管理
+  // 自定义弹窗状态管理
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; id: string | null; title: string | null }>({
     isOpen: false,
     id: null,
     title: null
   });
 
-  const blogPath = "F:/Projects/my-blog";
+  // 草稿的读写路径由后端从【项目仓库设置】里读，前端不再传路径参数
 
   const fetchDrafts = async () => {
     setIsLoading(true);
@@ -30,17 +33,20 @@ function DraftsContent() {
       const res = await fetch(`http://127.0.0.1:${configData.api_port}/api/drafts/list`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ blog_path: blogPath })
+        body: JSON.stringify({})
       });
 
       const data = await res.json();
       if (res.ok && data.success && Array.isArray(data.drafts)) {
         setDrafts(data.drafts);
+        setLoadError(null);
       } else {
         setDrafts([]);
+        setLoadError(data.message || "后端读取草稿失败");
       }
     } catch (error) {
       setDrafts([]);
+      setLoadError("无法连接到后端服务");
     } finally {
       setIsLoading(false);
     }
@@ -50,7 +56,7 @@ function DraftsContent() {
     fetchDrafts();
   }, []);
 
-  // 核心逻辑：执行真实的销毁操作
+  // 核心逻辑：执行真实的删除操作
   const confirmDelete = async () => {
     if (!deleteModal.id) return;
     const id = deleteModal.id;
@@ -62,15 +68,15 @@ function DraftsContent() {
       const res = await fetch(`http://127.0.0.1:${configData.api_port}/api/drafts/delete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ blog_path: blogPath, id: id })
+        body: JSON.stringify({ id: id })
       });
 
       const data = await res.json();
       if (data.success) {
-        showToast("草稿已被彻底销毁", "success");
+        showToast("草稿已删除", "success");
         setDrafts(prev => prev.filter(draft => draft.id !== id));
       } else {
-        showToast(`销毁失败: ${data.message}`, "error");
+        showToast(`删除失败: ${data.message}`, "error");
       }
     } catch (error) {
       showToast("引擎连接失败", "error");
@@ -91,6 +97,9 @@ function DraftsContent() {
     (draft.title || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
     (draft.contentPreview || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // 确认框支持 Esc 关闭
+  useEscapeClose(deleteModal.isOpen, () => setDeleteModal({ isOpen: false, id: null, title: null }));
 
   return (
     <div className="min-h-screen relative pb-20">
@@ -119,11 +128,11 @@ function DraftsContent() {
                 <AlertTriangle className="w-10 h-10 text-red-500" />
               </div>
 
-              <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">销毁这篇草稿？</h3>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">删除这篇草稿？</h3>
               <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-8 leading-relaxed">
-                你正在尝试抹除未发布的草稿 <br />
+                你正在尝试删除未发布的草稿 <br />
                 <span className="text-red-500 font-bold">"{deleteModal.title}"</span>。<br />
-                此操作不可逆，所有未保存的灵感将永久消失。
+                此操作不可撤销，草稿将被永久删除。
               </p>
 
               <div className="flex gap-3">
@@ -135,9 +144,9 @@ function DraftsContent() {
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="flex-1 py-4 bg-red-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-red-500/30 hover:bg-red-600 transition-all active:scale-95"
+                  className="flex-1 py-4 bg-red-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-sm hover:bg-red-600 transition-all active:scale-95"
                 >
-                  确认移除
+                  确认删除
                 </button>
               </div>
             </motion.div>
@@ -155,7 +164,7 @@ function DraftsContent() {
                 <span className="text-sm font-bold bg-indigo-500 text-white px-3 py-1 rounded-full">{drafts.length}</span>
               </h1>
               <p className="text-slate-500 dark:text-slate-400 font-medium text-sm flex items-center gap-2">
-                <Sparkles size={14} className="text-indigo-500" /> 灵感的避风港，所有未发布的心血都在这里。
+                <Sparkles size={14} className="text-indigo-500" /> 未发布的草稿都放在这里。
               </p>
             </div>
 
@@ -172,7 +181,7 @@ function DraftsContent() {
           </header>
 
           <div className="mb-8 flex gap-4">
-            <Link href="/editor?id=new&type=chatter" className="px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-2xl font-black text-sm shadow-lg shadow-pink-500/30 transition-all active:scale-95 flex items-center gap-2">
+            <Link href="/editor?id=new&type=chatter" className="px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-2xl font-black text-sm shadow-sm transition-all active:scale-95 flex items-center gap-2">
               <Sparkles size={16} /> 新建杂谈草稿
             </Link>
           </div>
@@ -227,7 +236,13 @@ function DraftsContent() {
 
               {filteredDrafts.length === 0 && (
                 <div className="col-span-full py-20 text-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl">
-                  <p className="text-slate-500 font-bold">搜索不到相关草稿，换个关键词试试？</p>
+                  {loadError ? (
+                    <p className="text-red-500 font-bold">草稿读取失败：{loadError}</p>
+                  ) : drafts.length === 0 ? (
+                    <p className="text-slate-500 font-bold">草稿箱是空的，去「写杂谈」攒第一篇吧。</p>
+                  ) : (
+                    <p className="text-slate-500 font-bold">搜索不到相关草稿，换个关键词试试？</p>
+                  )}
                 </div>
               )}
             </div>

@@ -2,10 +2,14 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { albums, Album } from '../../data/albums';
+import { useEscapeClose } from '../../lib/use-escape-close';
 
 export default function PhotoWallClient() {
   const [currentAlbum, setCurrentAlbum] = useState<Album | null>(null);
   const [selectedImage, setSelectedImage] = useState<{url: string, caption?: string} | null>(null);
+
+  // 灯箱支持 Esc 关闭
+  useEscapeClose(!!selectedImage, () => setSelectedImage(null));
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeQuery, setActiveQuery] = useState('');
@@ -47,8 +51,8 @@ export default function PhotoWallClient() {
             <div className="animate-fade-in-up">
               <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-6">
                 <div>
-                  <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-widest mb-2 transition-colors duration-700">光影画廊</h1>
-                  <p className="text-slate-600 dark:text-slate-400 font-medium tracking-wider transition-colors duration-700">定格时间，封存泰拉与现实的每一次心跳</p>
+                  <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-widest mb-2 transition-colors duration-700">照片墙</h1>
+                  <p className="text-slate-600 dark:text-slate-400 font-medium tracking-wider transition-colors duration-700">定格时间，封存每一次心跳</p>
                 </div>
 
                 <div className="relative w-full md:w-80 group">
@@ -78,7 +82,7 @@ export default function PhotoWallClient() {
                         <div
                           key={`search-photo-${index}`}
                           onClick={() => setSelectedImage(photo)}
-                          className="break-inside-avoid relative group rounded-2xl overflow-hidden cursor-zoom-in shadow-lg bg-white/20 border border-[var(--card-border)] transition-transform duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-indigo-500/20"
+                          className="break-inside-avoid relative group rounded-2xl overflow-hidden cursor-zoom-in shadow-lg bg-white/20 border border-[var(--card-border)] transition-transform duration-500 hover:scale-[1.02] hover:shadow-2xl"
                         >
                           <img src={photo.url} alt={photo.caption} className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105" loading="lazy" />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-5">
@@ -116,7 +120,7 @@ export default function PhotoWallClient() {
                           <img src={album.cover} alt={album.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-5">
                             <span className="text-white font-bold text-lg drop-shadow-md translate-y-2 group-hover:translate-y-0 transition-transform duration-500">{album.photos.length} 张照片</span>
-                            <span className="text-indigo-300 font-medium text-xs mt-1 drop-shadow-md translate-y-2 group-hover:translate-y-0 transition-transform duration-500 delay-75">Click to Open</span>
+                            <span className="text-indigo-300 font-medium text-xs mt-1 drop-shadow-md translate-y-2 group-hover:translate-y-0 transition-transform duration-500 delay-75">点击展开 · Click to Open</span>
                           </div>
                         </div>
                       </div>
@@ -134,7 +138,7 @@ export default function PhotoWallClient() {
 
                 {activeQuery && matchedAlbums.length === 0 && matchedPhotos.length === 0 && (
                   <div className="text-center py-20 text-slate-500 font-medium">
-                    在泰拉大陆的任何角落都没找到相关的记忆...
+                    没有找到相关的记忆...
                   </div>
                 )}
               </div>
@@ -153,7 +157,7 @@ export default function PhotoWallClient() {
                       <span className="paper-card p-1.5 rounded-lg border border-[var(--card-border)] shadow-sm group-hover:shadow-md transition-all">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
                       </span>
-                      返回画廊
+                      返回照片墙
                     </button>
                     <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700"></span>
                     <span className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{currentAlbum.date}</span>
@@ -163,7 +167,7 @@ export default function PhotoWallClient() {
                 </div>
 
                 <div className="text-sm font-bold text-slate-500 dark:text-slate-400 paper-card px-5 py-2.5 rounded-2xl border border-[var(--card-border)] shadow-sm">
-                  共 <span className="text-indigo-500 dark:text-indigo-400 text-lg">{currentAlbum.photos.length}</span> 瞬间
+                  共 <span className="text-indigo-500 dark:text-indigo-400 text-lg">{currentAlbum.photos.length}</span> 张
                 </div>
               </div>
 
@@ -172,7 +176,7 @@ export default function PhotoWallClient() {
                   <div
                     key={`${photo.url}-${index}`}
                     onClick={() => setSelectedImage(photo)}
-                    className="break-inside-avoid relative group rounded-2xl overflow-hidden cursor-zoom-in shadow-lg bg-white/20 border border-[var(--card-border)] transition-transform duration-500 hover:scale-[1.02] hover:shadow-2xl hover:shadow-indigo-500/20 animate-fade-in-up"
+                    className="break-inside-avoid relative group rounded-2xl overflow-hidden cursor-zoom-in shadow-lg bg-white/20 border border-[var(--card-border)] transition-transform duration-500 hover:scale-[1.02] hover:shadow-2xl animate-fade-in-up"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
                     <img src={photo.url} alt={photo.caption || '照片'} className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105" loading="lazy" />
@@ -197,7 +201,12 @@ export default function PhotoWallClient() {
           className="fixed inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-4 sm:p-10 cursor-zoom-out animate-fade-in"
           onClick={() => setSelectedImage(null)}
         >
-          <button className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors bg-white/10 hover:bg-white/20 rounded-full p-2">
+          <button
+            onClick={() => setSelectedImage(null)}
+            aria-label="关闭大图"
+            title="关闭大图"
+            className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors bg-white/10 hover:bg-white/20 rounded-full p-2"
+          >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
 

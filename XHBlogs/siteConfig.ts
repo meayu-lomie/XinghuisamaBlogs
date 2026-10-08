@@ -8,7 +8,7 @@ export const siteConfig = {
   title: "Meayu の 拾光集",
   faviconUrl: "/images/20261007_105536_f21a10.png",
   authorName: "Meayu",
-  bio: "写代码，也写点别的。把读过的、做过的、想明白的事情整理下来。",
+  bio: "随便写点。",
 
   navTitle: "Meayu",
 
@@ -29,23 +29,23 @@ export const siteConfig = {
   bgEnabled: true, // 全站背景轮播开关（在管理端【视觉背景配置】里切换）
 
   // 4. 文章默认封面图 (当 Markdown 没写 cover 时显示)
-  defaultPostCover: "https://bu.dusays.com/2026/03/24/69c1e38b346cb.jpg",
+  defaultPostCover: "/images/20261007_103601_e178d6.jpg",
 
   // 5. 首页照片墙预览图
-  photoWallImage: "https://bu.dusays.com/2026/03/24/69c1e38b4c370.jpg",
+  photoWallImage: "/images/20261007_014558_12db85.jpg",
   social: {
     github: "https://github.com/meayu-lomie",
-    gitee: "", // 待填：填入 Gitee 主页地址后社交按钮会自动出现
+    gitee: "",
     google: "mailto:bilibiliwuwuwu@gmail.com",
     email: "1124533793@qq.com",
     qq: "1124533793",
-    wechat: "XingHuisama",
+    wechat: "Meayu",
   },
   counts: {
     photos: 128, // 照片墙数量可以手动写死或动态计算
   },
   chatterTitle: "Meayu の 拾光集", // 你可以改成任何你喜欢的名字
-  chatterDescription: "代码、学术、提瓦特与泰拉大陆的碎片记录",
+  chatterDescription: "代码与日常碎片的记录",
 
 
   // 评论（Giscus，基于 GitHub Discussions）
@@ -58,4 +58,9 @@ export const siteConfig = {
     categoryId: "DIC_kwDOU994Ls4DHK0P",
   },
   buildDate: "2026-03-23T00:00:00", // 建站日期
+  // 备案信息（页脚展示；留空则不渲染）
+  icpConfig: {
+    name: "萌ICP备 20260240号",
+    link: "https://icp.gov.moe/?keyword=20260240",
+  },
 };

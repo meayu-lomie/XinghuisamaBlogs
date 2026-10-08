@@ -22,7 +22,7 @@ export default function TimelineNode({ post, index }: { post: any, index: number
       <div className="z-20 flex items-center justify-center order-1 bg-white dark:bg-slate-900 shadow-md w-6 h-6 rounded-full border-4 border-indigo-400 ring-4 ring-indigo-200/50 dark:ring-indigo-900/30 transition-colors duration-1000"></div>
 
       {/* 卡片实体 */}
-      <Link href={`/${post.type === 'chatter' ? 'chatter' : 'posts'}/${post.slug}`} className="order-1 w-full md:w-5/12 group">
+      <Link href={`/chatter/${post.slug}`} className="order-1 w-full md:w-5/12 group">
         <div className="paper-card rounded-2xl shadow-lg border border-[var(--card-border)] transition-all duration-500 hover:scale-[1.03] hover:paper-card-strong dark:hover:bg-slate-800/70 hover:shadow-2xl overflow-hidden flex flex-col">
 
           {/* 上半部分：封面图 */}

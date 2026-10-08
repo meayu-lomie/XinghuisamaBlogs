@@ -5,9 +5,14 @@ import MomentList from './MomentList';
 import { siteConfig } from '../../siteConfig';
 import { getBlogRoot } from '../../lib/blog-paths';
 
+// 管理端是本机控制台，内容随时会被后端改写（发布杂谈/说说、改相册等），
+// 页面必须在每次请求时实时读盘，不能被构建期静态化固化。
+export const dynamic = 'force-dynamic';
+
+
 export const metadata = {
   title: "说说 | " + siteConfig.authorName + " の 博客",
-  description: "说说与瞬间记录",
+  description: "说说与日常记录",
 };
 
 export default function MomentsPage() {

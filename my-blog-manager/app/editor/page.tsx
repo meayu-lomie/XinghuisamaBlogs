@@ -9,8 +9,9 @@ import { ArrowLeft, AlertTriangle, Save, LogOut, Sparkles, Check } from 'lucide-
 import { useToast } from '../../components/ToastProvider';
 import { useOperations } from '../../context/OperationContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useEscapeClose } from '../../lib/use-escape-close';
 
-// 🌟 核心修改 1：把原本暴露的主函数改名为 EditorContent（不带 export default）
+// 核心修改 1：把原本暴露的主函数改名为 EditorContent（不带 export default）
 function EditorContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -182,7 +183,7 @@ function EditorContent() {
         value: payload
       });
       setHasUnsavedChanges(false);
-      showToast("已加入待处理队列！", "info");
+      showToast("已加入收件箱，记得点右上角【写入博客】；刷新页面会丢失收件箱", "info");
       if (shouldExitAfterSave) router.back();
       return;
     }
@@ -196,9 +197,15 @@ function EditorContent() {
       });
       const data = await res.json();
       if (data.success) {
+        // 后端会给新草稿分配 id，必须回写到本地状态：
+        // 否则第二次保存仍以 id=null 提交，会再生成一份新草稿（草稿箱出现重复条目），
+        // 发布时也因 id 为空找不到草稿文件，导致草稿残留在草稿箱。
+        if (data.id && currentDocId === 'new') {
+          setCurrentDocId(data.id);
+        }
         setLastSaved(new Date().toLocaleTimeString());
         setHasUnsavedChanges(false);
-        showToast("草稿已落盘", "success");
+        showToast("草稿已保存", "success");
         if (shouldExitAfterSave) {
           setExitModalOpen(false);
           router.back();
@@ -207,6 +214,9 @@ function EditorContent() {
     } catch (e) { showToast("保存失败", "error"); }
     finally { setIsSaving(false); }
   };
+
+  // 确认框支持 Esc 关闭
+  useEscapeClose(exitModalOpen, () => setExitModalOpen(false));
 
   return (
     <div className="h-screen w-screen overflow-hidden relative">
@@ -219,7 +229,7 @@ function EditorContent() {
               <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-yellow-500 to-transparent opacity-50" />
               <div className="w-20 h-20 bg-yellow-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6"><AlertTriangle className="w-10 h-10 text-yellow-500" /></div>
               <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">存在未保存的数据</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-8 leading-relaxed">你的研究尚未记录，<br />直接离开将会导致这些数据消散在虚空中。</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-8 leading-relaxed">改动还没有保存，<br />直接离开会丢失本次修改。</p>
 
               <div className="flex flex-col gap-3">
                 <button
@@ -269,7 +279,7 @@ function EditorContent() {
                   </button>
                   <button
                     onClick={applyPolished}
-                    className="px-6 py-3 bg-emerald-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-emerald-500/30 hover:bg-emerald-600 transition-colors flex items-center gap-2"
+                    className="px-6 py-3 bg-emerald-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-sm hover:bg-emerald-600 transition-colors flex items-center gap-2"
                   >
                     <Check size={14} /> 应用润色
                   </button>
@@ -342,7 +352,7 @@ function EditorContent() {
   );
 }
 
-// 🌟 核心修改 2：在底部暴露真正的 EditorPage，并用 Suspense 把里面的内容套起来
+// 核心修改 2：在底部暴露真正的 EditorPage，并用 Suspense 把里面的内容套起来
 export default function EditorPage() {
   return (
     <Suspense fallback={

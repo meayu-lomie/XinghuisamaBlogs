@@ -6,6 +6,7 @@ import "./globals.css";
 import { ThemeProvider } from "../components/ThemeProvider";
 import Navbar from "../components/Navbar";
 import BackgroundSlideshow from "../components/BackgroundSlideshow";
+import Footer from "../components/Footer";
 import { siteConfig } from "../siteConfig";
 import MobileBackButton from '../components/MobileBackButton';
 
@@ -26,6 +27,23 @@ export const metadata: Metadata = {
   icons: {
     icon: siteConfig.faviconUrl,
     apple: siteConfig.faviconUrl,
+  },
+  // RSS 自动发现：订阅器与浏览器据此自行找到订阅源，
+  // 不必在导航栏摆一个点开只会显示 XML 源码的图标。
+  alternates: {
+    types: {
+      'application/rss+xml': `${siteConfig.siteUrl}/feed.xml`,
+    },
+  },
+  // 站点级 OpenGraph：没有它的话，首页与列表页分享出去没有标题和缩略图
+  // （杂谈详情页各自有 generateMetadata，这里兜住其余页面）
+  openGraph: {
+    title: siteConfig.title,
+    description: siteConfig.bio,
+    url: siteConfig.siteUrl,
+    siteName: siteConfig.title,
+    type: 'website',
+    images: [{ url: siteConfig.avatarUrl }],
   },
 };
 
@@ -57,6 +75,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <div className="relative z-10 flex-1 flex flex-col">
                 {children}
               </div>
+
+              <Footer />
 
               <div className="md:hidden block">
                 <MobileBackButton />

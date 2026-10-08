@@ -109,7 +109,7 @@ export default function CommentSection({ formData, handleUpdate, pushToQueue }: 
             onClick={saveToQueue}
             className="px-6 py-3 bg-indigo-500 text-white rounded-2xl font-black text-sm shadow-lg flex items-center gap-2 hover:bg-indigo-600 transition-colors"
           >
-            <Save size={16} /> 保存修改
+            <Save size={16} /> 暂存修改
           </button>
         </div>
 

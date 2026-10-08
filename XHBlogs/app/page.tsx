@@ -42,7 +42,7 @@ export default function Home() {
         const cover = data.cover || siteConfig.defaultPostCover;
         return {
           slug: fileName.replace(/\.md$/, ''),
-          title: data.title || '碎片记录',
+          title: data.title || '无标题',
           description: data.description || content.substring(0, 60),
           cover: cover,
           date: rawDate,
@@ -58,7 +58,7 @@ export default function Home() {
   } catch (e) {}
   const top5Chatters = allChatters.length > 0
     ? allChatters.slice(0, 5)
-    : [{ slug: 'none', title: '暂无记录', description: '记录一段思绪...', cover: siteConfig.defaultPostCover, date: '', formattedDate: '' }];
+    : [{ slug: 'none', title: '暂无记录', description: '还没有内容', cover: siteConfig.defaultPostCover, date: '', formattedDate: '' }];
 
   // ---- 说说（moments）----
   const momentsDirectory = path.join(process.cwd(), 'moments');
@@ -95,7 +95,7 @@ export default function Home() {
     <ToastProvider>
       <div className="min-h-screen relative pb-10">
         <div>
-          {/* 🌟 调整整体容器的内边距，适应手机端更小的屏幕 */}
+          {/* 调整整体容器的内边距，适应手机端更小的屏幕 */}
           <div className="w-full max-w-6xl mx-auto mt-24 sm:mt-28 px-4 sm:px-6 lg:px-10 relative z-10">
             <SearchBar posts={allChatters} moments={allMoments} />
 
@@ -119,7 +119,7 @@ export default function Home() {
                     <Link href="/moments" className="rounded-2xl paper-card border border-[var(--card-border)] shadow-md min-h-[420px] h-full flex flex-col items-center justify-center gap-3 group">
                       <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest bg-black/30 px-2 py-1 rounded-md border border-[var(--card-border)]">说说 · Moments</span>
                       <p className="text-slate-600 dark:text-slate-300 font-bold">还没有说说</p>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">去记录第一个瞬间吧</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">还没有内容</p>
                     </Link>
                   )}
                 </div>

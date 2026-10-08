@@ -14,10 +14,10 @@ interface FloatingImageToolProps {
 
 export default function FloatingImageTool({ isOpen, onClose, onInsert }: FloatingImageToolProps) {
   const { showToast } = useToast();
-  const [activeTab, setActiveTab] = useState<'upload' | 'url'>('upload'); // 🌟 新增：切换状态
+  const [activeTab, setActiveTab] = useState<'upload' | 'url'>('upload'); // 新增：切换状态
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedUrl, setUploadedUrl] = useState('');
-  const [externalUrl, setExternalUrl] = useState(''); // 🌟 新增：外链输入状态
+  const [externalUrl, setExternalUrl] = useState(''); // 新增：外链输入状态
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -77,7 +77,7 @@ export default function FloatingImageTool({ isOpen, onClose, onInsert }: Floatin
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) handleFileUpload(e.dataTransfer.files[0]);
   };
 
-  // 🌟 新增：验证并确认外链图片
+  // 新增：验证并确认外链图片
   const handleConfirmExternalUrl = () => {
     if (!externalUrl.trim()) {
       showToast("请输入有效的图片 URL", "warning");
@@ -108,7 +108,7 @@ export default function FloatingImageTool({ isOpen, onClose, onInsert }: Floatin
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
           style={{ position: 'fixed', top: '15vh', right: '5vw', zIndex: 99999 }}
-          className="w-80 paper-card rounded-[32px] shadow-lg border border-[var(--card-border)] overflow-hidden flex flex-col cursor-move"
+          className="w-80 paper-card rounded-2xl shadow-lg border border-[var(--card-border)] overflow-hidden flex flex-col cursor-move"
         >
           {/* 标题栏 */}
           <div className="flex justify-between items-center p-5 border-b border-white/30 dark:border-slate-700/50 paper-card">
@@ -119,7 +119,7 @@ export default function FloatingImageTool({ isOpen, onClose, onInsert }: Floatin
           </div>
 
           <div className="p-6 cursor-default bg-white/20">
-            {/* 🌟 模式切换 Tab */}
+            {/* 模式切换 Tab */}
             {!uploadedUrl && (
               <div className="flex bg-slate-200/50 p-1 rounded-2xl mb-5">
                 <button
@@ -154,7 +154,7 @@ export default function FloatingImageTool({ isOpen, onClose, onInsert }: Floatin
                   </div>
                 </div>
               ) : (
-                // 🌟 模式 B：外链输入区
+                // 模式 B：外链输入区
                 <div className="w-full space-y-4">
                   <div className="relative">
                     <textarea
@@ -177,7 +177,7 @@ export default function FloatingImageTool({ isOpen, onClose, onInsert }: Floatin
               <div className="flex flex-col gap-4">
                 <div className="w-full h-36 rounded-2xl overflow-hidden paper-card border border-[var(--card-border)] dark:border-slate-700/50 flex items-center justify-center p-2 shadow-inner group relative">
                   <img src={toPreviewSrc(uploadedUrl)} alt="preview" className="max-w-full max-h-full object-contain rounded-xl drop-shadow-md" />
-                  {/* 🌟 重新选择按钮 */}
+                  {/* 重新选择按钮 */}
                   <button
                     onClick={() => { setUploadedUrl(''); setExternalUrl(''); }}
                     className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold"
@@ -187,7 +187,7 @@ export default function FloatingImageTool({ isOpen, onClose, onInsert }: Floatin
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <button onClick={copyUrlToClipboard} className="py-2.5 rounded-xl paper-card text-slate-700 dark:text-slate-200 font-bold text-xs hover:bg-indigo-500 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-all shadow-sm">复制链接</button>
-                  <button onClick={() => { onInsert(uploadedUrl); setUploadedUrl(''); setExternalUrl(''); }} className="py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black text-xs shadow-lg shadow-emerald-500/30 hover:from-emerald-600 hover:to-teal-600 transition-all active:scale-95">嵌入正文</button>
+                  <button onClick={() => { onInsert(uploadedUrl); setUploadedUrl(''); setExternalUrl(''); }} className="py-2.5 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-black text-xs shadow-sm transition-all active:scale-95">嵌入正文</button>
                 </div>
               </div>
             )}

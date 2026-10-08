@@ -10,13 +10,12 @@ export const metadata = {
 };
 
 export default function Timeline() {
-  // 归档 = 文章(posts) + 杂谈(chatters) 的自动汇总时间线
-  const postsDirectory = path.join(process.cwd(), 'posts');
+  // 时间线 = 杂谈(chatters) + 说说(moments) 的自动汇总
   const chattersDirectory = path.join(process.cwd(), 'chatters');
   let posts: any[] = [];
   let tagCounts: Record<string, number> = {};
 
-  const collect = (dir: string, type: 'post' | 'chatter') => {
+  const collect = (dir: string) => {
     try {
       if (!fs.existsSync(dir)) return;
       const fileNames = fs.readdirSync(dir).filter(f => f.endsWith('.md'));
@@ -33,20 +32,20 @@ export default function Timeline() {
 
         posts.push({
           slug,
-          type, // 前端据此决定跳 /posts/ 还是 /chatter/
-          title: data.title || (type === 'chatter' ? '碎片记录' : '无标题'),
+          type: 'chatter',
+          title: data.title || '无标题',
           date: data.date || '1970-01-01',
-          description: data.description || (type === 'chatter' && data.mood ? `心情：${data.mood}` : ''),
+          description: data.description || (data.mood ? `心情：${data.mood}` : ''),
           tags: itemTags,
           cover: data.cover || siteConfig.defaultPostCover,
         });
       });
     } catch (e) {
-      console.error(`读取${type === 'chatter' ? '杂谈' : '文章'}列表失败`, e);
+      console.error('读取杂谈列表失败', e);
     }
   };
 
-  collect(chattersDirectory, 'chatter');
+  collect(chattersDirectory);
 
   posts.sort((a, b) => {
     const dateDiff = new Date(b.date).getTime() - new Date(a.date).getTime();

@@ -2,15 +2,15 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-// 🌟 引入你的图床工具组件 (请根据你实际的文件夹层级调整相对路径)
+// 引入你的图床工具组件 (请根据你实际的文件夹层级调整相对路径)
 import FloatingImageTool from '../editor/FloatingImageTool';
 
 export default function ProfileSection({ formData, handleUpdate, pushToQueue }: any) {
-  // 🌟 终极防崩溃兜底
+  // 终极防崩溃兜底
   const safeData = formData || {};
   const safeSocial = safeData.social || {};
 
-  // 🌟 控制图床工具的状态
+  // 控制图床工具的状态
   const [isImageToolOpen, setIsImageToolOpen] = useState(false);
   const [targetImageField, setTargetImageField] = useState<'avatarUrl' | 'faviconUrl' | null>(null);
 
@@ -37,7 +37,7 @@ export default function ProfileSection({ formData, handleUpdate, pushToQueue }: 
     });
   };
 
-  // 🌟🌟🌟 核心破局点：化繁为简！
+  // 核心破局点：化繁为简！
   const handleSaveAll = () => {
     pushToQueue('全量更新个人名片');
   };
@@ -49,8 +49,8 @@ export default function ProfileSection({ formData, handleUpdate, pushToQueue }: 
 
           {/* 左侧：头像预览区域 */}
           <div className="relative group shrink-0 self-center md:self-start flex flex-col items-center gap-4">
-            <motion.div whileHover={{ rotate: 0, scale: 1.05 }} className="w-40 h-40 rounded-[32px] p-1.5 border-2 border-[var(--accent)] shadow-lg rotate-6 transition-all duration-500">
-              <img src={safeData.avatarUrl || ''} alt="Avatar" className="w-full h-full rounded-[26px] object-cover bg-white dark:bg-slate-900 border-2 border-white dark:border-slate-800" />
+            <motion.div whileHover={{ rotate: 0, scale: 1.05 }} className="w-40 h-40 rounded-2xl p-1.5 border-2 border-[var(--accent)] shadow-lg rotate-6 transition-all duration-500">
+              <img src={safeData.avatarUrl || ''} alt="Avatar" className="w-full h-full rounded-xl object-cover bg-white dark:bg-slate-900 border-2 border-white dark:border-slate-800" />
             </motion.div>
           </div>
 
@@ -58,7 +58,7 @@ export default function ProfileSection({ formData, handleUpdate, pushToQueue }: 
           <div className="flex-1 w-full space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-              {/* 🌟 导航栏三部曲配置区 */}
+              {/* 导航栏三部曲配置区 */}
               <div className="col-span-1 md:col-span-2 bg-white/30 p-5 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 grid grid-cols-3 gap-4 shadow-sm">
                 <div className="col-span-3 pb-2 border-b border-slate-200 dark:border-slate-700/50 mb-2">
                   <h3 className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center gap-2">
@@ -67,7 +67,7 @@ export default function ProfileSection({ formData, handleUpdate, pushToQueue }: 
                 </div>
                 <div>
                   <label className="text-[10px] font-black text-slate-400 uppercase ml-1">前缀 (navTitle)</label>
-                  <input type="text" value={safeData.navTitle || ''} onChange={e => handleUpdate('navTitle', e.target.value)} placeholder="例如: XingHuiSama" className="w-full paper-card-strong border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm mt-1 outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-bold" />
+                  <input type="text" value={safeData.navTitle || ''} onChange={e => handleUpdate('navTitle', e.target.value)} placeholder="例如: Meayu" className="w-full paper-card-strong border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2.5 text-sm mt-1 outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-bold" />
                 </div>
                 <div>
                   <label className="text-[10px] font-black text-slate-400 uppercase ml-1">连接符 (navSuffix)</label>
@@ -150,13 +150,13 @@ export default function ProfileSection({ formData, handleUpdate, pushToQueue }: 
             </div>
 
             <button onClick={handleSaveAll} className="px-10 py-3 bg-indigo-500 text-white rounded-2xl text-sm font-black shadow-md hover:bg-indigo-600 transition-all active:scale-95 w-full md:w-auto">
-              暂存修改至操作队列
+              暂存修改至收件箱
             </button>
           </div>
         </div>
       </motion.section>
 
-      {/* 🌟 挂载全局图床工具 */}
+      {/* 挂载全局图床工具 */}
       <FloatingImageTool
         isOpen={isImageToolOpen}
         onClose={() => setIsImageToolOpen(false)}

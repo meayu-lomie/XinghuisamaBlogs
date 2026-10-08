@@ -34,7 +34,6 @@ function SettingsContent() {
     },
     buildDate: siteConfig.buildDate || "2026-03-23T00:00:00",
     icpConfig: siteConfig.icpConfig || { name: "", link: "" },
-    footerBadges: [...(siteConfig.footerBadges || [])],
   });
 
 
@@ -56,7 +55,6 @@ function SettingsContent() {
             giscusConfig: { ...(prev.giscusConfig || {}), ...(data.data.giscusConfig || {}) },
             buildDate: data.data.buildDate || prev.buildDate,
             icpConfig: data.data.icpConfig || prev.icpConfig,
-            footerBadges: data.data.footerBadges ? [...data.data.footerBadges] : prev.footerBadges,
           }));
         } else {
           console.error("后端返回失败:", data.message);
@@ -80,14 +78,14 @@ function SettingsContent() {
     addOperation({
       id: Date.now().toString(),
       type: 'CONFIG',
-      label: `配置暂存：${label}`,
-      description: `修改了系统的 ${label}，等待同步至 my-blog`,
+      label: `暂存配置：${label}`,
+      description: `修改了 ${label}，等待写入博客`,
       timestamp: new Date().toLocaleTimeString().slice(0, 5),
       payload: formData,
       key: key,
       value: value
     });
-    showToast(`【${label}】已加入右上角操作队列`, "success");
+    showToast(`【${label}】已加入收件箱，请在右上角点击【写入博客】`, "success");
   };
 
   const menuItems = [

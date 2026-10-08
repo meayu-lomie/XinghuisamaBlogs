@@ -4,11 +4,15 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { MapPin, MessageSquare, Clock, Sparkles, Search, ArrowDownAZ, ArrowUpZA, ChevronLeft, ChevronRight, Ghost } from 'lucide-react';
 import MomentComments from '../../components/MomentComments';
+import { useEscapeClose } from '../../lib/use-escape-close';
 
 function timeAgo(dateStr: string) {
   const date = new Date(dateStr);
+  // 历史数据里存在 ISO UTC 串，解析失败或未来时间时直接原样返回，避免显示「-1 天前」
+  if (Number.isNaN(date.getTime())) return dateStr;
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (diffInSeconds < 0) return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
   if (diffInSeconds < 60) return '刚刚';
   if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} 分钟前`;
   if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} 小时前`;
@@ -39,6 +43,9 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
     });
     return result;
   }, [moments, searchQuery, sortOrder]);
+
+  // 灯箱支持 Esc 关闭（此前只能点背景退出）
+  useEscapeClose(!!lightbox, () => setLightbox(null));
 
   const nextImg = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -119,7 +126,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
         <div className="min-w-0 flex-1 pr-2">
           {moment.location && (
             <span className="inline-flex items-center gap-1 md:gap-1.5 text-[9px] md:text-[11px] font-bold px-2 md:px-3 py-1 md:py-1.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 max-w-full truncate border border-indigo-500/10">
-              {/* 🌟 就是这里！shrink-0 已经乖乖放进 className 里面了 */}
+              {/* 就是这里！shrink-0 已经乖乖放进 className 里面了 */}
               <MapPin size={10} className="md:w-3 md:h-3 shrink-0" />
               <span className="truncate">{moment.location}</span>
             </span>
@@ -149,7 +156,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
       <div className="mb-8 md:mb-14 text-center relative">
         <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-2 md:mb-4 tracking-tighter">说说</motion.h1>
         <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-medium italic opacity-80 flex items-center justify-center gap-1.5 md:gap-2">
-          <Sparkles size={12} className="md:w-3.5 md:h-3.5 text-indigo-500" /> “ 在代码之外捕捉瞬间的温度 ”
+          <Sparkles size={12} className="md:w-3.5 md:h-3.5 text-indigo-500" /> “ 随手记下的日常 ”
         </p>
       </div>
 
@@ -185,7 +192,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
           </div>
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center py-12 md:py-24 min-h-[300px] md:min-h-[450px]">
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center text-center px-6 md:px-10 py-12 md:py-20 paper-card rounded-[32px] md:rounded-2xl border border-[var(--card-border)] shadow-lg max-w-lg w-full mx-auto">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center text-center px-6 md:px-10 py-12 md:py-20 paper-card rounded-2xl border border-[var(--card-border)] shadow-lg max-w-lg w-full mx-auto">
               <div className="w-16 h-16 md:w-24 md:h-24 bg-indigo-500/10 rounded-2xl md:rounded-2xl flex items-center justify-center mb-6 md:mb-8 relative">
                 <div className="absolute inset-0 bg-indigo-500/20 blur-2xl rounded-full animate-pulse"></div>
                 <Ghost size={32} className="md:w-12 md:h-12 text-indigo-500 relative z-10" strokeWidth={1.5} />

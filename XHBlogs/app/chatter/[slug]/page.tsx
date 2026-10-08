@@ -1,19 +1,21 @@
 import fs from 'fs';
+import { cache } from 'react';
+import { notFound } from 'next/navigation';
 import path from 'path';
 import matter from 'gray-matter';
 import { Link } from 'next-view-transitions';
 
-// 🌟 核心升级：引入 Next.js 现代统一解析流
+// 核心升级：引入 Next.js 现代统一解析流
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
-import remarkGfm from 'remark-gfm'; // 🌟 挂载 GFM 支持删除线
+import remarkGfm from 'remark-gfm'; // 挂载 GFM 支持删除线
 import remarkMath from 'remark-math';
 import remarkRehype from 'remark-rehype';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeStringify from 'rehype-stringify';
 import rehypeKatex from 'rehype-katex';
 
-// 🌟 引入神仙代码高亮主题（Atom One Dark）
+// 引入神仙代码高亮主题（Atom One Dark）
 import 'highlight.js/styles/atom-one-dark.css';
 import { siteConfig } from '../../../siteConfig';
 import ClientSocials from '../../../components/ClientSocials';
@@ -33,14 +35,22 @@ export async function generateStaticParams() {
     }));
 }
 
-async function getChatterData(slug: string) {
+const getChatterData = cache(async (slug: string) => {
+  // 防目录穿越：slug 来自 URL，只允许纯文件名
+  if (!slug || slug.includes('/') || slug.includes('\\') || slug.includes('..')) {
+    notFound();
+  }
   const fullPath = path.join(process.cwd(), 'chatters', `${slug}.md`);
+  // 访问不存在的 slug 时抛异常会落到默认错误页，这里直接走 404
+  if (!fs.existsSync(fullPath)) {
+    notFound();
+  }
   const fileContents = fs.readFileSync(fullPath, 'utf8');
 
   let { data, content } = matter(fileContents);
 
   // ==========================================
-  // 🌟 前台渲染清洗区：终极防吞换行 + 安全保护补丁！（从 Post 完美移植）
+  // 前台渲染清洗区：终极防吞换行 + 安全保护补丁！（从 Post 完美移植）
   // ==========================================
 
   // 1. 基础物理清洗：统一换行符，干掉幽灵占位符和纯空格废行
@@ -51,12 +61,12 @@ async function getChatterData(slug: string) {
   // 2. 强行修复数字列表缺少空格导致无法渲染为列表的 Bug (1.百度 -> 1. 百度)
   content = content.replace(/^(\s*\d+)\.([^ \n])/gm, '$1. $2');
 
-  // 3. 🌟 空间隔离防吞换行阵法（绝对不伤代码块！）
+  // 3. 空间隔离防吞换行阵法（绝对不伤代码块！）
   const blocks = content.split(/(```[\s\S]*?```|~~~[\s\S]*?~~~)/g);
   content = blocks.map((block, index) => {
     // 奇数索引是代码块
     if (index % 2 === 1) {
-      // 🌟 安全注入：如果代码块没写明语言，只在开头安全补上 cpp，绝不破坏结尾！
+      // 安全注入：如果代码块没写明语言，只在开头安全补上 cpp，绝不破坏结尾！
       if (/^```[ \t]*(\n|$)/.test(block)) {
          return block.replace(/^```[ \t]*/, '```cpp');
       }
@@ -105,7 +115,7 @@ async function getChatterData(slug: string) {
   return {
     slug,
     contentHtml: processedContent.toString(),
-    title: data.title || '碎片记录',
+    title: data.title || '无标题',
     date: data.date,
     mood: data.mood,
     summary: typeof data.summary === 'string' ? data.summary : '',
@@ -115,10 +125,10 @@ async function getChatterData(slug: string) {
     readingMinutes,
     tocItems
   };
-}
+});
 
 /** 相邻文章：按日期降序，prev = 更新的一篇，next = 更早的一篇 */
-function getPrevNext(currentSlug: string) {
+const getPrevNext = cache((currentSlug: string) => {
   const chattersDirectory = path.join(process.cwd(), 'chatters');
   let fileNames: string[] = [];
   try { fileNames = fs.readdirSync(chattersDirectory).filter(f => f.endsWith('.md')); } catch(e) {}
@@ -127,7 +137,7 @@ function getPrevNext(currentSlug: string) {
     const s = f.replace(/\.md$/, '');
     const c = fs.readFileSync(path.join(chattersDirectory, f), 'utf8');
     const { data } = matter(c);
-    return { slug: s, title: data.title || '碎片记录', date: data.date || '1970-01-01' };
+    return { slug: s, title: data.title || '无标题', date: data.date || '1970-01-01' };
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const idx = sorted.findIndex(p => p.slug === currentSlug);
@@ -135,9 +145,9 @@ function getPrevNext(currentSlug: string) {
     prev: idx > 0 ? sorted[idx - 1] : null,
     next: idx >= 0 && idx < sorted.length - 1 ? sorted[idx + 1] : null,
   };
-}
+});
 
-function getRecentChatters(currentSlug: string) {
+const getRecentChatters = cache((currentSlug: string) => {
   const chattersDirectory = path.join(process.cwd(), 'chatters');
   let fileNames: string[] = [];
   try { fileNames = fs.readdirSync(chattersDirectory).filter(f => f.endsWith('.md')); } catch(e) {}
@@ -147,11 +157,11 @@ function getRecentChatters(currentSlug: string) {
     const s = f.replace(/\.md$/, '');
     const c = fs.readFileSync(path.join(chattersDirectory, f), 'utf8');
     const { data } = matter(c);
-    return { slug: s, title: data.title || '碎片记录', date: data.date || '1970-01-01' };
+    return { slug: s, title: data.title || '无标题', date: data.date || '1970-01-01' };
   }).filter(p => p.slug !== currentSlug)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 3);
-}
+});
 
 function generateCalendarMatrix(year: number, month: number, targetDay: number) {
   const firstDayOfMonth = new Date(year, month - 1, 1).getDay();
@@ -161,6 +171,38 @@ function generateCalendarMatrix(year: number, month: number, targetDay: number) 
   for (let i = 0; i < startDay; i++) { days.push(null); }
   for (let i = 1; i <= daysInMonth; i++) { days.push(i); }
   return { days, targetDay };
+}
+
+/**
+ * 每篇杂谈独立生成 metadata。
+ *
+ * UpdateLog 里写过「新增 OpenGraph metadata」，但此前全仓没有任何
+ * generateMetadata / openGraph 实现，分享到社交平台时标题与摘要
+ * 都是站点默认值。这里按内容补齐。
+ */
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const data = await getChatterData(slug);
+
+  const title = data.title || slug;
+  const description = data.summary || siteConfig.bio;
+  const url = `${siteConfig.siteUrl}/chatter/${slug}`;
+  const cover = data.cover || siteConfig.defaultPostCover;
+
+  return {
+    title: `${title} | ${siteConfig.title}`,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: siteConfig.title,
+      type: 'article',
+      publishedTime: data.date,
+      images: cover ? [{ url: cover }] : undefined,
+    },
+  };
 }
 
 export default async function ChatterDetail({ params }: { params: Promise<{ slug: string }> }) {
@@ -177,8 +219,31 @@ export default async function ChatterDetail({ params }: { params: Promise<{ slug
   const { days: calendarDays } = generateCalendarMatrix(yearStr, monthNum, dayNum);
   const weekDays = ['一', '二', '三', '四', '五', '六', '日'];
 
+  // 封面可能是站内相对路径（/images/x.jpg），也可能是历史外链。
+  // 只有相对路径才需要拼站点域名，否则会拼成坏 URL。
+  const cover = chatterData.cover || siteConfig.defaultPostCover;
+  const coverUrl = cover
+    ? (/^https?:\/\//.test(cover) ? cover : `${siteConfig.siteUrl}${cover}`)
+    : '';
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: chatterData.title,
+    datePublished: chatterData.date,
+    image: coverUrl ? [coverUrl] : undefined,
+    description: chatterData.summary || siteConfig.bio,
+    author: { '@type': 'Person', name: siteConfig.authorName },
+    mainEntityOfPage: `${siteConfig.siteUrl}/chatter/${resolvedParams.slug}`,
+    keywords: chatterData.tags?.join(', '),
+  };
+
   return (
     <div className="min-h-screen relative pb-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       <div>
         <main className="w-[95%] md:w-[90%] max-w-6xl mx-auto mt-24 md:mt-28 flex flex-col lg:flex-row gap-6 md:gap-8 relative z-10">
@@ -237,93 +302,6 @@ export default async function ChatterDetail({ params }: { params: Promise<{ slug
               )}
 
               <div className="relative">
-                <style>{`
-                  .prose h1 { font-size: 1.8rem !important; font-weight: 900 !important; margin-bottom: 1.2rem !important; margin-top: 2rem !important; line-height: 1.3 !important; color: inherit !important; }
-                  .prose h2 { font-size: 1.5rem !important; font-weight: 800 !important; margin-bottom: 1rem !important; margin-top: 1.5rem !important; color: inherit !important; }
-                  .prose h3 { font-size: 1.2rem !important; font-weight: 700 !important; margin-bottom: 0.8rem !important; color: inherit !important; }
-                  .prose p { font-size: 0.95rem !important; line-height: 1.75 !important; color: inherit !important; }
-                  
-                  .prose a { color: var(--accent) !important; text-decoration: none !important; font-weight: 600 !important; border-bottom: 1px dashed var(--accent) !important; transition: all 0.3s ease !important; }
-                  .prose a:hover { color: color-mix(in oklab, var(--accent) 85%, #000) !important; border-bottom-style: solid !important; background-color: color-mix(in srgb, var(--accent) 10%, transparent) !important; padding: 0 0.2rem !important; border-radius: 0.2rem !important; }
-                  .dark .prose a { color: var(--accent) !important; border-bottom-color: var(--accent) !important; }
-                  .dark .prose a:hover { color: color-mix(in oklab, var(--accent) 80%, #fff) !important; background-color: color-mix(in srgb, var(--accent) 15%, transparent) !important; }
-
-                  .prose ul { list-style-type: disc !important; padding-left: 1.5rem !important; font-size: 0.95rem !important; }
-                  .prose ol { list-style-type: decimal !important; padding-left: 1.5rem !important; font-size: 0.95rem !important; }
-                  .prose li { display: list-item !important; margin-bottom: 0.5rem !important; }
-                  
-                  .prose ul ul, .prose ol ul { list-style-type: circle !important; margin-top: 0.25rem !important; margin-bottom: 0.25rem !important; }
-                  .prose ol ol, .prose ul ol { list-style-type: lower-alpha !important; margin-top: 0.25rem !important; margin-bottom: 0.25rem !important; }
-                  
-                  .prose del { text-decoration-color: inherit !important; opacity: 0.6; }
-
-                  /* 🌟 引用块专属果冻极客风样式补丁 */
-                  .prose blockquote {
-                    border-left: 4px solid var(--accent) !important;
-                    background-color: color-mix(in srgb, var(--accent) 5%, transparent) !important;
-                    padding: 1rem 1.5rem !important;
-                    margin: 1.5rem 0 !important;
-                    border-radius: 0 1.25rem 1.25rem 0 !important;
-                    font-style: italic !important;
-                    color: #64748b !important;
-                  }
-                  .prose blockquote p {
-                    margin: 0 !important; 
-                    color: inherit !important;
-                  }
-                  .dark .prose blockquote {
-                    border-left-color: var(--accent) !important;
-                    background-color: color-mix(in srgb, var(--accent) 10%, transparent) !important;
-                    color: var(--ink-soft) !important;
-                  }
-                  
-                  .prose pre {
-                    background-color: #282c34 !important; color: #abb2bf !important;
-                    padding: 1rem !important; border-radius: 0.75rem !important;
-                    overflow-x: auto !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.3) !important;
-                    margin-top: 1rem !important; margin-bottom: 1rem !important;
-                  }
-                  
-                  .prose pre code, .prose p code, .prose li code { 
-                    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, ui-monospace, monospace !important; 
-                    font-variant-ligatures: contextual !important; 
-                  }
-                  .prose pre code { 
-                    background-color: transparent !important; 
-                    padding: 0 !important; 
-                    color: inherit !important; 
-                    font-size: 0.85em !important; 
-                  }
-                  
-                  .prose code::before, .prose code::after { content: none !important; }
-                  .prose p code, .prose li code { background-color: color-mix(in srgb, var(--accent) 10%, transparent) !important; color: var(--accent) !important; padding: 0.1rem 0.3rem !important; border-radius: 0.25rem !important; font-weight: 600 !important; font-size: 0.85em !important; }
-                  .dark .prose p code, .dark .prose li code { background-color: color-mix(in srgb, var(--accent) 20%, transparent) !important; color: var(--accent) !important; }
-                  .prose img { display: block !important; margin: 1.5rem auto !important; border-radius: 1rem !important; box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important; max-width: 100% !important; height: auto !important; }
-
-                  .prose pre code .hljs-comment, .prose pre code .hljs-quote { color: #5c6370 !important; font-style: italic !important; }
-                  .prose pre code .hljs-doctag, .prose pre code .hljs-keyword, .prose pre code .hljs-formula { color: #c678dd !important; }
-                  .prose pre code .hljs-keyword.type_, .prose pre code .hljs-type { color: #c678dd !important; } 
-                  .prose pre code .hljs-section, .prose pre code .hljs-name, .prose pre code .hljs-selector-tag, .prose pre code .hljs-deletion, .prose pre code .hljs-subst { color: #e06c75 !important; }
-                  .prose pre code .hljs-literal { color: #56b6c2 !important; }
-                  .prose pre code .hljs-string, .prose pre code .hljs-regexp, .prose pre code .hljs-addition, .prose pre code .hljs-attribute, .prose pre code .hljs-meta-string { color: #98c379 !important; }
-                  .prose pre code .hljs-built_in, .prose pre code .hljs-class .hljs-title, .prose pre code .hljs-title.class_ { color: #e6c07b !important; } 
-                  .prose pre code .hljs-attr, .prose pre code .hljs-variable, .prose pre code .hljs-template-variable, .prose pre code .hljs-selector-class, .prose pre code .hljs-selector-attr, .prose pre code .hljs-selector-pseudo, .prose pre code .hljs-number { color: #d19a66 !important; }
-                  .prose pre code .hljs-symbol, .prose pre code .hljs-bullet, .prose pre code .hljs-link, .prose pre code .hljs-meta, .prose pre code .hljs-selector-id, .prose pre code .hljs-title, .prose pre code .hljs-title.function_ { color: #61aeee !important; } 
-
-                  @media (min-width: 768px) {
-                    .prose h1 { font-size: 3rem !important; font-weight: 950 !important; margin-bottom: 2rem !important; margin-top: 3rem !important; line-height: 1.1 !important; }
-                    .prose h2 { font-size: 2.2rem !important; margin-bottom: 1.5rem !important; margin-top: 2rem !important; }
-                    .prose h3 { font-size: 1.5rem !important; margin-bottom: 1rem !important; }
-                    .prose p { font-size: 1.15rem !important; line-height: 1.85 !important; }
-                    
-                    .prose ul, .prose ol { padding-left: 2rem !important; font-size: 1.1rem !important; }
-                    
-                    .prose pre { padding: 1.25rem !important; margin-top: 1.5rem !important; margin-bottom: 1.5rem !important; }
-                    .prose pre code { font-size: 0.9em !important; }
-                    .prose p code, .prose li code { padding: 0.2rem 0.4rem !important; font-size: 0.9em !important; border-radius: 0.375rem !important;}
-                    .prose img { margin: 2rem auto !important; border-radius: 2rem !important; box-shadow: 0 20px 50px rgba(0,0,0,0.15) !important; }
-                  }
-                `}</style>
 
                 <div
                   id="article-content"
@@ -392,7 +370,7 @@ export default async function ChatterDetail({ params }: { params: Promise<{ slug
             </div>
 
             <div className="paper-card rounded-2xl p-6 border border-[var(--card-border)] shadow-md">
-              <h3 className="font-black text-slate-900 dark:text-white mb-4 border-l-4 border-indigo-500 pl-2 text-xs tracking-widest uppercase">Recent Records</h3>
+              <h3 className="font-black text-slate-900 dark:text-white mb-4 border-l-4 border-indigo-500 pl-2 text-xs tracking-widest uppercase">近期杂谈 · Recent Records</h3>
               <div className="space-y-4">
                 {recentChatters.map(p => (
                   <Link key={p.slug} href={`/chatter/${p.slug}`} className="group block">

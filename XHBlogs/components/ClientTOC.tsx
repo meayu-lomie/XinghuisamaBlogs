@@ -7,7 +7,7 @@ type TocItem = {
   id: string;
 };
 
-// 🌟 核心增幅：终极 Markdown 净化器！
+// 核心增幅：终极 Markdown 净化器！
 // 专门用来扒掉诸如 [链接名字](https://...) 的外壳，只留下 "链接名字"
 const cleanMarkdownHeading = (rawText: string) => {
   if (!rawText) return '';
@@ -23,7 +23,7 @@ const cleanMarkdownHeading = (rawText: string) => {
     .trim();
 };
 
-// 🌟 底层 ID 净化器
+// 底层 ID 净化器
 const getSafeId = (rawText: string) => {
   // 先把超链接外壳扒掉，得到纯文本
   const cleanText = cleanMarkdownHeading(rawText);
@@ -33,7 +33,7 @@ const getSafeId = (rawText: string) => {
     .toLowerCase();
 };
 
-// 🌟 侧边栏视觉净化器
+// 侧边栏视觉净化器
 const getDisplayText = (rawText: string) => {
   // 直接调用终极净化器，展示纯洁无瑕的标题名！
   return cleanMarkdownHeading(rawText);
@@ -48,7 +48,7 @@ export default function ClientTOC({ toc }: { toc: TocItem[] }) {
 
     const headings = Array.from(contentDiv.querySelectorAll('h1, h2, h3'));
 
-    // 🌟 强制统一正文 ID
+    // 强制统一正文 ID
     headings.forEach((heading) => {
       // heading.textContent 拿到的是渲染后的纯文字（已经没有超链接语法了）
       // 再过一遍 getSafeId，确保正文和侧边栏的 ID 100% 对齐！
@@ -80,7 +80,7 @@ export default function ClientTOC({ toc }: { toc: TocItem[] }) {
   }, [toc]);
 
   const scrollToHeading = (e: React.MouseEvent, id: string) => {
-    // 🌟 防止任何超链接的意外默认行为
+    // 防止任何超链接的意外默认行为
     e.preventDefault();
 
     const targetElement = document.getElementById(id);
@@ -123,7 +123,7 @@ export default function ClientTOC({ toc }: { toc: TocItem[] }) {
   return (
     <div className="paper-card rounded-2xl p-6 border border-[var(--card-border)] shadow-md sticky top-28 transition-colors duration-700 max-h-[75vh] overflow-y-auto custom-scrollbar">
       <h3 className="font-black text-slate-900 dark:text-white mb-4 border-l-4 border-indigo-500 pl-2 text-sm uppercase tracking-widest">
-        Table of Contents
+        目录 · Table of Contents
       </h3>
       <nav className="flex flex-col gap-2 relative">
         <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-slate-200 dark:bg-slate-700/50 rounded-full"></div>
@@ -148,7 +148,7 @@ export default function ClientTOC({ toc }: { toc: TocItem[] }) {
               `}
             >
               {isActive && (
-                <span className="absolute left-[-5px] top-[50%] -translate-y-[50%] w-[6px] h-[6px] rounded-full bg-indigo-500 shadow-[0_0_8px_color-mix(in_srgb,var(--accent)_80%,transparent)]"></span>
+                <span className="absolute left-[-5px] top-[50%] -translate-y-[50%] w-[6px] h-[6px] rounded-full bg-indigo-500 shadow-sm"></span>
               )}
               {displayText}
             </button>

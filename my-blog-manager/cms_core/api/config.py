@@ -9,10 +9,45 @@ from cms_core.paths import get_blog_root
 router = APIRouter()
 
 # ---------------------------------------------------------
-# 🛠️ 寻址引擎：物理锁死 Manager 本地根目录！(终极修复版)
+# 寻址：定位管理端本地根目录
 # ---------------------------------------------------------
 CURRENT_API_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_API_DIR, "..", ".."))
+
+# TS 字符串字面量：双引号 / 单引号 / 反引号，内容允许任意转义序列。
+# 必须识别 \" 这类转义，否则含引号的配置值在第二次写入时会破坏文件
+# （旧模式用 [\s\S]*? 会在第一个转义引号处收尾，把余下内容留成裸文本）。
+# 用命名组 (?P<ts>) 捕获内容，避免多个顶层分支导致组编号漂移。
+TS_STRING = r'"(?:[^"\\]|\\.)*"|' + r"'(?:[^'\\]|\\.)*'|" + r'`(?:[^`\\]|\\.)*`'
+TS_STR_CAP = (r'"(?P<ts_dq>(?:[^"\\]|\\.)*)"|'
+              r"'(?P<ts_sq>(?:[^'\\]|\\.)*)'|"
+              r'`(?P<ts_bq>(?:[^`\\]|\\.)*)`')
+
+
+def _captured(match) -> str | None:
+    """取出 TS 字符串内容（三种引号任一命中），未命中返回 None。"""
+    for name in ('ts_dq', 'ts_sq', 'ts_bq'):
+        val = match.group(name)
+        if val is not None:
+            return val
+    return None
+
+
+def _unescape_ts(raw: str) -> str:
+    """把 TS 字符串字面量里的转义序列还原为真实字符。"""
+    out = []
+    i = 0
+    while i < len(raw):
+        ch = raw[i]
+        if ch == '\\' and i + 1 < len(raw):
+            nxt = raw[i + 1]
+            mapping = {'n': '\n', 'r': '\r', 't': '\t', '"': '"', "'": "'", '`': '`', '\\': '\\'}
+            out.append(mapping.get(nxt, '\\' + nxt))
+            i += 2
+        else:
+            out.append(ch)
+            i += 1
+    return ''.join(out)
 
 
 def get_config_path():
@@ -27,7 +62,7 @@ def get_config_path():
         if os.path.exists(p):
             return p
 
-    print(f"❌ 警告：在 Manager 目录未找到 siteConfig.ts！正在搜索的根目录是: {PROJECT_ROOT}")
+    print(f"警告：在管理端目录未找到 siteConfig.ts，搜索根目录是: {PROJECT_ROOT}")
     return None
 
 
@@ -45,7 +80,7 @@ def dict_to_ts_string(data, indent=2):
     if isinstance(data, dict):
         lines = ["{"]
         for k, v in data.items():
-            # 🌟 核心修复：无论是字典还是外层，全部使用 json.dumps 强制安全转义，彻底消灭 Unterminated string constant
+            # 无论字典还是外层，统一用 json.dumps 安全转义，避免字符串未闭合
             val = json.dumps(v, ensure_ascii=False)
             lines.append(f"{' ' * (indent + 2)}{k}: {val},")
         lines.append(" " * indent + "}")
@@ -54,7 +89,7 @@ def dict_to_ts_string(data, indent=2):
 
 
 # =========================================================
-# 🚀 接口 1：读取配置 (GET) - 终极安全隔离版 (🌟 修复布尔值读取)
+# 接口 1：读取配置 (GET)
 # =========================================================
 @router.get("/get")
 def get_site_config():
@@ -69,7 +104,7 @@ def get_site_config():
         parsed_config = {}
         root_content = content
 
-        # 1. 🌟 预先提取并隔离所有已知的“嵌套对象”，防止内部属性泄露到外层！
+        # 1. 先提取已知的嵌套对象，避免内部属性泄露到外层
         known_dicts = ['social', 'giscusConfig', 'icpConfig']
         for dict_name in known_dicts:
             dict_match = re.search(rf'{dict_name}\s*:\s*\{{([\s\S]+?)\}}', content)
@@ -79,23 +114,20 @@ def get_site_config():
                 root_content = re.sub(rf'{dict_name}\s*:\s*\{{[\s\S]+?\}},?', '', root_content)
 
                 sub_dict = {}
-                # 提取字符串（支持安全匹配包含 \n 的字符串）
-                for m in re.finditer(r'([a-zA-Z0-9_]+)\s*:\s*(["\'])([\s\S]*?)\2', dict_str):
-                    # 将转义的 \\n 恢复为真实的换行，供前端显示
-                    sub_dict[m.group(1)] = m.group(3).replace('\\n', '\n')
-
-
+                # 提取字符串（识别转义序列，避免在 \" 处提前收尾）
+                for m in re.finditer(rf'([a-zA-Z0-9_]+)\s*:\s*({TS_STR_CAP})', dict_str):
+                    sub_dict[m.group(1)] = _unescape_ts(_captured(m) or '')
 
                 parsed_config[dict_name] = sub_dict
 
-        # 2. 🌟 核心升级：提取外层基础变量（现在支持 字符串、布尔值、数字！）
-        for match in re.finditer(r'([a-zA-Z0-9_]+)\s*:\s*(?:(["\'])([\s\S]*?)\2|(true|false|\d+))', root_content):
+        # 2. 提取外层基础变量（字符串、布尔值、数字）
+        for match in re.finditer(rf'([a-zA-Z0-9_]+)\s*:\s*(?:{TS_STR_CAP}|(true|false|\d+))', root_content):
             key = match.group(1)
-            str_val = match.group(3) # 匹配到的字符串
-            raw_val = match.group(4) # 匹配到的布尔或数字
+            str_raw = _captured(match)
+            raw_val = match.group(5)  # 布尔或数字（命名组 ts_dq/ts_sq/ts_bq 占 2-4）
 
-            if str_val is not None:
-                parsed_config[key] = str_val.replace('\\n', '\n')
+            if str_raw is not None:
+                parsed_config[key] = _unescape_ts(str_raw)
             elif raw_val == 'true':
                 parsed_config[key] = True
             elif raw_val == 'false':
@@ -104,12 +136,13 @@ def get_site_config():
                 parsed_config[key] = int(raw_val)
 
         return {"success": True, "data": parsed_config}
+
     except Exception as e:
         return {"success": False, "message": f"解析失败: {str(e)}"}
 
 
 # =========================================================
-# 🚀 接口 2：写入配置 (POST) - 白名单防漏防崩溃版
+# 接口 2：写入配置 (POST)，带根节点白名单
 # =========================================================
 @router.post("/update")
 def update_site_config(payload: Dict[str, Any] = Body(...)):
@@ -121,12 +154,12 @@ def update_site_config(payload: Dict[str, Any] = Body(...)):
     if not config_path:
         return {"success": False, "message": "未能扫描到 siteConfig.ts"}
 
-    # 🌟 核心防线：绝对安全的根节点白名单！
+    # 根节点白名单：拦截非配置字段
     VALID_ROOT_KEYS = {
         "siteUrl", "title", "authorName", "bio", "avatarUrl", "useGradient", "themeColors",
         "bgImages", "bgEnabled", "defaultPostCover", "photoWallImage", "social",
         "counts", "chatterTitle", "chatterDescription", "picBedName", "picBedUrl",
-        "picBedToken", "giscusConfig", "buildDate", "footerBadges",
+        "picBedToken", "giscusConfig", "buildDate",
         "icpConfig",
         "faviconUrl",
         "navTitle",
@@ -139,13 +172,13 @@ def update_site_config(payload: Dict[str, Any] = Body(...)):
         with open(path, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        print(f"🔥 写入目标文件: {path}")
+        print(f"写入目标文件: {path}")
         count = 0
 
         for key, value in updates.items():
             # 拦截非白名单字段，防止误写危险字段
             if key not in VALID_ROOT_KEYS:
-                print(f"  🛑 拦截非根节点字段 -> [{key}]")
+                print(f"  拦截非根节点字段 -> [{key}]")
                 continue
 
             if isinstance(value, str):
@@ -162,12 +195,18 @@ def update_site_config(payload: Dict[str, Any] = Body(...)):
             elif isinstance(value, list):
                 pattern = rf"({key}\s*:\s*)\[[\s\S]*?\]"
             else:
-                pattern = rf"({key}\s*:\s*)(['\"`][\s\S]*?['\"`]|true|false|\d+)"
+                # 用能识别转义的 TS_STRING：旧写法 [\s\S]*? 会在 \" 处提前收尾，
+                # 含引号的值被二次写入后，文件里会留下裸文本 → 语法错误。
+                pattern = rf"({key}\s*:\s*)({TS_STRING}|true|false|\d+)"
 
             if re.search(pattern, content):
                 content = re.sub(pattern, lambda m: m.group(1) + val_str, content, count=1)
-                print(f"  ✅ 已更新 -> [{key}]")
+                print(f"  已更新 -> [{key}]")
                 count += 1
+            else:
+                # 字段不在文件里（前端加了新字段但 siteConfig 还没写），
+                # 静默跳过会让用户以为保存成功，这里如实打印。
+                print(f"  文件中没有该字段，已跳过 -> [{key}]")
 
         with open(path, 'w', encoding='utf-8') as f:
             f.write(content)
@@ -183,7 +222,7 @@ def update_site_config(payload: Dict[str, Any] = Body(...)):
         if blog_config:
             n_blog = apply_updates(blog_config)
         else:
-            print("⚠️ 未找到博客前端的 siteConfig.ts，本次只更新了管理端配置")
+            print("未找到博客前端的 siteConfig.ts，本次只更新了管理端配置")
 
         print("=" * 50 + "\n")
 
@@ -205,5 +244,5 @@ def update_site_config(payload: Dict[str, Any] = Body(...)):
         return {"success": True, "message": msg}
 
     except Exception as e:
-        print(f"❌ 写入发生错误: {str(e)}")
+        print(f"写入发生错误: {str(e)}")
         return {"success": False, "message": f"文件读写错误: {str(e)}"}

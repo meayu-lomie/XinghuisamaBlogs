@@ -10,7 +10,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
 type ActivityRecord = {
   id: string;
-  type: '文章' | '杂谈' | '说说';
+  type: '杂谈' | '说说';
   title: string;
   date: string;
   url: string;
@@ -116,7 +116,6 @@ export default function AboutClient({
 
   const getTypeColor = (type: string) => {
     switch(type) {
-      case '文章': return 'text-indigo-600 dark:text-indigo-400';
       case '杂谈': return 'text-purple-600 dark:text-purple-400';
       case '说说': return 'text-pink-600 dark:text-pink-400';
       default: return 'text-slate-500 dark:text-slate-400';
@@ -136,11 +135,11 @@ export default function AboutClient({
           <img src={siteConfig.avatarUrl} alt="avatar" className="w-full h-full object-cover" />
         </div>
 
-        {/* 🌟 核心修复区：手机端排版优雅适配 */}
+        {/* 核心修复区：手机端排版优雅适配 */}
         <div className="mt-4 md:mt-6 mb-6 md:mb-8 relative flex flex-col md:flex-row md:items-end justify-between gap-5 md:gap-4">
           <div className="text-center md:text-left">
             <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-1 md:mb-3 transition-colors duration-700">关于我</h1>
-            <p className="text-sm md:text-lg text-indigo-600 dark:text-indigo-400 font-bold tracking-widest uppercase transition-colors duration-700">Hello World, I'm {siteConfig.authorName}</p>
+            <p className="text-sm md:text-lg text-indigo-600 dark:text-indigo-400 font-bold tracking-widest uppercase transition-colors duration-700">你好，我是 {siteConfig.authorName} · Hello World</p>
           </div>
 
           <div className="flex items-center w-full md:w-auto gap-1 paper-card p-1 md:p-1.5 rounded-xl md:rounded-2xl shadow-inner border border-[var(--card-border)]">
@@ -154,7 +153,7 @@ export default function AboutClient({
               onClick={() => handleTabChange('activity')}
               className={`flex-1 md:flex-none px-4 md:px-6 py-2 md:py-2 rounded-lg md:rounded-xl text-xs md:text-sm font-black transition-all duration-300 ${activeTab === 'activity' ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-500 hover:text-indigo-500'}`}
             >
-              研究动态
+              近期更新
             </button>
           </div>
         </div>
@@ -165,53 +164,6 @@ export default function AboutClient({
           {activeTab === 'intro' && (
             <motion.div key="intro" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
               <div className="relative">
-                <style>{`
-                  .prose h1 { font-size: 1.8rem !important; font-weight: 900 !important; margin-bottom: 1.2rem !important; margin-top: 2rem !important; line-height: 1.3 !important; color: inherit !important; }
-                  .prose h2 { font-size: 1.5rem !important; font-weight: 800 !important; margin-bottom: 1rem !important; margin-top: 1.5rem !important; color: inherit !important; }
-                  .prose h3 { font-size: 1.2rem !important; font-weight: 700 !important; margin-bottom: 0.8rem !important; color: inherit !important; }
-                  .prose p { font-size: 0.95rem !important; line-height: 1.75 !important; color: inherit !important; }
-                  .prose ul, .prose ol { padding-left: 1.2rem !important; font-size: 0.95rem !important; }
-
-                  .prose pre {
-                    background-color: #282c34 !important; color: #abb2bf !important;
-                    padding: 1rem !important; border-radius: 0.75rem !important;
-                    overflow-x: auto !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.3) !important;
-                    margin-top: 1rem !important; margin-bottom: 1rem !important;
-                  }
-                  
-                  .prose pre code, .prose p code, .prose li code { 
-                    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, ui-monospace, monospace !important; 
-                    font-variant-ligatures: contextual !important; 
-                  }
-                  .prose pre code { 
-                    background-color: transparent !important; 
-                    padding: 0 !important; 
-                    color: inherit !important; 
-                    font-size: 0.85em !important; 
-                  }
-                  
-                  .prose code::before, .prose code::after { content: none !important; }
-                  .prose p code, .prose li code { background-color: color-mix(in srgb, var(--accent) 10%, transparent) !important; color: var(--accent) !important; padding: 0.1rem 0.3rem !important; border-radius: 0.25rem !important; font-weight: 600 !important; font-size: 0.85em !important; }
-                  .dark .prose p code, .dark .prose li code { background-color: color-mix(in srgb, var(--accent) 20%, transparent) !important; color: var(--accent) !important; }
-                  .prose img { display: block !important; margin: 1.5rem auto !important; border-radius: 1rem !important; box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important; max-width: 100% !important; height: auto !important; }
-
-                  .prose pre code .hljs-comment, .prose pre code .hljs-quote { color: #5c6370 !important; font-style: italic !important; }
-                  .prose pre code .hljs-doctag, .prose pre code .hljs-keyword, .prose pre code .hljs-formula { color: #c678dd !important; }
-                  .prose pre code .hljs-section, .prose pre code .hljs-name, .prose pre code .hljs-selector-tag, .prose pre code .hljs-deletion, .prose pre code .hljs-subst { color: #e06c75 !important; }
-                  .prose pre code .hljs-literal { color: #56b6c2 !important; }
-                  .prose pre code .hljs-string, .prose pre code .hljs-regexp, .prose pre code .hljs-addition, .prose pre code .hljs-attribute, .prose pre code .hljs-meta-string { color: #98c379 !important; }
-                  .prose pre code .hljs-built_in, .prose pre code .hljs-class .hljs-title { color: #e6c07b !important; }
-                  .prose pre code .hljs-attr, .prose pre code .hljs-variable, .prose pre code .hljs-template-variable, .prose pre code .hljs-type, .prose pre code .hljs-selector-class, .prose pre code .hljs-selector-attr, .prose pre code .hljs-selector-pseudo, .prose pre code .hljs-number { color: #d19a66 !important; }
-                  .prose pre code .hljs-symbol, .prose pre code .hljs-bullet, .prose pre code .hljs-link, .prose pre code .hljs-meta, .prose pre code .hljs-selector-id, .prose pre code .hljs-title { color: #61aeee !important; }
-
-                  @media (min-width: 768px) {
-                    .prose h1 { font-size: 3rem !important; font-weight: 950 !important; margin-bottom: 2rem !important; margin-top: 3rem !important; line-height: 1.1 !important; }
-                    .prose h2 { font-size: 2.2rem !important; margin-bottom: 1.5rem !important; margin-top: 2rem !important; }
-                    .prose p { font-size: 1.15rem !important; }
-                    .prose pre { padding: 1.25rem !important; margin-top: 1.5rem !important; margin-bottom: 1.5rem !important; }
-                    .prose pre code { font-size: 0.9em !important; }
-                  }
-                `}</style>
                 <div className="prose prose-slate dark:prose-invert prose-base md:prose-lg max-w-none text-slate-800 dark:text-slate-200 font-serif transition-colors duration-700 leading-relaxed scroll-smooth" dangerouslySetInnerHTML={{ __html: contentHtml }} />
               </div>
               <div className="mt-12 md:mt-16"><Comments /></div>
@@ -224,7 +176,7 @@ export default function AboutClient({
               <div className="mb-12 p-5 md:p-8 bg-slate-50/50 rounded-2xl border border-slate-200/50 shadow-inner">
                 <h3 className="text-lg font-black text-slate-800 dark:text-white mb-6 flex items-center gap-2">
                   <Activity size={20} className="text-green-500" />
-                  {activities.length} contributions in the last year
+                  过去一年 {activities.length} 次记录 · Contributions in the last year
                 </h3>
 
                 <div className="flex gap-2">
@@ -348,7 +300,7 @@ export default function AboutClient({
                 })}
 
                 {activities.length === 0 && (
-                  <div className="text-slate-500 text-sm font-bold">源石数据库中暂无活动记录...</div>
+                  <div className="text-slate-500 text-sm font-bold">暂无活动记录...</div>
                 )}
               </div>
 

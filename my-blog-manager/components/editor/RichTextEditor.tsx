@@ -15,12 +15,10 @@ import { Color } from '@tiptap/extension-color';
 import TaskList from '@tiptap/extension-task-list';
 import TaskItem from '@tiptap/extension-task-item';
 
-// 🌟 引入 Markdown 插件
-import { Markdown } from 'tiptap-markdown';
 
-// 🌟 引入满血版 C++ 语法高亮
+// 引入满血版 C++ 语法高亮
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
-import { createLowlight, all } from 'lowlight';
+import { createLowlight, common } from 'lowlight';
 
 import {
   Undo2, Redo2, Eraser, Bold, Italic, Underline as UnderlineIcon, Strikethrough,
@@ -31,7 +29,9 @@ import {
   Sparkles
 } from 'lucide-react';
 
-const lowlight = createLowlight(all);
+// 编辑器代码块只用这几种语言，注册 common 集即可，
+// 原先 createLowlight(all) 会打进 190+ 种语言的语法定义。
+const lowlight = createLowlight(common);
 
 const CustomImage = Image.extend({
   addAttributes() {
@@ -54,10 +54,10 @@ const FontSize = Extension.create({
   addCommands() { return { setFontSize: (fontSize: string) => ({ chain }) => chain().setMark('textStyle', { fontSize }).run() }; },
 });
 
-// 🌟 终极修复：彻底废弃 absolute 下拉框，升级为 Fixed 居中模态框 (Modal)！
+// 终极修复：彻底废弃 absolute 下拉框，升级为 Fixed 居中模态框 (Modal)！
 // 这样就能 100% 逃脱父级容器的 overflow 限制，绝对不可能再被遮挡！
 const CustomColorPicker = ({ activeColor, onSelect, onConfirm, recentColors, onClose }: any) => {
-  const presets = ['#000000', '#6366F1', '#EC4899', '#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#8B5CF6'];
+  const presets = ['#000000', 'var(--accent)', '#EC4899', '#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#8B5CF6'];
   const [hex, setHex] = useState(activeColor);
   return (
     <>
@@ -65,10 +65,10 @@ const CustomColorPicker = ({ activeColor, onSelect, onConfirm, recentColors, onC
       <div className="fixed inset-0 z-[9990] bg-slate-900/20 dark:bg-black/40 transition-all" onClick={onClose} />
 
       {/* 永远居中显示的调色板面板 */}
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 paper-card-strong rounded-[32px] p-6 shadow-lg border border-[var(--card-border)] z-[9999] animate-in fade-in zoom-in-95 duration-200">
+      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 paper-card-strong rounded-2xl p-6 shadow-lg border border-[var(--card-border)] z-[9999] animate-in fade-in zoom-in-95 duration-200">
         <div className="flex flex-col gap-5">
           <div className="flex justify-between items-center">
-            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Color Palette</span>
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">取色 · Color Palette</span>
             <button onClick={() => onConfirm(hex)} className="w-8 h-8 flex items-center justify-center bg-indigo-500 text-white rounded-full hover:scale-110 transition-transform">
               <Check size={16}/>
             </button>
@@ -126,7 +126,7 @@ interface EditorProps {
 }
 
 const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, setTitle, initialContent, onOpenImageTool, onPolishClick, isTitleLocked, onChange }, ref) => {
-  const [textColors, setTextColors] = useState<string[]>(['#6366F1', '#000000']);
+  const [textColors, setTextColors] = useState<string[]>(['var(--accent)', '#000000']);
   const [highlightColors, setHighlightColors] = useState<string[]>(['#FEF08A', '#BBF7D0']);
   const [showTextPicker, setShowTextPicker] = useState(false);
   const [showHighlightPicker, setShowHighlightPicker] = useState(false);
@@ -144,7 +144,7 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, s
         lowlight,
         defaultLanguage: 'cpp',
         HTMLAttributes: {
-          class: 'bg-[#282c34] text-[#abb2bf] p-6 rounded-[1.5rem] font-mono my-6 overflow-x-auto shadow-inner'
+          class: 'bg-[var(--code-bg)] text-[var(--code-fg)] p-6 rounded-2xl font-mono my-6 overflow-x-auto shadow-inner'
         },
       }),
       Underline, Subscript, Superscript, TextStyle, Color, FontSize, CustomImage,
@@ -233,56 +233,6 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, s
 
   return (
     <div className="flex flex-col h-full w-full min-h-0 bg-transparent relative">
-      <style dangerouslySetInnerHTML={{ __html: `
-        .editor-content-area h1 { font-size: 3rem !important; font-weight: 950 !important; margin-bottom: 2rem !important; margin-top: 3rem !important; line-height: 1.1; color: inherit; } 
-        .editor-content-area h2 { font-size: 2.2rem !important; font-weight: 800 !important; margin-bottom: 1.5rem !important; margin-top: 2rem !important; } 
-        .editor-content-area h3 { font-size: 1.5rem !important; font-weight: 700 !important; margin-bottom: 1rem !important; } 
-        .editor-content-area p { font-size: 1.15rem !important; line-height: 1.85 !important; } 
-        .editor-content-area ul { list-style-type: disc !important; padding-left: 1.5rem !important; } 
-        .editor-content-area ol { list-style-type: decimal !important; padding-left: 1.5rem !important; }
-        
-        .editor-content-area s, .editor-content-area del { text-decoration-line: line-through !important; opacity: 0.6; }
-
-        .editor-content-area blockquote {
-          border-left: 4px solid var(--accent) !important;
-          background-color: color-mix(in srgb, var(--accent) 5%, transparent) !important;
-          padding: 1rem 1.5rem !important;
-          margin: 1.5rem 0 !important;
-          border-radius: 0 1.25rem 1.25rem 0 !important;
-          font-style: italic !important;
-          color: #64748b !important;
-        }
-        .editor-content-area blockquote p {
-          margin: 0 !important; 
-          color: inherit !important;
-        }
-        .dark .editor-content-area blockquote {
-          border-left-color: var(--accent) !important;
-          background-color: color-mix(in srgb, var(--accent) 10%, transparent) !important;
-          color: #94a3b8 !important;
-        }
-
-        .editor-content-area pre code, .editor-content-area p code {
-          font-family: ui-rounded, 'Quicksand', 'Nunito', 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Source Code Pro', Menlo, Monaco, Consolas, monospace !important;
-          font-variant-ligatures: contextual !important;
-          font-weight: 500 !important;
-          letter-spacing: 0.02em !important;
-        }
-        
-        .editor-content-area p code {
-           background-color: color-mix(in srgb, var(--accent) 10%, transparent) !important; color: var(--accent) !important; padding: 0.2rem 0.4rem !important; border-radius: 0.5rem !important; font-size: 0.85em !important;
-        }
-
-        .editor-content-area pre code .hljs-comment, .editor-content-area pre code .hljs-quote { color: #5c6370; font-style: italic; }
-        .editor-content-area pre code .hljs-doctag, .editor-content-area pre code .hljs-keyword, .editor-content-area pre code .hljs-formula { color: #c678dd; }
-        .editor-content-area pre code .hljs-keyword.type_, .editor-content-area pre code .hljs-type { color: #c678dd; } 
-        .editor-content-area pre code .hljs-section, .editor-content-area pre code .hljs-name, .editor-content-area pre code .hljs-selector-tag, .editor-content-area pre code .hljs-deletion, .editor-content-area pre code .hljs-subst { color: #e06c75; }
-        .editor-content-area pre code .hljs-literal { color: #56b6c2; }
-        .editor-content-area pre code .hljs-string, .editor-content-area pre code .hljs-regexp, .editor-content-area pre code .hljs-addition, .editor-content-area pre code .hljs-attribute, .editor-content-area pre code .hljs-meta-string { color: #98c379; }
-        .editor-content-area pre code .hljs-built_in, .editor-content-area pre code .hljs-class .hljs-title, .editor-content-area pre code .hljs-title.class_ { color: #e6c07b; } 
-        .editor-content-area pre code .hljs-attr, .editor-content-area pre code .hljs-variable, .editor-content-area pre code .hljs-template-variable, .editor-content-area pre code .hljs-selector-class, .editor-content-area pre code .hljs-selector-attr, .editor-content-area pre code .hljs-selector-pseudo, .editor-content-area pre code .hljs-number { color: #d19a66; }
-        .editor-content-area pre code .hljs-symbol, .editor-content-area pre code .hljs-bullet, .editor-content-area pre code .hljs-link, .editor-content-area pre code .hljs-meta, .editor-content-area pre code .hljs-selector-id, .editor-content-area pre code .hljs-title, .editor-content-area pre code .hljs-title.function_ { color: #61aeee; } 
-      `}} />
 
       <div className="shrink-0 px-12 pt-14 pb-4 flex items-center gap-4">
         <input
@@ -298,7 +248,7 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, s
         {isTitleLocked && (
           <div className="px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-2xl flex items-center gap-2 text-slate-400 border border-slate-200 dark:border-slate-700 animate-in fade-in slide-in-from-right duration-500">
             <Lock size={16} />
-            <span className="text-[10px] font-black uppercase tracking-widest">System Locked</span>
+            <span className="text-[10px] font-black uppercase tracking-widest">标题已锁定 · System Locked</span>
           </div>
         )}
       </div>
@@ -390,7 +340,7 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, s
       </div>
 
       {/* 将弹窗从 Toolbar 结构中抽离出来，独立于 Flex 布局之外！ */}
-      {showTextPicker && <CustomColorPicker activeColor="#6366F1" recentColors={textColors} onClose={() => setShowTextPicker(false)} onSelect={(c: string) => editor.chain().focus().setColor(c).run()} onConfirm={(c: string) => { if(!textColors.includes(c)) setTextColors(p => [c, ...p].slice(0, 6)); setShowTextPicker(false); }} />}
+      {showTextPicker && <CustomColorPicker activeColor="var(--accent)" recentColors={textColors} onClose={() => setShowTextPicker(false)} onSelect={(c: string) => editor.chain().focus().setColor(c).run()} onConfirm={(c: string) => { if(!textColors.includes(c)) setTextColors(p => [c, ...p].slice(0, 6)); setShowTextPicker(false); }} />}
       {showHighlightPicker && <CustomColorPicker activeColor="#FEF08A" recentColors={highlightColors} onClose={() => setShowHighlightPicker(false)} onSelect={(c: string) => editor.chain().focus().setHighlight({ color: c }).run()} onConfirm={(c: string) => { if(!highlightColors.includes(c)) setHighlightColors(p => [c, ...p].slice(0, 6)); setShowHighlightPicker(false); }} />}
 
       <div className="flex-1 overflow-y-auto px-12 py-12 custom-scrollbar"><EditorContent editor={editor} /></div>

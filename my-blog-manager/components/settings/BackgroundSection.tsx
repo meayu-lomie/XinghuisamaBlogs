@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '../ToastProvider';
 import { toPreviewSrc } from '../imagePreview';
+import { Clock, Cloud } from 'lucide-react';
 
 export default function BackgroundSection({ formData, handleUpdate, pushToQueue }: any) {
   const { showToast } = useToast();
@@ -9,13 +10,13 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
   const [isUploading, setIsUploading] = useState(false);
   const [isTogglingBg, setIsTogglingBg] = useState(false);
 
-  // 👈 新增状态：用来存放刚刚上传成功，但还没决定是否加入背景的图片 URL
+  // 新增状态：用来存放刚刚上传成功，但还没决定是否加入背景的图片 URL
   const [pendingImageUrl, setPendingImageUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   /**
    * 切换全站背景轮播开关。
-   * 这个开关直接写后端（不走操作队列）：队列发送的是整个表单快照，
+   * 这个开关直接写后端（不走收件箱）：收件箱发送的是整个表单快照，
    * 开关值在其中容易过期；而且开关属于「立即想看到效果」的操作。
    */
   const toggleBgEnabled = async () => {
@@ -104,7 +105,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
       const data = await res.json();
       if (data.success && data.url) {
         showToast("图片上传成功，请确认是否加入背景库", "success");
-        // 👈 上传成功，拿到真实 URL，触发确认面板
+        // 上传成功，拿到真实 URL，触发确认面板
         setPendingImageUrl(data.url);
       } else {
         showToast(`上传失败: ${data.message}`, "error");
@@ -148,13 +149,13 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
           <h2 className="text-xl font-black text-slate-800 dark:text-white flex items-center gap-2">视觉背景配置</h2>
           <p className="text-[10px] font-bold text-slate-400 mt-2 uppercase">管理网站的全局轮播背景图 ({formData.bgImages?.length || 0} 张)</p>
         </div>
-        {/* 👈 修复暂存参数：传入真正的 key 和 value */}
+        {/* 修复暂存参数：传入真正的 key 和 value */}
         <button onClick={() => pushToQueue('视觉背景图', 'bgImages', formData.bgImages)} className="px-6 py-2 bg-indigo-500 text-white rounded-xl text-xs font-black shadow-lg active:scale-95 transition-all">
           暂存背景修改
         </button>
       </header>
 
-      {/* 🌟 全站背景轮播开关 */}
+      {/* 全站背景轮播开关 */}
       <div className="relative z-10 flex items-center justify-between gap-4 paper-card rounded-2xl px-6 py-5 border border-[var(--card-border)] dark:border-slate-700/50 shadow-sm">
         <div className="min-w-0">
           <p className="text-sm font-black text-slate-800 dark:text-white">全站背景轮播</p>
@@ -199,7 +200,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
             <p className="text-[10px] font-black text-slate-400 uppercase mb-3">粘贴网络图片 URL</p>
             <div className="flex gap-2">
               <input type="text" placeholder="https://..." value={formData.newBgUrl} onChange={e => handleUpdate('newBgUrl', e.target.value)} className="flex-1 bg-white dark:bg-slate-900 border-none rounded-xl px-4 py-2 text-xs outline-none shadow-inner" />
-              <button onClick={addBgUrl} className="px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-black shadow-lg shadow-emerald-500/20 active:scale-95">添加</button>
+              <button onClick={addBgUrl} className="px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-black shadow-sm active:scale-95">添加</button>
             </div>
           </div>
 
@@ -213,7 +214,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
             <input type="file" ref={fileInputRef} onChange={e => e.target.files && handleFileUpload(e.target.files[0])} className="hidden" accept="image/*" />
 
             <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl shadow-md transition-all duration-300 ${isDragging ? 'bg-indigo-500 text-white rotate-12' : 'bg-white dark:bg-slate-800 text-slate-500'}`}>
-              {isUploading ? "⏳" : "☁️"}
+              {isUploading ? <Clock size={26} className="animate-pulse" /> : <Cloud size={26} />}
             </div>
 
             <div className="text-center z-10">
@@ -231,7 +232,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
         </div>
       </div>
 
-      {/* 👈 【新增】：上传成功后的浮动确认面板 */}
+      {/* 上传成功后的浮动确认面板 */}
       <AnimatePresence>
         {pendingImageUrl && (
           <motion.div
@@ -252,7 +253,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
                 <button onClick={cancelPendingImage} className="flex-1 py-3 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-bold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
                   不了，仅上传
                 </button>
-                <button onClick={confirmAddPendingImage} className="flex-1 py-3 bg-pink-500 text-white rounded-xl text-xs font-black shadow-lg shadow-pink-500/30 hover:bg-pink-600 active:scale-95 transition-all">
+                <button onClick={confirmAddPendingImage} className="flex-1 py-3 bg-pink-500 text-white rounded-xl text-xs font-black shadow-sm hover:bg-pink-600 active:scale-95 transition-all">
                   加入背景库
                 </button>
               </div>

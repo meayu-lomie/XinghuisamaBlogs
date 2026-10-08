@@ -27,9 +27,6 @@ my-blog-manager/posts/
 my-blog-manager/chatters/
 my-blog-manager/moments/
 
-# ---- 同步备份（历史遗留）----
-XHBlogs/_sync_backup/
-
 # ---- 编辑器/系统临时文件 ----
 *.swp
 *.swo

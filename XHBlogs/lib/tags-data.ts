@@ -21,7 +21,7 @@ export function collectTags(): Map<string, { slug: string; title: string; date: 
           if (!map.has(t)) map.set(t, []);
           map.get(t)!.push({
             slug: f.replace(/\.md$/, ''),
-            title: data.title || '碎片记录',
+            title: data.title || '无标题',
             date: data.date || '',
           });
         }

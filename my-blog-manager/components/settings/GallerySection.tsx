@@ -8,7 +8,7 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
   const [testResult, setTestResult] = useState<{ success: boolean, msg: string } | null>(null);
 
   const handleTestConnection = async () => {
-    // 👈 彻底去掉写死逻辑，完全读取用户在界面输入的 URL 和 Token
+    // 彻底去掉写死逻辑，完全读取用户在界面输入的 URL 和 Token
     const url = formData.picBedUrl;
     const token = formData.picBedToken;
 
@@ -52,10 +52,9 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
       showToast("API 地址和 TOKEN 不能为空，无法暂存！", "error");
       return;
     }
-    // 👈 三个参数全部推送到操作队列
-    pushToQueue('更新图床名称', 'picBedName', formData.picBedName);
-    pushToQueue('更新图床 API', 'picBedUrl', formData.picBedUrl);
-    pushToQueue('更新图床 Token', 'picBedToken', formData.picBedToken);
+    // pushToQueue 推送的是整个表单快照，key/value 会被忽略；
+    // 图床三项配置在同一份快照里，推一次即可，重复推送只会塞满收件箱。
+    pushToQueue('图床配置');
   };
 
   return (
@@ -73,7 +72,7 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
           />
         </div>
 
-        {/* 👈 新增：彻底解耦的 API 地址输入框 */}
+        {/* 新增：彻底解耦的 API 地址输入框 */}
         <div>
           <label className="text-[10px] font-black text-slate-400 uppercase ml-1">API 接口地址 (URL)</label>
           <input
@@ -100,8 +99,8 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
           <button
             onClick={handleTestConnection}
             disabled={isTesting}
-            className={`flex-1 py-3 rounded-2xl text-sm font-black shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2
-              ${isTesting ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-pink-500 text-white hover:bg-pink-600 shadow-pink-500/30'}`}
+            className={`flex-1 py-3 rounded-2xl text-sm font-black shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2
+              ${isTesting ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-pink-500 text-white hover:bg-pink-600'}`}
           >
             {isTesting ? (
               <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>

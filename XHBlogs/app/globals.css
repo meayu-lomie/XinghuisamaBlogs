@@ -9,6 +9,9 @@
      .theme-xuan    宣纸·昼      .theme-xuan.dark    宣纸·夜
      .theme-journal 手账·昼      .theme-journal.dark 手账·夜
    默认（未加 class）走宣纸·昼，保证首屏不闪。
+
+   语义色（状态色）：ok 石绿 / warn 赭石 / danger 绛红，
+   与纸张同族，避免上游的荧光绿、警示黄、纯红。
    ======================================================== */
 :root,
 .theme-xuan {
@@ -16,13 +19,17 @@
   --paper-deep: #efe9dc;
   --ink: #2b2620;
   --ink-soft: #6f6558;
-  --ink-faint: #a89c8a;
+  --ink-faint: #776d60;
   --rule: rgba(43, 38, 32, .16);
   --accent: #a63a2e;
   --accent-soft: rgba(166, 58, 46, .35);
   --card: #fbf8f1;
   --card-border: rgba(43, 38, 32, .12);
-  --code-bg: rgba(43, 38, 32, .06);
+  --ok: #4a7c59;
+  --warn: #9a6b2f;
+  --danger: #8c2f26;
+  --code-bg: #2b2620;
+  --code-fg: #e8e2d6;
   --paper-grain-blend: multiply;
   --paper-grain-opacity: .07;
 }
@@ -32,13 +39,17 @@
   --paper-deep: #1e1a14;
   --ink: #e6ded0;
   --ink-soft: #a49883;
-  --ink-faint: #6d6355;
+  --ink-faint: #877e70;
   --rule: rgba(230, 222, 208, .15);
-  --accent: #c9563f;
+  --accent: #cb5c46;
   --accent-soft: rgba(201, 86, 63, .42);
   --card: #1f1b15;
   --card-border: rgba(230, 222, 208, .1);
-  --code-bg: rgba(230, 222, 208, .08);
+  --ok: #7fb98d;
+  --warn: #d0a15c;
+  --danger: #d4685a;
+  --code-bg: #100e0b;
+  --code-fg: #ded6c8;
   --paper-grain-blend: screen;
   --paper-grain-opacity: .05;
 }
@@ -47,19 +58,21 @@
   --paper: #fdfbf7;
   --paper-deep: #f5f1e8;
   --ink: #3a3733;
-  --ink-soft: #7b756c;
-  --ink-faint: #a9a29a;
+  --ink-soft: #79736a;
+  --ink-faint: #79736d;
   --rule: rgba(58, 55, 51, .14);
-  --accent: #d5796a;
+  --accent: #a36358;
   --accent-soft: rgba(214, 121, 106, .3);
   --card: #fffefb;
   --card-border: rgba(58, 55, 51, .09);
-  --code-bg: rgba(182, 220, 200, .38);
+  --ok: #5f8f6b;
+  --warn: #a97b3a;
+  --danger: #b04a3c;
   --grid: rgba(122, 148, 168, .17);
-  --tape-mint: #b6dcc8;
-  --tape-butter: #f2e6ad;
   --paper-grain-blend: multiply;
   --paper-grain-opacity: .05;
+  --code-bg: #2b2620;
+  --code-fg: #e8e2d6;
 }
 
 .theme-journal.dark {
@@ -67,20 +80,21 @@
   --paper-deep: #22262c;
   --ink: #e3e1dd;
   --ink-soft: #a5a19b;
-  --ink-faint: #767269;
+  --ink-faint: #89857d;
   --rule: rgba(227, 225, 221, .14);
   --accent: #e29a89;
   --accent-soft: rgba(226, 154, 137, .3);
   --card: #23262c;
   --card-border: rgba(227, 225, 221, .1);
-  --code-bg: rgba(122, 190, 158, .16);
+  --ok: #8cc29a;
+  --warn: #d9b06a;
+  --danger: #e08573;
   --grid: rgba(138, 168, 200, .13);
-  --tape-mint: rgba(122, 190, 158, .3);
-  --tape-butter: rgba(226, 206, 130, .28);
   --paper-grain-blend: screen;
   --paper-grain-opacity: .04;
+  --code-bg: #17191d;
+  --code-fg: #dfe3e0;
 }
-
 /* ========================================================
    2b. 色板重映射：Tailwind 强调色族 → 印章红
    --------------------------------------------------------
@@ -101,10 +115,22 @@
   --color-indigo-700: color-mix(in oklab, var(--accent) 72%, #000);
   --color-indigo-800: color-mix(in oklab, var(--accent) 56%, #000);
   --color-indigo-900: color-mix(in oklab, var(--accent) 40%, #000);
+  --color-indigo-950: color-mix(in oklab, var(--accent) 26%, #000);
 }
 
 /* 紫/粉色族同样重映射（这些颜色在本项目里只作强调色用） */
 :root {
+  --color-purple-50:  color-mix(in oklab, var(--accent) 6%,  var(--paper));
+  --color-purple-100: color-mix(in oklab, var(--accent) 13%, var(--paper));
+  --color-purple-200: color-mix(in oklab, var(--accent) 26%, var(--paper));
+  --color-purple-300: color-mix(in oklab, var(--accent) 44%, var(--paper));
+  --color-purple-400: color-mix(in oklab, var(--accent) 64%, var(--paper));
+  --color-purple-500: var(--accent);
+  --color-purple-600: color-mix(in oklab, var(--accent) 88%, #000);
+  --color-purple-700: color-mix(in oklab, var(--accent) 72%, #000);
+  --color-purple-800: color-mix(in oklab, var(--accent) 56%, #000);
+  --color-purple-900: color-mix(in oklab, var(--accent) 40%, #000);
+
   --color-pink-50:  color-mix(in oklab, var(--accent) 6%,  var(--paper));
   --color-pink-100: color-mix(in oklab, var(--accent) 13%, var(--paper));
   --color-pink-200: color-mix(in oklab, var(--accent) 26%, var(--paper));
@@ -112,9 +138,9 @@
   --color-pink-400: color-mix(in oklab, var(--accent) 64%, var(--paper));
   --color-pink-500: var(--accent);
   --color-pink-600: color-mix(in oklab, var(--accent) 88%, #000);
-  --color-purple-400: color-mix(in oklab, var(--accent) 64%, var(--paper));
-  --color-purple-500: var(--accent);
-  --color-purple-600: color-mix(in oklab, var(--accent) 88%, #000);
+  --color-pink-700: color-mix(in oklab, var(--accent) 72%, #000);
+  --color-pink-800: color-mix(in oklab, var(--accent) 56%, #000);
+  --color-pink-900: color-mix(in oklab, var(--accent) 40%, #000);
 }
 
 /* 暗色下浅档往亮处推，保证 dark:text-indigo-400 这类文字仍有对比度 */
@@ -130,7 +156,204 @@
   --color-indigo-900: color-mix(in oklab, var(--accent) 44%, #000);
   --color-pink-300: color-mix(in oklab, var(--accent) 72%, #fff);
   --color-pink-400: color-mix(in oklab, var(--accent) 84%, #fff);
+  --color-purple-300: color-mix(in oklab, var(--accent) 72%, #fff);
   --color-purple-400: color-mix(in oklab, var(--accent) 84%, #fff);
+}
+
+/* ========================================================
+   2b-2. 色板重映射：状态色族 → 石绿 / 赭石 / 绛红
+   --------------------------------------------------------
+   上游用 green/emerald/teal 表示成功、amber/yellow 表示提醒、
+   red 表示危险。这些荧光色在纸面上过于刺眼，且不属于任何
+   纸张色系。这里按语义整体重定义，写法和 2b 一致：
+   所有相关工具类（含 /透明度、ring、shadow、border、渐变）
+   一次性跟随主题，无需逐个改调用点。
+   ======================================================== */
+:root {
+  --color-green-50:  color-mix(in oklab, var(--ok) 6%,  var(--paper));
+  --color-green-100: color-mix(in oklab, var(--ok) 13%, var(--paper));
+  --color-green-200: color-mix(in oklab, var(--ok) 26%, var(--paper));
+  --color-green-300: color-mix(in oklab, var(--ok) 44%, var(--paper));
+  --color-green-400: color-mix(in oklab, var(--ok) 64%, var(--paper));
+  --color-green-500: var(--ok);
+  --color-green-600: color-mix(in oklab, var(--ok) 88%, #000);
+  --color-green-700: color-mix(in oklab, var(--ok) 72%, #000);
+  --color-green-800: color-mix(in oklab, var(--ok) 56%, #000);
+  --color-green-900: color-mix(in oklab, var(--ok) 40%, #000);
+
+  --color-emerald-50:  color-mix(in oklab, var(--ok) 6%,  var(--paper));
+  --color-emerald-100: color-mix(in oklab, var(--ok) 13%, var(--paper));
+  --color-emerald-200: color-mix(in oklab, var(--ok) 26%, var(--paper));
+  --color-emerald-300: color-mix(in oklab, var(--ok) 44%, var(--paper));
+  --color-emerald-400: color-mix(in oklab, var(--ok) 64%, var(--paper));
+  --color-emerald-500: var(--ok);
+  --color-emerald-600: color-mix(in oklab, var(--ok) 88%, #000);
+  --color-emerald-700: color-mix(in oklab, var(--ok) 72%, #000);
+  --color-emerald-800: color-mix(in oklab, var(--ok) 56%, #000);
+  --color-emerald-900: color-mix(in oklab, var(--ok) 40%, #000);
+
+  --color-teal-50:  color-mix(in oklab, var(--ok) 6%,  var(--paper));
+  --color-teal-100: color-mix(in oklab, var(--ok) 13%, var(--paper));
+  --color-teal-200: color-mix(in oklab, var(--ok) 26%, var(--paper));
+  --color-teal-300: color-mix(in oklab, var(--ok) 44%, var(--paper));
+  --color-teal-400: color-mix(in oklab, var(--ok) 64%, var(--paper));
+  --color-teal-500: var(--ok);
+  --color-teal-600: color-mix(in oklab, var(--ok) 88%, #000);
+  --color-teal-700: color-mix(in oklab, var(--ok) 72%, #000);
+  --color-teal-800: color-mix(in oklab, var(--ok) 56%, #000);
+  --color-teal-900: color-mix(in oklab, var(--ok) 40%, #000);
+
+  --color-amber-50:  color-mix(in oklab, var(--warn) 6%,  var(--paper));
+  --color-amber-100: color-mix(in oklab, var(--warn) 13%, var(--paper));
+  --color-amber-200: color-mix(in oklab, var(--warn) 26%, var(--paper));
+  --color-amber-300: color-mix(in oklab, var(--warn) 44%, var(--paper));
+  --color-amber-400: color-mix(in oklab, var(--warn) 64%, var(--paper));
+  --color-amber-500: var(--warn);
+  --color-amber-600: color-mix(in oklab, var(--warn) 88%, #000);
+  --color-amber-700: color-mix(in oklab, var(--warn) 72%, #000);
+  --color-amber-800: color-mix(in oklab, var(--warn) 56%, #000);
+  --color-amber-900: color-mix(in oklab, var(--warn) 40%, #000);
+
+  --color-yellow-50:  color-mix(in oklab, var(--warn) 6%,  var(--paper));
+  --color-yellow-100: color-mix(in oklab, var(--warn) 13%, var(--paper));
+  --color-yellow-200: color-mix(in oklab, var(--warn) 26%, var(--paper));
+  --color-yellow-300: color-mix(in oklab, var(--warn) 44%, var(--paper));
+  --color-yellow-400: color-mix(in oklab, var(--warn) 64%, var(--paper));
+  --color-yellow-500: var(--warn);
+  --color-yellow-600: color-mix(in oklab, var(--warn) 88%, #000);
+  --color-yellow-700: color-mix(in oklab, var(--warn) 72%, #000);
+  --color-yellow-800: color-mix(in oklab, var(--warn) 56%, #000);
+  --color-yellow-900: color-mix(in oklab, var(--warn) 40%, #000);
+
+  --color-orange-50:  color-mix(in oklab, var(--warn) 6%,  var(--paper));
+  --color-orange-100: color-mix(in oklab, var(--warn) 13%, var(--paper));
+  --color-orange-200: color-mix(in oklab, var(--warn) 26%, var(--paper));
+  --color-orange-300: color-mix(in oklab, var(--warn) 44%, var(--paper));
+  --color-orange-400: color-mix(in oklab, var(--warn) 64%, var(--paper));
+  --color-orange-500: var(--warn);
+  --color-orange-600: color-mix(in oklab, var(--warn) 88%, #000);
+  --color-orange-700: color-mix(in oklab, var(--warn) 72%, #000);
+  --color-orange-800: color-mix(in oklab, var(--warn) 56%, #000);
+  --color-orange-900: color-mix(in oklab, var(--warn) 40%, #000);
+
+  --color-red-50:  color-mix(in oklab, var(--danger) 6%,  var(--paper));
+  --color-red-100: color-mix(in oklab, var(--danger) 13%, var(--paper));
+  --color-red-200: color-mix(in oklab, var(--danger) 26%, var(--paper));
+  --color-red-300: color-mix(in oklab, var(--danger) 44%, var(--paper));
+  --color-red-400: color-mix(in oklab, var(--danger) 64%, var(--paper));
+  --color-red-500: var(--danger);
+  --color-red-600: color-mix(in oklab, var(--danger) 88%, #000);
+  --color-red-700: color-mix(in oklab, var(--danger) 72%, #000);
+  --color-red-800: color-mix(in oklab, var(--danger) 56%, #000);
+  --color-red-900: color-mix(in oklab, var(--danger) 40%, #000);
+
+  --color-rose-50:  color-mix(in oklab, var(--danger) 6%,  var(--paper));
+  --color-rose-100: color-mix(in oklab, var(--danger) 13%, var(--paper));
+  --color-rose-200: color-mix(in oklab, var(--danger) 26%, var(--paper));
+  --color-rose-300: color-mix(in oklab, var(--danger) 44%, var(--paper));
+  --color-rose-400: color-mix(in oklab, var(--danger) 64%, var(--paper));
+  --color-rose-500: var(--danger);
+  --color-rose-600: color-mix(in oklab, var(--danger) 88%, #000);
+  --color-rose-700: color-mix(in oklab, var(--danger) 72%, #000);
+  --color-rose-800: color-mix(in oklab, var(--danger) 56%, #000);
+  --color-rose-900: color-mix(in oklab, var(--danger) 40%, #000);
+}
+
+/* 暗色下状态色同样往亮处推，保证深底上的文字与图标可读 */
+.dark {
+  --color-green-300: color-mix(in oklab, var(--ok) 72%, #fff);
+  --color-green-400: color-mix(in oklab, var(--ok) 84%, #fff);
+  --color-green-600: color-mix(in oklab, var(--ok) 90%, #000);
+  --color-green-700: color-mix(in oklab, var(--ok) 76%, #000);
+  --color-green-800: color-mix(in oklab, var(--ok) 60%, #000);
+  --color-green-900: color-mix(in oklab, var(--ok) 44%, #000);
+
+  --color-emerald-300: color-mix(in oklab, var(--ok) 72%, #fff);
+  --color-emerald-400: color-mix(in oklab, var(--ok) 84%, #fff);
+  --color-emerald-600: color-mix(in oklab, var(--ok) 90%, #000);
+  --color-emerald-700: color-mix(in oklab, var(--ok) 76%, #000);
+  --color-emerald-800: color-mix(in oklab, var(--ok) 60%, #000);
+  --color-emerald-900: color-mix(in oklab, var(--ok) 44%, #000);
+
+  --color-teal-300: color-mix(in oklab, var(--ok) 72%, #fff);
+  --color-teal-400: color-mix(in oklab, var(--ok) 84%, #fff);
+  --color-teal-600: color-mix(in oklab, var(--ok) 90%, #000);
+  --color-teal-700: color-mix(in oklab, var(--ok) 76%, #000);
+  --color-teal-800: color-mix(in oklab, var(--ok) 60%, #000);
+  --color-teal-900: color-mix(in oklab, var(--ok) 44%, #000);
+
+  --color-amber-300: color-mix(in oklab, var(--warn) 72%, #fff);
+  --color-amber-400: color-mix(in oklab, var(--warn) 84%, #fff);
+  --color-amber-600: color-mix(in oklab, var(--warn) 90%, #000);
+  --color-amber-700: color-mix(in oklab, var(--warn) 76%, #000);
+  --color-amber-800: color-mix(in oklab, var(--warn) 60%, #000);
+  --color-amber-900: color-mix(in oklab, var(--warn) 44%, #000);
+
+  --color-yellow-300: color-mix(in oklab, var(--warn) 72%, #fff);
+  --color-yellow-400: color-mix(in oklab, var(--warn) 84%, #fff);
+  --color-yellow-600: color-mix(in oklab, var(--warn) 90%, #000);
+  --color-yellow-700: color-mix(in oklab, var(--warn) 76%, #000);
+  --color-yellow-800: color-mix(in oklab, var(--warn) 60%, #000);
+  --color-yellow-900: color-mix(in oklab, var(--warn) 44%, #000);
+
+  --color-orange-300: color-mix(in oklab, var(--warn) 72%, #fff);
+  --color-orange-400: color-mix(in oklab, var(--warn) 84%, #fff);
+  --color-orange-600: color-mix(in oklab, var(--warn) 90%, #000);
+  --color-orange-700: color-mix(in oklab, var(--warn) 76%, #000);
+  --color-orange-800: color-mix(in oklab, var(--warn) 60%, #000);
+  --color-orange-900: color-mix(in oklab, var(--warn) 44%, #000);
+
+  --color-red-300: color-mix(in oklab, var(--danger) 72%, #fff);
+  --color-red-400: color-mix(in oklab, var(--danger) 84%, #fff);
+  --color-red-600: color-mix(in oklab, var(--danger) 90%, #000);
+  --color-red-700: color-mix(in oklab, var(--danger) 76%, #000);
+  --color-red-800: color-mix(in oklab, var(--danger) 60%, #000);
+  --color-red-900: color-mix(in oklab, var(--danger) 44%, #000);
+
+  --color-rose-300: color-mix(in oklab, var(--danger) 72%, #fff);
+  --color-rose-400: color-mix(in oklab, var(--danger) 84%, #fff);
+  --color-rose-600: color-mix(in oklab, var(--danger) 90%, #000);
+  --color-rose-700: color-mix(in oklab, var(--danger) 76%, #000);
+  --color-rose-800: color-mix(in oklab, var(--danger) 60%, #000);
+  --color-rose-900: color-mix(in oklab, var(--danger) 44%, #000);
+}
+
+/* ========================================================
+   2c. 色板重映射：slate 灰 → 纸张墨色系
+   --------------------------------------------------------
+   原主题大量使用 slate-* 作正文/边框/卡底，冷蓝灰与纸张暖墨
+   色调冲突。同 indigo→accent 的做法整体重定义，所有 slate
+   工具类（文字、边框、卡底、divide、placeholder）一次性跟随
+   纸墨主题。变量全部基于 --ink/--paper/--card，自动适配
+   宣纸/手账两套主题与明暗切换。
+   ======================================================== */
+:root {
+  --color-slate-50:  color-mix(in oklab, var(--ink) 4%,  var(--paper));
+  --color-slate-100: color-mix(in oklab, var(--ink) 8%,  var(--paper));
+  --color-slate-200: color-mix(in oklab, var(--ink) 13%, var(--paper));
+  --color-slate-300: color-mix(in oklab, var(--ink) 20%, var(--paper));
+  --color-slate-400: var(--ink-faint);
+  --color-slate-500: color-mix(in oklab, var(--ink) 52%, var(--paper));
+  --color-slate-600: color-mix(in oklab, var(--ink) 68%, var(--paper));
+  --color-slate-700: color-mix(in oklab, var(--ink) 84%, var(--paper));
+  --color-slate-800: var(--ink);
+  --color-slate-900: var(--ink);
+  --color-slate-950: var(--ink);
+}
+
+/* 暗色下反向：文字档变亮墨，卡底档变纸深色 */
+.dark {
+  --color-slate-50:  color-mix(in oklab, var(--ink) 8%,  var(--paper));
+  --color-slate-100: color-mix(in oklab, var(--ink) 14%, var(--paper));
+  --color-slate-200: var(--ink);
+  --color-slate-300: color-mix(in oklab, var(--ink) 84%, var(--paper));
+  --color-slate-400: var(--ink-soft);
+  --color-slate-500: color-mix(in oklab, var(--ink-soft) 70%, var(--ink-faint));
+  --color-slate-600: color-mix(in oklab, var(--ink) 16%, var(--paper));
+  --color-slate-700: color-mix(in oklab, var(--ink) 10%, var(--paper));
+  --color-slate-800: var(--card);
+  --color-slate-900: color-mix(in oklab, var(--card) 72%, #000);
+  --color-slate-950: color-mix(in oklab, var(--card) 55%, #000);
 }
 
 /* ========================================================
@@ -211,15 +434,16 @@
 
 /* ========================================================
    4b. 玻璃色板 → 纸张色板 映射
-   原项目在 29 个文件里硬编码了大量半透明白/石板色卡片。
-   逐个改写风险高，这里按「同类色归一到同一纸张语义」统一重映射，
-   并让 !important 压过 Tailwind 工具类，使主题切换立刻生效。
+   --------------------------------------------------------
+   两份 globals.css（博客端 / 管理端）此段必须保持一致：
+   任何一处漏枚举，都会让同一份组件在两端表现不同。
    ======================================================== */
 
 /* —— 卡片底色：半透明白/深色 → 纸面 —— */
 [class~="bg-white/40"], [class~="bg-white/50"], [class~="bg-white/60"],
 [class~="bg-white/70"], [class~="bg-white/80"], [class~="bg-white/90"],
-[class~="bg-white/30"], [class~="bg-white/20"],
+[class~="bg-white/30"], [class~="bg-white/20"], [class~="bg-white/10"],
+[class~="bg-white/5"],
 .dark [class~="dark:bg-slate-800/50"], .dark [class~="dark:bg-slate-800/40"],
 .dark [class~="dark:bg-slate-800/30"], .dark [class~="dark:bg-slate-800/20"],
 .dark [class~="dark:bg-slate-900/50"], .dark [class~="dark:bg-slate-900/60"],
@@ -229,28 +453,67 @@
 
 /* —— 浅灰底（次级容器） —— */
 [class~="bg-slate-100"], [class~="bg-slate-100/60"], [class~="bg-slate-200"],
-[class~="bg-slate-50"], [class~="bg-white"] {
+[class~="bg-slate-50"], [class~="bg-white"], [class~="bg-slate-200/50"],
+[class~="bg-slate-50/50"] {
   background-color: var(--paper-deep) !important;
 }
 .dark [class~="dark:bg-slate-900"], .dark [class~="dark:bg-slate-800"] {
   background-color: var(--paper-deep) !important;
 }
 
+/* —— 深色条（面板、标题栏、灯箱）→ 纸面深色 —— */
+[class~="bg-slate-900/80"], [class~="bg-slate-900/90"], [class~="bg-slate-950/90"],
+[class~="bg-slate-950/98"], [class~="bg-slate-800/80"], [class~="bg-slate-800/90"],
+[class~="bg-slate-800/70"], [class~="bg-slate-800/60"], [class~="bg-slate-900"],
+[class~="bg-slate-800"], [class~="bg-black"], [class~="bg-slate-900/30"] {
+  background-color: var(--paper-deep) !important;
+}
+/* 深色条里的白字跟着变墨色 */
+[class~="bg-slate-900/80"] [class~="text-white"],
+[class~="bg-slate-900/90"] [class~="text-white"],
+[class~="bg-slate-950/90"] [class~="text-white"],
+[class~="bg-slate-950/98"] [class~="text-white"],
+[class~="bg-slate-800/80"] [class~="text-white"],
+[class~="bg-slate-800/90"] [class~="text-white"],
+[class~="bg-slate-900"] [class~="text-white"],
+[class~="bg-slate-800"] [class~="text-white"] {
+  color: var(--ink) !important;
+}
+
+/* 同一元素上的「深底白字」反色按钮：
+   上面用的是后代选择器（中间有空格），而这类按钮两个类在同一元素上，
+   匹配不到 → 底被映射成浅纸、字仍是白 → 白字白底不可见。 */
+[class~="bg-slate-900"][class~="text-white"],
+[class~="bg-slate-800"][class~="text-white"],
+[class~="bg-black"][class~="text-white"],
+[class~="bg-slate-900/80"][class~="text-white"],
+[class~="bg-slate-900/90"][class~="text-white"],
+[class~="bg-slate-950/90"][class~="text-white"],
+[class~="bg-slate-950/98"][class~="text-white"] {
+  color: var(--ink) !important;
+}
+/* 暗色模式下的反色按钮（dark:bg-white + dark:text-slate-900）同样跟纸面走 */
+.dark [class~="dark:bg-white"][class~="dark:text-slate-900"] {
+  background-color: var(--paper-deep) !important;
+  color: var(--ink) !important;
+}
+
 /* —— 卡片描边 —— */
 [class~="border-white/40"], [class~="border-white/50"], [class~="border-white/60"],
 [class~="border-white/30"], [class~="border-white/20"], [class~="border-white/10"],
 [class~="border-white/5"], [class~="border-white"],
-[class~="border-slate-200/50"], [class~="border-slate-200"] {
+[class~="border-slate-200/50"], [class~="border-slate-200"],
+[class~="border-slate-300/50"], [class~="border-slate-300"] {
   border-color: var(--card-border) !important;
 }
 .dark [class~="dark:border-white/10"], .dark [class~="dark:border-white/5"],
 .dark [class~="dark:border-slate-700/50"], .dark [class~="dark:border-slate-700"],
-.dark [class~="dark:border-slate-600/50"] {
+.dark [class~="dark:border-slate-600/50"], .dark [class~="dark:border-slate-600"] {
   border-color: var(--card-border) !important;
 }
 
 /* —— 正文/次要文字：石板色 → 墨色梯度 —— */
-[class~="text-slate-900"], [class~="text-slate-800"] {
+[class~="text-slate-900"], [class~="text-slate-800"], [class~="text-black"] {
   color: var(--ink) !important;
 }
 .dark [class~="dark:text-white"], .dark [class~="dark:text-slate-100"] {
@@ -269,77 +532,28 @@
   color: var(--ink-faint) !important;
 }
 
-/* —— 强调色：靛蓝 → 印章红/朱砂 ——
-   具体映射已由上面 2b 的色板变量统一处理（含 /透明度、ring、shadow、渐变），
-   这里不再逐个类名打补丁，避免 !important 覆盖掉正确的透明度语义。 */
-
-/* —— 强调色的浅底（标签、选中态）→ 由 2b 色板变量处理 —— */
-
-/* —— 补漏：深色条（歌词栏等）→ 纸面深色 —— */
-[class~="bg-slate-900/80"], [class~="bg-slate-900/90"], [class~="bg-slate-950/90"],
-[class~="bg-slate-950/98"], [class~="bg-slate-800/80"], [class~="bg-slate-800/90"],
-[class~="bg-slate-800/70"], [class~="bg-slate-800/60"],
-.dark [class~="dark:bg-slate-950/90"] {
-  background-color: var(--paper-deep) !important;
-}
-
-/* 深色条里的白字要跟着变墨色 */
-[class~="bg-slate-900/80"] [class~="text-white"],
-[class~="bg-slate-900/90"] [class~="text-white"],
-[class~="bg-slate-950/90"] [class~="text-white"],
-[class~="bg-slate-950/98"] [class~="text-white"],
-[class~="bg-slate-800/80"] [class~="text-white"],
-[class~="bg-slate-800/90"] [class~="text-white"],
-[class~="bg-slate-800/70"] [class~="text-white"] {
-  color: var(--ink) !important;
-}
-
-/* —— 强调色的实心/高透明度版本 → 由 2b 色板变量处理 —— */
-
-/* 强调色实心块上的文字 */
-[class~="bg-indigo-500/80"] [class~="text-white"],
-[class~="bg-indigo-500/90"] [class~="text-white"],
-[class~="bg-indigo-400"] [class~="text-white"],
-[class~="bg-indigo-500"] [class~="text-white"] {
+/* —— 强调色实心块上的文字（背景已由色板重映射为印章红） —— */
+[class~="bg-indigo-500"] [class~="text-white"],
+[class~="bg-indigo-600"] [class~="text-white"],
+[class~="bg-pink-500"] [class~="text-white"],
+[class~="bg-purple-500"] [class~="text-white"] {
   color: #fdfbf7 !important;
 }
 
-/* —— 靛蓝文字/渐变、紫粉装饰 → 全部由 2b 色板变量统一处理 —— */
-
-/* ========================================================
-   4c. Gitalk 评论区（第三方组件自带样式，用 gt- 前缀覆盖）
-   ======================================================== */
-.gt-container .gt-header-textarea,
-.gt-container .gt-header-preview {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  background-color: var(--card) !important;
-  color: var(--ink) !important;
-  border-color: var(--card-border) !important;
-}
-.gt-container .gt-btn,
-.gt-container .gt-btn-preview,
-.gt-container .gt-btn-login,
-.gt-container .gt-btn-public,
-.gt-container .gt-btn-edit {
-  background-color: var(--accent) !important;
-  border-color: var(--accent) !important;
+/* —— 状态色实心块上的文字（背景已由 2b-2 重映射） —— */
+[class~="bg-green-500"] [class~="text-white"],
+[class~="bg-green-600"] [class~="text-white"],
+[class~="bg-emerald-500"] [class~="text-white"],
+[class~="bg-emerald-600"] [class~="text-white"],
+[class~="bg-teal-500"] [class~="text-white"],
+[class~="bg-amber-500"] [class~="text-white"],
+[class~="bg-yellow-500"] [class~="text-white"],
+[class~="bg-orange-500"] [class~="text-white"],
+[class~="bg-red-500"] [class~="text-white"],
+[class~="bg-red-600"] [class~="text-white"],
+[class~="bg-rose-500"] [class~="text-white"] {
   color: #fdfbf7 !important;
 }
-.gt-container .gt-btn:hover { filter: brightness(1.08); }
-.gt-container .gt-svg svg,
-.gt-container .gt-ico svg { fill: var(--accent) !important; }
-.gt-container .gt-link,
-.gt-container a { color: var(--accent) !important; }
-.gt-container .gt-header-controls-tip,
-.gt-container .gt-counts,
-.gt-container .gt-meta,
-.gt-container .gt-comment-body { color: var(--ink-soft) !important; }
-.gt-container .gt-comment-content {
-  background-color: var(--card) !important;
-  border-color: var(--card-border) !important;
-}
-.gt-container .gt-comment-username { color: var(--ink) !important; }
 
 /* ========================================================
    5. 滚动条
@@ -364,8 +578,13 @@
   scrollbar-color: var(--rule) transparent;
 }
 
+/* 局部细滚动条（目录、弹窗内容区等） */
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--accent-soft); }
+
 /* ========================================================
-   6. 音乐播放器进度条
+   6. 表单控件
    ======================================================== */
 input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -376,8 +595,257 @@ input[type=range]::-webkit-slider-thumb {
   cursor: pointer;
 }
 
+/* 彻底隐藏数字输入框的上下箭头 */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* 占位符统一为墨色淡调（原项目的浅蓝/浅灰在纸面上不协调） */
+input::placeholder,
+textarea::placeholder {
+  color: var(--ink-faint) !important;
+  opacity: .55;
+}
+[class*="placeholder:text-"]::placeholder {
+  color: var(--ink-faint) !important;
+  opacity: .55;
+}
+
+/* 修复 Tailwind Prose 抹除列表符号的问题 */
+.prose ul { list-style-type: disc !important; padding-left: 1.5em !important; }
+.prose ol { list-style-type: decimal !important; padding-left: 1.5em !important; }
+.prose ul[data-type="taskList"] { list-style-type: none !important; padding-left: 0 !important; }
+.prose ul[data-type="taskList"] li { display: flex; align-items: flex-start; gap: 0.5rem; }
+.prose ul[data-type="taskList"] input[type="checkbox"] {
+  margin-top: 0.5rem;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
 /* ========================================================
-   7. 页面切换入场动画
+   7. 纸片卡工具类：92% 纸色微透（纸片压在背景上，缝隙微透）
+   只定义底色与边框；圆角与阴影保留在各处原类上，便于微调。
+   ======================================================== */
+@utility paper-card {
+  background-color: color-mix(in oklab, var(--card) 92%, transparent);
+  border: 1px solid var(--card-border);
+}
+
+/* 高实底版本：弹窗、确认框等需要压住下层内容的场景 */
+@utility paper-card-strong {
+  background-color: color-mix(in oklab, var(--card) 98%, transparent);
+  border: 1px solid var(--card-border);
+}
+
+/* ========================================================
+   8. 正文排版（.prose）
+   --------------------------------------------------------
+   上游把这一整套样式分别内联在 about 页、杂谈详情页与 AboutClient 里
+   各写一遍（三份内容还互不一致），且用的是「果冻极客风」：大圆角、
+   Atom One Dark 深色代码底、写死的灰蓝色。这里收敛成唯一一份，
+   统一走纸张主题变量，页面里不再需要内联 <style>。
+
+   注：@tailwindcss/typography 插件并未在本项目注册（globals.css 里
+   没有 @plugin 指令），所以 prose-* 类名只作语义标记，真正的排版
+   全部由本节提供——删掉本节会让正文失去样式。
+   ======================================================== */
+.prose h1 {
+  font-size: 1.8rem;
+  font-weight: 900;
+  margin-bottom: 1.2rem;
+  margin-top: 2rem;
+  line-height: 1.3;
+  color: inherit;
+}
+.prose h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  margin-top: 1.5rem;
+  color: inherit;
+}
+.prose h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  margin-top: 1.2rem;
+  color: inherit;
+}
+.prose p {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: inherit;
+}
+.prose ul,
+.prose ol {
+  padding-left: 1.5rem;
+  font-size: 0.95rem;
+}
+.prose li { margin-bottom: 0.5rem; }
+.prose ul ul, .prose ol ul { list-style-type: circle; }
+.prose ol ol, .prose ul ol { list-style-type: lower-alpha; }
+.prose del { text-decoration-color: inherit; opacity: 0.6; }
+
+/* 链接：印章红下划线，hover 变实线并加浅底 */
+.prose a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px dashed var(--accent);
+  transition: color .2s ease, border-color .2s ease, background-color .2s ease;
+}
+.prose a:hover {
+  color: color-mix(in oklab, var(--accent) 85%, #000);
+  border-bottom-style: solid;
+  background-color: color-mix(in srgb, var(--accent) 10%, transparent);
+  padding: 0 0.2rem;
+  border-radius: 0.2rem;
+}
+.dark .prose a { color: var(--accent); border-bottom-color: var(--accent); }
+.dark .prose a:hover {
+  color: color-mix(in oklab, var(--accent) 80%, #fff);
+  background-color: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+/* 引用块：左侧印章红细线 + 微透底，圆角收敛到纸张尺度 */
+.prose blockquote {
+  border-left: 3px solid var(--accent);
+  background-color: color-mix(in srgb, var(--accent) 5%, transparent);
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: 0 0.5rem 0.5rem 0;
+  font-style: italic;
+  color: var(--ink-soft);
+}
+.prose blockquote p { margin: 0; color: inherit; }
+/* 去掉 Tailwind Typography 生成的前后伪元素引号 */
+.prose blockquote p::before,
+.prose blockquote p::after {
+  display: none;
+  content: none;
+}
+
+/* 代码块：深墨底（--code-bg），圆角与阴影收敛 */
+.prose pre {
+  background-color: var(--code-bg);
+  color: var(--code-fg);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  overflow-x: auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+.prose pre code,
+.prose p code,
+.prose li code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, ui-monospace, monospace;
+  font-variant-ligatures: contextual;
+}
+.prose pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: 0.85em;
+}
+.prose code::before,
+.prose code::after { content: none; }
+/* 行内代码：印章红微底 */
+.prose p code,
+.prose li code {
+  background-color: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--accent);
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+  font-size: 0.85em;
+}
+.dark .prose p code,
+.dark .prose li code {
+  background-color: color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent);
+}
+
+/* 确保正文里生成的 <br> 占据真实垂直空间 */
+.prose br { display: block; content: ""; margin-top: 0.5em; }
+
+.prose img {
+  display: block;
+  margin: 1.5rem auto;
+  border-radius: 0.5rem;
+  max-width: 100%;
+  height: auto;
+}
+
+/* 代码高亮配色（Atom One Dark 色板，仅用于深色代码块内部） */
+.prose pre code .hljs-comment,
+.prose pre code .hljs-quote { color: #5c6370; font-style: italic; }
+.prose pre code .hljs-doctag,
+.prose pre code .hljs-keyword,
+.prose pre code .hljs-formula,
+.prose pre code .hljs-type { color: #c678dd; }
+.prose pre code .hljs-section,
+.prose pre code .hljs-name,
+.prose pre code .hljs-selector-tag,
+.prose pre code .hljs-deletion,
+.prose pre code .hljs-subst { color: #e06c75; }
+.prose pre code .hljs-literal { color: #56b6c2; }
+.prose pre code .hljs-string,
+.prose pre code .hljs-regexp,
+.prose pre code .hljs-addition,
+.prose pre code .hljs-attribute,
+.prose pre code .hljs-meta-string { color: #98c379; }
+.prose pre code .hljs-built_in,
+.prose pre code .hljs-class .hljs-title,
+.prose pre code .hljs-title.class_ { color: #e6c07b; }
+.prose pre code .hljs-attr,
+.prose pre code .hljs-variable,
+.prose pre code .hljs-template-variable,
+.prose pre code .hljs-selector-class,
+.prose pre code .hljs-selector-attr,
+.prose pre code .hljs-selector-pseudo,
+.prose pre code .hljs-number { color: #d19a66; }
+.prose pre code .hljs-symbol,
+.prose pre code .hljs-bullet,
+.prose pre code .hljs-link,
+.prose pre code .hljs-meta,
+.prose pre code .hljs-selector-id,
+.prose pre code .hljs-title,
+.prose pre code .hljs-title.function_ { color: #61aeee; }
+
+@media (min-width: 768px) {
+  .prose h1 {
+    font-size: 2.4rem;
+    font-weight: 900;
+    margin-bottom: 2rem;
+    margin-top: 3rem;
+    line-height: 1.15;
+  }
+  .prose h2 { font-size: 1.9rem; margin-bottom: 1.5rem; margin-top: 2rem; }
+  .prose h3 { font-size: 1.4rem; margin-bottom: 1rem; }
+  .prose p { font-size: 1.05rem; line-height: 1.85; }
+  .prose ul, .prose ol { padding-left: 2rem; font-size: 1rem; }
+  .prose pre {
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0.875rem;
+  }
+  .prose pre code { font-size: 0.9em; }
+  .prose p code, .prose li code {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.9em;
+    border-radius: 0.375rem;
+  }
+  .prose img { margin: 2rem auto; border-radius: 0.75rem; }
+}
+
+/* ========================================================
+   9. 页面切换入场动画
    --------------------------------------------------------
    用 CSS 而非 JS 动画库：
    - 这是预定性动效（每次切页同一套动作），CSS 跑在合成层，
@@ -403,18 +871,19 @@ input[type=range]::-webkit-slider-thumb {
 @utility page-enter {
   animation: page-enter 0.26s cubic-bezier(0.23, 1, 0.32, 1) both;
 }
-/* 减少动效偏好：纯淡入版本（去掉位移），由组件用 motion-reduce: 变体套用 */
-@utility page-enter-soft {
-  animation: page-enter-soft 0.2s ease-out both;
-}
 
+/* 减少动效偏好：纯淡入版本（去掉位移），由组件用 motion-reduce: 变体套用 */
 @keyframes page-enter-soft {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
 
+@utility page-enter-soft {
+  animation: page-enter-soft 0.2s ease-out both;
+}
+
 /* ========================================================
-   View Transitions（路由切换视图过渡）
+   10. View Transitions（路由切换视图过渡）
    next-view-transitions 触发；不支持的浏览器自动跳过本段，
    退回 template.tsx 的 page-enter 入场动画。
    ======================================================== */
@@ -445,54 +914,38 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 /* ========================================================
-   2c. 色板重映射：slate 灰 → 纸张墨色系
+   11. 时间线网格：滚动条与边缘渐隐
    --------------------------------------------------------
-   原主题大量使用 slate-* 作正文/边框/卡底，冷蓝灰与纸张暖墨
-   色调冲突。同 indigo→accent 的做法整体重定义，所有 slate
-   工具类（文字、边框、卡底、divide、placeholder）一次性跟随
-   纸墨主题。变量全部基于 --ink/--paper/--card，自动适配
-   宣纸/手账两套主题与明暗切换。
+   原为 TimelineClient 的内联 <style>。这两个类在组件里以
+   className 直接引用，所以定义必须落到这里，不能只删内联块。
+
+   - 滚动条宽度统一 6px，与第 5 节的全局滚动条一致。
+     （原写法里的 `md:width: 12px` 是把 Tailwind 语法误写进裸
+     CSS，浏览器不识别，等于从未生效，故直接去掉。）
+   - 原 thumb 渐变里混了 `#c084fc`（上游「果冻极客风」的紫色），
+     改为印章红同色系渐变；并去掉 2px 透明边框 + padding-box
+     裁剪（宽度收到 6px 后那样只剩 2px 可见，与其它滚动条不一致）。
    ======================================================== */
-:root {
-  --color-slate-50:  color-mix(in oklab, var(--ink) 4%,  var(--paper));
-  --color-slate-100: color-mix(in oklab, var(--ink) 8%,  var(--paper));
-  --color-slate-200: color-mix(in oklab, var(--ink) 13%, var(--paper));
-  --color-slate-300: color-mix(in oklab, var(--ink) 20%, var(--paper));
-  --color-slate-400: var(--ink-faint);
-  --color-slate-500: color-mix(in oklab, var(--ink) 52%, var(--paper));
-  --color-slate-600: color-mix(in oklab, var(--ink) 68%, var(--paper));
-  --color-slate-700: color-mix(in oklab, var(--ink) 84%, var(--paper));
-  --color-slate-800: var(--ink);
-  --color-slate-900: var(--ink);
-  --color-slate-950: var(--ink);
+.cyber-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.cyber-scrollbar::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+  border-radius: 10px;
+  margin-top: 20px;
+  margin-bottom: 56px;
+}
+.cyber-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 70%, #fff) 0%, var(--accent) 100%);
+  border-radius: 10px;
+}
+.cyber-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
 
-/* 暗色下反向：文字档变亮墨，卡底档变纸深色 */
-.dark {
-  --color-slate-50:  color-mix(in oklab, var(--ink) 8%,  var(--paper));
-  --color-slate-100: color-mix(in oklab, var(--ink) 14%, var(--paper));
-  --color-slate-200: var(--ink);
-  --color-slate-300: color-mix(in oklab, var(--ink) 84%, var(--paper));
-  --color-slate-400: var(--ink-soft);
-  --color-slate-500: color-mix(in oklab, var(--ink-soft) 70%, var(--ink-faint));
-  --color-slate-600: color-mix(in oklab, var(--ink) 16%, var(--paper));
-  --color-slate-700: color-mix(in oklab, var(--ink) 10%, var(--paper));
-  --color-slate-800: var(--card);
-  --color-slate-900: color-mix(in oklab, var(--card) 72%, #000);
-  --color-slate-950: color-mix(in oklab, var(--card) 55%, #000);
-}
-
-/* ========================================================
-   2d. 纸片卡工具类：92% 纸色微透（纸片压在背景上，缝隙微透）
-   只定义底色与边框；圆角与阴影保留在各处原类上，便于微调。
-   ======================================================== */
-@utility paper-card {
-  background-color: color-mix(in oklab, var(--card) 92%, transparent);
-  border: 1px solid var(--card-border);
-}
-
-/* 高实底版本：弹窗、确认框等需要压住下层内容的场景 */
-@utility paper-card-strong {
-  background-color: color-mix(in oklab, var(--card) 98%, transparent);
-  border: 1px solid var(--card-border);
+/* 上下边缘渐隐：暗示内容可继续滚动 */
+.fade-edges {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%);
 }

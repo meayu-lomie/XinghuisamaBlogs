@@ -1,10 +1,20 @@
 import Link from 'next/link';
 import { collectTags } from '../../../lib/tags-data';
+import { siteConfig } from '../../../siteConfig';
 
 export async function generateStaticParams() {
   return Array.from(collectTags().keys()).map((tag) => ({
     tag: encodeURIComponent(tag),
   }));
+}
+export async function generateMetadata({ params }: { params: Promise<{ tag: string }> }) {
+  const { tag } = await params;
+  const name = decodeURIComponent(tag);
+  const count = collectTags().get(name)?.length ?? 0;
+  return {
+    title: `#${name} | ${siteConfig.title}`,
+    description: `标签「${name}」下共 ${count} 篇杂谈`,
+  };
 }
 
 export default async function TagDetailPage({ params }: { params: Promise<{ tag: string }> }) {

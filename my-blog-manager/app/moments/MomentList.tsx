@@ -11,8 +11,11 @@ import { toPreviewSrc } from '../../components/imagePreview';
 
 function timeAgo(dateStr: string) {
   const date = new Date(dateStr);
+  // 历史数据里存在 ISO UTC 串，解析失败或未来时间时直接原样返回，避免显示「-1 天前」
+  if (Number.isNaN(date.getTime())) return dateStr;
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  if (diffInSeconds < 0) return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
   if (diffInSeconds < 60) return '刚刚';
   if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} 分钟前`;
   if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} 小时前`;
@@ -311,7 +314,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
     );
   };
 
-  // 🌟 将卡片渲染抽象为一个函数，方便分列渲染
+  // 将卡片渲染抽象为一个函数，方便分列渲染
   const renderMomentCard = (moment: any) => (
     <motion.div
       key={moment.id}
@@ -378,14 +381,14 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
       <div className="mb-14 text-center relative">
         <motion.h1 initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter">说说</motion.h1>
         <p className="text-slate-500 dark:text-slate-400 font-medium italic opacity-80 flex items-center justify-center gap-2">
-          <Sparkles size={14} className="text-indigo-500" /> “ 在代码之外捕捉瞬间的温度 ”
+          <Sparkles size={14} className="text-indigo-500" /> “ 随手记下的日常 ”
         </p>
       </div>
 
       <div className="mb-16 flex flex-col items-center gap-8">
         <button
           onClick={() => setIsPublishOpen(true)}
-          className="group relative px-10 py-3.5 bg-indigo-500 rounded-xl shadow-md text-white font-black tracking-widest text-sm hover:bg-indigo-600 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 overflow-hidden"
+          className="group relative px-10 py-3.5 bg-indigo-500 rounded-xl shadow-md text-white font-black text-sm hover:bg-indigo-600 hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-2 overflow-hidden"
         >
           {/* hover 轻微压暗而非提亮，保证浅色主题下白字始终可读 */}
           <div className="absolute inset-0 bg-black/15 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
@@ -408,7 +411,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
         </div>
       </div>
 
-      {/* 🌟 完美的 Flexbox 分列瀑布流！彻底告别错位和缝隙！ */}
+      {/* 完美的 Flexbox 分列瀑布流！彻底告别错位和缝隙！ */}
       <LayoutGroup>
         {processedMoments.length > 0 ? (
           <div className="flex flex-col md:flex-row gap-8 pb-32 w-full items-start">
@@ -450,24 +453,27 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
 
             <motion.div
               initial={{ scale: 0.9, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="relative w-full max-w-2xl paper-card-strong rounded-2xl shadow-lg border border-[var(--card-border)] p-10 overflow-hidden flex flex-col max-h-[90vh] overflow-y-auto custom-scrollbar"
+              className="relative w-full max-w-xl paper-card-strong rounded-2xl shadow-lg border border-[var(--card-border)] p-6 md:p-7 flex flex-col max-h-[90vh] overflow-y-auto custom-scrollbar"
             >
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-60" />
-
-              <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight flex items-center gap-3">
-                  <Sparkles className="text-indigo-500" /> 记录新瞬间
+              <div className="flex justify-between items-center mb-5">
+                <h2 className="text-lg font-black text-[var(--ink)] flex items-center gap-2">
+                  <Sparkles size={18} className="text-indigo-500" /> 发条说说
                 </h2>
-                <button onClick={() => setIsPublishOpen(false)} className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-red-500 transition-colors">
-                  <X size={20} />
+                <button
+                  onClick={() => setIsPublishOpen(false)}
+                  aria-label="关闭"
+                  title="关闭"
+                  className="w-9 h-9 flex items-center justify-center rounded-full text-[var(--ink-faint)] hover:text-red-500 hover:bg-[var(--paper-deep)] transition-colors"
+                >
+                  <X size={18} />
                 </button>
               </div>
 
               <textarea
                 value={newMoment.content}
                 onChange={(e) => setNewMoment(prev => ({...prev, content: e.target.value}))}
-                placeholder="这一刻的想法..."
-                className="w-full paper-card border border-slate-200 dark:border-slate-700/50 rounded-2xl p-5 text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 min-h-[120px] resize-none mb-3 font-medium custom-scrollbar"
+                placeholder="这一刻的想法…"
+                className="w-full paper-card rounded-2xl p-4 text-sm text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-indigo-500/40 min-h-[110px] resize-none mb-3 leading-relaxed custom-scrollbar"
               />
 
               {/* AI 润色：按钮 + 预览提示条 */}
@@ -488,13 +494,13 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
                     </span>
                     <button
                       onClick={() => { setNewMoment({ ...newMoment, content: polishPreview }); setPolishPreview(null); }}
-                      className="shrink-0 px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-[10px] font-black uppercase hover:bg-emerald-600 transition-colors"
+                      className="shrink-0 px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-[11px] font-bold hover:bg-emerald-600 transition-colors"
                     >
                       应用
                     </button>
                     <button
                       onClick={() => setPolishPreview(null)}
-                      className="shrink-0 px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-[10px] font-black uppercase hover:bg-slate-300 transition-colors"
+                      className="shrink-0 px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-[11px] font-bold hover:bg-slate-300 transition-colors"
                     >
                       丢弃
                     </button>
@@ -507,7 +513,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
                   <MapPin className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                   <input
                     type="text"
-                    placeholder="所在位置 (可选)"
+                    placeholder="所在位置（可选）"
                     value={newMoment.location}
                     onChange={(e) => setNewMoment(prev => ({...prev, location: e.target.value}))}
                     className="w-full paper-card border border-slate-200 dark:border-slate-700/50 rounded-2xl py-3 pl-12 pr-4 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
@@ -534,7 +540,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
                     <ImageIcon className="text-slate-400" size={28} />
                   )}
                   <span className="text-sm font-bold text-slate-500 dark:text-slate-400">
-                    {isUploading ? '极速上传中...' : '点击或拖拽图片到这里'}
+                    {isUploading ? '上传中…' : '点击或拖拽图片到这里'}
                   </span>
                 </div>
 
@@ -543,7 +549,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
                     <LinkIcon className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                     <input
                       type="text"
-                      placeholder="粘贴外链 URL 添加..."
+                      placeholder="粘贴图片链接"
                       value={imageUrlInput}
                       onChange={(e) => setImageUrlInput(e.target.value)}
                       className="w-full paper-card border border-slate-200 dark:border-slate-700/50 rounded-2xl py-3 pl-12 pr-4 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
@@ -575,25 +581,28 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
                 </div>
               )}
 
-              <div className="flex flex-wrap gap-3 mt-auto pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
-                <button onClick={() => setIsPublishOpen(false)} className="flex-1 py-4 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-black uppercase tracking-widest text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">
+              <div className="flex flex-col-reverse sm:flex-row gap-3 mt-auto pt-4 border-t border-[var(--rule)]">
+                <button
+                  onClick={() => setIsPublishOpen(false)}
+                  className="sm:w-24 py-3 rounded-2xl paper-card text-[var(--ink-soft)] text-sm font-bold hover:shadow-md transition-all"
+                >
                   取消
                 </button>
 
                 <button
                   onClick={handleQueueMoment}
                   disabled={isUploading || isSubmitting}
-                  className="flex-[1.5] py-4 px-2 rounded-2xl bg-slate-800 text-white font-black uppercase tracking-[0.1em] text-xs shadow-lg hover:bg-slate-900 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="sm:flex-1 py-3 px-4 rounded-2xl paper-card text-[var(--ink)] text-sm font-bold hover:shadow-md transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  <Send size={16} /> 加入队列
+                  <Send size={15} /> 加入收件箱
                 </button>
 
                 <button
                   onClick={handleDirectPublish}
                   disabled={isUploading || isSubmitting}
-                  className="flex-[2] py-4 px-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black uppercase tracking-[0.2em] text-[13px] shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="sm:flex-1 py-3 px-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white text-sm font-black shadow-sm transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  {isSubmitting ? <Clock className="animate-spin" size={18} /> : <Zap size={18} className="fill-current text-yellow-300" />}
+                  {isSubmitting ? <Clock className="animate-spin" size={16} /> : <Zap size={16} />}
                   立即发布
                 </button>
               </div>
@@ -613,12 +622,12 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
               </div>
               <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">删除这条记忆？</h3>
               <p className="text-sm text-slate-500 mb-8 leading-relaxed">
-                物理文件将被彻底销毁<br />并且无法被找回。
+                源文件将被删除<br />并且无法被找回。
               </p>
               <div className="flex gap-3">
                 <button onClick={() => setDeleteConfirmId(null)} disabled={isDeleting} className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-black uppercase transition-colors hover:bg-slate-200 dark:hover:bg-slate-700">取消</button>
-                <button onClick={executeDelete} disabled={isDeleting} className="flex-1 py-4 bg-red-500 hover:bg-red-600 text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-red-500/30 transition-all flex justify-center items-center">
-                  {isDeleting ? <Clock className="animate-spin" size={16} /> : '确认粉碎'}
+                <button onClick={executeDelete} disabled={isDeleting} className="flex-1 py-4 bg-red-500 hover:bg-red-600 text-white rounded-2xl text-xs font-black uppercase shadow-sm transition-all flex justify-center items-center">
+                  {isDeleting ? <Clock className="animate-spin" size={16} /> : '确认删除'}
                 </button>
               </div>
             </motion.div>

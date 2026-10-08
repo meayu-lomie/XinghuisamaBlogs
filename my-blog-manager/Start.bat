@@ -12,7 +12,7 @@ if %errorlevel% equ 0 (
     echo [状态] 正在调用 Python 3.10 环境...
     py -3.10 run_me.py
     if %errorlevel% neq 0 (
-        echo ❌ 错误：Python 3.10 执行 run_me.py 失败！
+        echo 错误：Python 3.10 执行 run_me.py 失败！
         pause
         exit /b 1
     )
@@ -29,13 +29,13 @@ if %errorlevel% equ 0 (
         echo [状态] 正在调用默认 Python 3.10+ 环境...
         python run_me.py
         if %errorlevel% neq 0 (
-            echo ❌ 错误：默认Python执行 run_me.py 失败！
+            echo 错误：默认Python执行 run_me.py 失败！
             pause
             exit /b 1
         )
         goto end
     ) else (
-        echo ❌ 错误：默认Python版本不是3.10！当前版本：
+        echo 错误：默认Python版本不是3.10！当前版本：
         python --version
         pause
         exit /b 1
@@ -43,13 +43,13 @@ if %errorlevel% equ 0 (
 )
 
 :: 3. 兜底：未找到Python环境
-echo ❌ 错误：未找到 Python 3.10 环境，请确保已安装并添加到系统PATH！
-echo 🔍 排查步骤：
+echo 错误：未找到 Python 3.10 环境，请确保已安装并添加到系统PATH！
+echo 排查步骤：
 echo    1. 确认安装Python 3.10（官网：https://www.python.org/downloads/release/python-3100/）
 echo    2. 安装时勾选 "Add Python 3.10 to PATH"
 echo    3. 重启命令行/电脑后重试
 pause
 
 :end
-echo ✅ 程序执行完成
+echo 程序执行完成
 exit /b 0

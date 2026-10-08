@@ -25,14 +25,14 @@ async def sync_projects(request: Request):
         if not target:
             return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
 
-        print(f"🚀 尝试物理写入项目矩阵: {target}")
+        print(f"写入项目数据: {target}")
 
         # 序列化
         json_str = json.dumps(projects_list, ensure_ascii=False, indent=2)
 
         # 构造格式
         ts_content = (
-            "// 🛡️ 本文件由控制台自动生成，请勿手动修改\n\n"
+            "// 本文件由控制台自动生成，请勿手动修改\n\n"
             "export type Project = {\n"
             "  id: string;\n"
             "  name: string;\n"
@@ -49,8 +49,8 @@ async def sync_projects(request: Request):
         with open(target, "w", encoding="utf-8") as f:
             f.write(ts_content)
 
-        print("✅ 项目矩阵物理落盘成功！")
+        print("项目数据写入成功")
         return {"success": True, "message": "写入成功"}
     except Exception as e:
-        print(f"❌ 写入失败: {str(e)}")
+        print(f"写入失败: {str(e)}")
         return {"success": False, "message": str(e)}

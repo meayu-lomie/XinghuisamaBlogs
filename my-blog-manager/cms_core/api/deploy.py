@@ -21,7 +21,7 @@ async def get_deploy_config():
                 return json.load(f)
         except:
             pass
-    # 🌟 默认返回双轨结构
+    # 默认返回双轨结构
     return {
         "blogPath": "",
         "staticRepoUrl": "",
@@ -38,7 +38,7 @@ async def save_deploy_config(request: Request):
         os.makedirs(os.path.dirname(CONFIG_FILE), exist_ok=True)
         with open(CONFIG_FILE, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
-        return {"success": True, "message": "✅ 双轨部署配置已永久保存！"}
+        return {"success": True, "message": "部署配置已保存"}
     except Exception as e:
         return {"success": False, "message": f"保存失败: {str(e)}"}
 
@@ -59,7 +59,8 @@ async def check_blog_path(request: Request):
             return {"success": False,
                     "message": "该路径下没有 package.json，看起来不是博客前端项目，已拦截。"}
 
-        missing = [d for d in ["posts", "data", "app"]
+        # 博客前端的内容目录：chatters（杂谈）/ moments（说说）/ data / app
+        missing = [d for d in ["chatters", "moments", "data", "app"]
                    if not os.path.exists(os.path.join(target_path, d))]
         if missing:
             return {"success": True,
@@ -69,7 +70,7 @@ async def check_blog_path(request: Request):
     except Exception as e:
         return {"success": False, "message": f"校验异常: {str(e)}"}
 
-# 🔑 核心大升级：根据 type 动态获取/生成不同的 SSH 密匙，并自动配置路由！
+# 根据 type 动态获取/生成不同的 SSH 密钥，并自动配置路由
 @router.get("/ssh/key")
 async def get_my_ssh_key(type: str = "static"):
     """获取或生成本地 SSH 公钥 (支持 A/B 双线隔离)"""
@@ -103,7 +104,7 @@ async def get_my_ssh_key(type: str = "static"):
             ], check=True)
             pub_key_path = f"{priv_key_path}.pub"
 
-        # 🌟 极客魔法：如果是 B 线(source)，自动在本地注入 SSH 路由分流规则！
+        # B 线(source) 自动在本地注入 SSH 路由分流规则
         if type == "source":
             config_path = os.path.join(ssh_dir, "config")
             # 兼容 Windows 和 Mac 路径分隔符
@@ -142,7 +143,7 @@ async def check_git_env(request: Request):
         if not os.path.exists(git_dir):
             return {"success": False, "message": "该路径未初始化 Git 仓库，请点击下方【一键初始化】按钮。"}
 
-        return {"success": True, "message": "✅ Git 环境正常！已准备就绪。"}
+        return {"success": True, "message": "Git 环境正常，已准备就绪"}
     except Exception as e:
         return {"success": False, "message": f"Git 检测失败: {str(e)}"}
 
@@ -189,17 +190,51 @@ async def init_deploy_env(request: Request):
         )
         stdout, stderr = process.communicate()
 
-        return {"success": True, "message": "✨ 太棒了！双轨部署底层依赖与配置初始化完成！"}
+        return {"success": True, "message": "部署环境初始化完成"}
     except Exception as e:
         return {"success": False, "message": f"初始化发生异常: {str(e)}"}
 
 
-# 🚀 A 线接口：打包静态文件并发布到 GitHub Pages
+# A 线接口：打包静态文件并发布到 GitHub Pages
 @router.post("/publish")
 async def publish_to_github_pages(request: Request):
+    """A 线：打包静态文件并发布到静态仓库（GitHub Pages）。
+
+    依赖 `npm run deploy`（由 /init 写入，内容为 next build && gh-pages -d out），
+    以及 next.config 里的 `output: 'export'`（否则不会产出 out/ 目录）。
+    这里先做前置检查，缺什么就直说是缺什么，不要等 npm 抛一堆看不懂的错。
+    """
     try:
         payload = await request.json()
         blog_path = payload.get("blogPath", "").strip()
+
+        if not blog_path or not os.path.exists(blog_path):
+            return {"success": False, "message": "博客物理路径不存在，请先在【项目仓库设置】里检查路径"}
+
+        pkg_path = os.path.join(blog_path, "package.json")
+        if not os.path.exists(pkg_path):
+            return {"success": False, "message": "该路径下没有 package.json，不像是博客前端项目"}
+
+        with open(pkg_path, "r", encoding="utf-8") as f:
+            pkg_data = json.load(f)
+        if "deploy" not in (pkg_data.get("scripts") or {}):
+            return {
+                "success": False,
+                "message": "还没初始化静态部署环境：缺少 npm run deploy 脚本，请先点击下方【一键初始化】",
+            }
+
+        # next.config 没开 output:'export' 时，next build 不会产出 out/，
+        # gh-pages 会因为找不到目录而失败，提前说清楚。
+        next_config = os.path.join(blog_path, "next.config.ts")
+        if os.path.exists(next_config):
+            with open(next_config, "r", encoding="utf-8") as f:
+                cfg_text = f.read()
+            if re.search(r"^\s*//\s*output:\s*['\"]export['\"]", cfg_text, re.M):
+                return {
+                    "success": False,
+                    "message": "next.config.ts 里的 output: 'export' 仍是注释状态，构建不会产出 out/ 目录。"
+                               "请先启用静态导出（或改用 B 线源码同步部署到 Vercel）",
+                }
 
         process = subprocess.Popen(
             ["npm", "run", "deploy"],
@@ -212,15 +247,15 @@ async def publish_to_github_pages(request: Request):
         )
         stdout, stderr = process.communicate()
         if process.returncode == 0:
-            return {"success": True, "message": "🎉 A线: 网页已成功编译并发布到静态仓库！"}
-        else:
-            return {"success": False, "message": f"发布失败，报错:\n{stderr}"}
+            return {"success": True, "message": "静态站点已编译并发布到静态仓库"}
+        # 把 stdout 尾部也带上：npm 的错误经常打在 stdout 而不是 stderr
+        detail = (stderr or "").strip() or (stdout or "").strip()[-800:]
+        return {"success": False, "message": f"发布失败，报错：\n{detail}"}
     except Exception as e:
         return {"success": False, "message": f"静态发布引擎崩溃: {str(e)}"}
 
 
-# ☁️ B 线接口：同步源代码到 Vercel 仓库 (全新核心功能)
-# ☁️ B 线接口：同步源代码到 Vercel 仓库 (全新终极强绑定机制)
+# B 线接口：同步源代码到 Vercel 仓库
 @router.post("/source")
 async def sync_source_to_vercel(request: Request):
     try:
@@ -238,42 +273,42 @@ async def sync_source_to_vercel(request: Request):
         source_branch = config.get("sourceBranch", "main").strip()
 
         if not source_repo:
-            return {"success": False, "message": "B 线源码仓库地址为空，无法同步！"}
+            return {"success": False, "message": "源码仓库地址为空，无法同步。请先在下方填写仓库二的地址"}
 
-        os.chdir(blog_path)
+        # 不用 os.chdir：那会永久改变后端进程的工作目录，影响其它接口。
+        # git 的 cwd 参数就能指定工作目录。
+        def run_git(args, **kw):
+            return subprocess.run(
+                args, cwd=blog_path, capture_output=True,
+                text=True, encoding='utf-8', **kw
+            )
 
         # 1. 添加所有代码改动
-        subprocess.run(["git", "add", "."], check=True)
+        run_git(["git", "add", "."])
 
-        # 2. 提交代码 (这里加入容错)
-        commit_cmd = 'git commit -m "Auto sync source code for Vercel 🚀" || echo "No changes to commit"'
-        subprocess.run(commit_cmd, shell=True, capture_output=True)
+        # 2. 提交（无改动时 git commit 会返回非 0，这里忽略即可）
+        run_git(["git", "commit", "-m", "Auto sync source code for Vercel"])
 
-        # 🌟 终极杀招：强行绑定 B 线专属私钥，无视 Windows 智障路由！
+        # 绑定 B 线专属私钥，避免 Windows 下的路由问题
         ssh_dir = os.path.expanduser("~/.ssh")
         # 把 Windows 的反斜杠强制替换为正斜杠，防止 Git 识别错误
         priv_key_path = os.path.join(ssh_dir, "id_ed25519_source").replace("\\", "/")
 
-        # 组装环境变量，用 GIT_SSH_COMMAND 强行逼迫 Git 使用这把钥匙
+        # 组装环境变量，用 GIT_SSH_COMMAND 指定这把钥匙
         custom_env = os.environ.copy()
         custom_env["GIT_SSH_COMMAND"] = f'ssh -i "{priv_key_path}" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no'
 
-        # 3. 推送 (携带我们强行塞进去的钥匙环境变量)
-        push_cmd = f'git push "{source_repo}" HEAD:{source_branch}'
-        push_process = subprocess.run(
-            push_cmd,
-            shell=True,
-            capture_output=True,
-            text=True,
-            encoding='utf-8',
-            env=custom_env  # 👈 就是这里！把钥匙按在 Git 脸上！
+        # 3. 推送
+        push_process = run_git(
+            ["git", "push", source_repo, f"HEAD:{source_branch}"],
+            env=custom_env,
         )
 
         # 判断是否成功
-        if push_process.returncode != 0 and "Everything up-to-date" not in push_process.stderr:
+        if push_process.returncode != 0 and "Everything up-to-date" not in (push_process.stderr or ""):
             return {"success": False, "message": f"源码同步失败:\n{push_process.stderr}"}
 
-        return {"success": True, "message": "☁️ B线: 源码已成功送达 GitHub，Vercel 构建已触发！"}
+        return {"success": True, "message": "源码已推送到 GitHub，Vercel 构建已触发"}
 
     except Exception as e:
         return {"success": False, "message": f"源码同步引擎异常: {str(e)}"}

@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  // 👇 屏蔽 TypeScript 类型报错（Next 16 已移除 build 期 ESLint 检查，无需再配）
+  // 屏蔽 TypeScript 类型报错（Next 16 已移除 build 期 ESLint 检查，无需再配）
   typescript: {
     ignoreBuildErrors: true,
   },

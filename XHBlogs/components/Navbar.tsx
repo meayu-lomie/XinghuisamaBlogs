@@ -13,7 +13,7 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  // --- 🌟 物理引擎：菜单转动逻辑 ---
+  // --- 物理引擎：菜单转动逻辑 ---
   const wheelRef = useRef<HTMLDivElement>(null);
   const rawRotation = useMotionValue(0);
   const smoothRotation = useSpring(rawRotation, { stiffness: 200, damping: 25 });
@@ -36,7 +36,7 @@ export default function Navbar() {
     rawRotation.set(rawRotation.get() + deltaAngle);
   };
 
-  // --- 🌟 物理引擎：手机端按钮拖拽逻辑 ---
+  // --- 物理引擎：手机端按钮拖拽逻辑 ---
   const dragY = useMotionValue(0);
   const [constraints, setConstraints] = useState({ top: 0, bottom: 0 });
 
@@ -103,7 +103,6 @@ export default function Navbar() {
                 </Link>
               );
             })}
-
             {/* 主题切换：版式 + 明暗 */}
             <span className="ml-1 pl-4 border-l" style={{ borderColor: 'var(--rule)' }}>
               <NavThemeSwitch />
@@ -112,7 +111,7 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* 📱 手机端：可拖拽吸附的触发球 */}
+      {/* 手机端：可拖拽吸附的触发球 */}
       <div className="md:hidden">
         <motion.button
           drag="y"
@@ -165,10 +164,10 @@ export default function Navbar() {
                     </button>
                   </div>
 
-                  {/* 🌟 手机端轮盘渲染：使用过滤后的 mobileNavLinks */}
+                  {/* 手机端轮盘渲染：使用过滤后的 mobileNavLinks */}
                   {mobileNavLinks.map((link, index) => {
                     const isActive = pathname === link.href || pathname === `${link.href}/`;
-                    // 🌟 角度计算也会基于过滤后的长度，保证图标自动均匀排布！
+                    // 角度计算也会基于过滤后的长度，保证图标自动均匀排布！
                     const angle = index * (360 / mobileNavLinks.length);
 
                     return (
@@ -185,7 +184,7 @@ export default function Navbar() {
                             onClick={() => setIsMobileMenuOpen(false)}
                             className={`flex items-center justify-center w-full h-full rounded-full transition-all duration-300 ${
                               isActive 
-                                ? 'bg-indigo-500 text-white shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_80%,transparent)] scale-110'
+                                ? 'bg-indigo-500 text-white shadow-sm scale-110'
                                 : 'paper-card-strong text-slate-800 dark:text-slate-200 shadow-md hover:scale-110 border border-[var(--card-border)] dark:border-slate-600'
                             }`}
                           >

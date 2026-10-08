@@ -30,7 +30,7 @@ export default function ProjectsBoard() {
         </div>
         <div className="text-center md:text-left w-full">
           <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-widest drop-shadow-sm uppercase">
-            Projects Matrix
+            项目 · Projects
           </h1>
           <p className="text-slate-600 dark:text-slate-400 font-serif">
             开源项目、科研代码与实验室折腾记录。
@@ -71,7 +71,7 @@ export default function ProjectsBoard() {
                 href={project.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block h-full rounded-2xl paper-card border border-[var(--card-border)] shadow-md overflow-hidden hover:shadow-indigo-500/20 transition-all duration-700 hover:-translate-y-1 group relative p-6 md:p-8"
+                className="block h-full rounded-2xl paper-card border border-[var(--card-border)] shadow-md overflow-hidden transition-all duration-700 hover:-translate-y-1 group relative p-6 md:p-8"
               >
                 {/* 装饰性光晕 */}
                 <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-colors duration-700"></div>
@@ -111,7 +111,7 @@ export default function ProjectsBoard() {
             animate={{ opacity: 1 }}
             className="col-span-full text-center py-20 text-slate-500 font-serif w-full"
           >
-            云端尚未建立代号为 [{searchQuery}] 的档案...
+            没有找到与「{searchQuery}」匹配的项目
           </motion.div>
         )}
       </motion.div>

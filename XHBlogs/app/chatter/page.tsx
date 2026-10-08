@@ -7,7 +7,7 @@ import { siteConfig } from '@/siteConfig';
 
 export const metadata = {
   title: "杂谈 | "+ siteConfig.title,
-  description: "日常碎片与灵感记录",
+  description: "日常记录",
 };
 
 export default function ChatterPage() {

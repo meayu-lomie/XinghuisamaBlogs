@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { siteConfig } from '../../siteConfig';
 import { Plus, Pencil, Trash2, Search, Sparkles, AlertTriangle, X } from 'lucide-react';
 import { useToast } from '../../components/ToastProvider';
+import { useEscapeClose } from '../../lib/use-escape-close';
 
 type Chatter = {
   slug: string;
@@ -22,7 +23,7 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
   const [activeTag, setActiveTag] = useState("全部");
   const { showToast } = useToast();
 
-  // 👇 控制自定义弹窗的状态
+  // 控制自定义弹窗的状态
   const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; slug: string | null; title: string | null }>({
     isOpen: false,
     slug: null,
@@ -64,10 +65,10 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
 
       const data = await res.json();
       if (data.success) {
-        showToast("物理文件已彻底销毁", "success");
+        showToast("杂谈文件已删除", "success");
         setChatters(prev => prev.filter(c => c.slug !== slug));
       } else {
-        showToast("销毁失败: " + data.message, "error");
+        showToast("删除失败: " + data.message, "error");
       }
     } catch (err) {
       showToast("无法连接到 Python 引擎", "error");
@@ -76,6 +77,9 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
     }
   };
   // ... 保持其他部分不变 ...
+
+  // 确认框支持 Esc 关闭
+  useEscapeClose(deleteModal.isOpen, () => setDeleteModal({ isOpen: false, slug: null, title: null }));
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 py-10 pt-28 relative z-10">
@@ -106,9 +110,9 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
                 <AlertTriangle className="w-10 h-10 text-red-500" />
               </div>
 
-              <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">确认要销毁吗？</h3>
+              <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">确认要删除吗？</h3>
               <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-8 leading-relaxed">
-                你正在尝试抹除 <span className="text-red-500 font-bold">"{deleteModal.title}"</span>。<br />
+                你正在尝试删除 <span className="text-red-500 font-bold">"{deleteModal.title}"</span>。<br />
                 此操作将永久从硬盘删除源文件，不可撤回。
               </p>
 
@@ -121,9 +125,9 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="flex-1 py-4 bg-red-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-red-500/30 hover:bg-red-600 transition-all active:scale-95"
+                  className="flex-1 py-4 bg-red-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-sm hover:bg-red-600 transition-all active:scale-95"
                 >
-                  彻底抹除
+                  确认删除
                 </button>
               </div>
             </motion.div>
@@ -140,11 +144,11 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
           initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
           className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4 tracking-tighter"
         >
-          {siteConfig.chatterTitle || "源石研究笔记"}
+          {siteConfig.chatterTitle || "杂谈"}
         </motion.h1>
         <p className="text-slate-500 dark:text-slate-400 font-medium italic opacity-80 flex items-center justify-center gap-2">
           <Sparkles size={14} className="text-indigo-500" />
-          “ {siteConfig.chatterDescription || "日常碎片与灵感记录"} ”
+          “ {siteConfig.chatterDescription || "日常记录"} ”
         </p>
       </div>
 
@@ -178,12 +182,12 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
         {/* 新增项 */}
         <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="break-inside-avoid">
           <Link href="/editor?type=chatter"
-            className="group flex flex-col items-center justify-center min-h-[250px] rounded-[32px] border-2 border-dashed border-slate-300 dark:border-slate-700 bg-white/10 hover:bg-white/30 dark:hover:bg-indigo-500/5 hover:border-indigo-500 transition-all duration-500"
+            className="group flex flex-col items-center justify-center min-h-[250px] rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-white/10 hover:bg-white/30 dark:hover:bg-indigo-500/5 hover:border-indigo-500 transition-all duration-500"
           >
             <div className="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:bg-indigo-500 group-hover:text-white group-hover:rotate-90 transition-all duration-500 shadow-sm">
               <Plus size={32} />
             </div>
-            <span className="mt-4 text-xs font-black uppercase tracking-[0.2em] text-slate-400 group-hover:text-indigo-500 transition-colors">记录新的灵感...</span>
+            <span className="mt-4 text-xs font-black uppercase tracking-[0.2em] text-slate-400 group-hover:text-indigo-500 transition-colors">写点新的</span>
           </Link>
         </motion.div>
 
@@ -202,7 +206,7 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
                   <Pencil size={14} />
                 </Link>
                 <button
-                  // 👇 核心修改：点击不再直接 delete，而是打开自定义弹窗
+                  // 核心修改：点击不再直接 delete，而是打开自定义弹窗
                   onClick={(e) => {
                     e.preventDefault();
                     setDeleteModal({ isOpen: true, slug: chatter.slug, title: chatter.title || "无标题笔记" });
@@ -214,7 +218,7 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
               </div>
 
               <Link href={`/chatter/${chatter.slug}`}
-                className="block rounded-[32px] paper-card border border-[var(--card-border)] shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden"
+                className="block rounded-2xl paper-card border border-[var(--card-border)] shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden"
               >
                 {chatter.cover && (
                   <div className="w-full h-52 overflow-hidden relative">
@@ -236,7 +240,7 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
                   </div>
 
                   <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-4 leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                    {chatter.title || "碎片笔记"}
+                    {chatter.title || "无标题"}
                   </h3>
 
                   <div className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-5 opacity-90 font-medium italic">

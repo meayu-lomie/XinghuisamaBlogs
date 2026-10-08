@@ -60,10 +60,10 @@ export default function Navbar() {
     }
   };
 
-  // 🌟 监控增强版更新逻辑
+  // 监控增强版更新逻辑
   const handleUpdateLocal = async () => {
       if (operations.length === 0) {
-        showToast("队列中没有待处理的操作", "warning");
+        showToast("收件箱里还没有待写入的改动", "warning");
         return;
       }
 
@@ -74,7 +74,7 @@ export default function Navbar() {
         const configData = await configRes.json();
         const apiBase = `http://127.0.0.1:${configData.api_port}`;
 
-        for (const op of operations) {
+        for (const [index, op] of operations.entries()) {
           let apiUrl = '';
           let body = {};
 
@@ -111,12 +111,15 @@ export default function Navbar() {
 
           const data = await res.json();
           if (!data.success) {
-            showToast(`任务执行失败: ${data.message}`, "error");
+            // 队列是逐条提交的，前面几条可能已经写盘。这里如实说明，避免用户以为全部回滚。
+            showToast(`第 ${index + 1}/${operations.length} 项执行失败：${data.message}；已写入的部分不会回滚，请检查后重试`, "error");
             return;
           }
+          // 后端返回的 message 描述了本次实际写入的结果，不要吞掉
+          if (data.message) showToast(`任务已执行：${data.message}`, "success");
         }
 
-        showToast("任务已全部执行，本地数据已写入！", "success");
+        showToast(`收件箱已清空，共写入 ${operations.length} 项改动`, "success");
         clearOperations();
         setIsOpBoxOpen(false);
 
@@ -177,13 +180,13 @@ export default function Navbar() {
                 {isOpBoxOpen && (
                   <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute right-0 mt-3 w-80 paper-card-strong border border-slate-200 dark:border-slate-700 rounded-2xl shadow-lg p-4 z-50 cursor-default">
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">待处理操作</h3>
+                      <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">待写入的改动</h3>
                       <button onClick={clearOperations} className="text-[10px] text-red-500 font-bold hover:underline">清空全部</button>
                     </div>
 
                     <div className="flex flex-col gap-2 max-h-64 overflow-y-auto mb-4 custom-scrollbar">
                       {operations.length === 0 ? (
-                        <p className="text-center py-6 text-sm text-slate-400 font-medium">暂无积攒的操作</p>
+                        <p className="text-center py-6 text-sm text-slate-400 font-medium">暂无待写入的改动</p>
                       ) : (
                         operations.map(op => (
                           <div key={op.id} className="paper-card p-3 rounded-xl border border-slate-100 dark:border-slate-700 flex justify-between items-center group">

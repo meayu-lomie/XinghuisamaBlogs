@@ -3,10 +3,16 @@ import path from 'path';
 import matter from 'gray-matter';
 import ChatterBoard from './ChatterBoard';
 import { getBlogDir } from '../../lib/blog-paths';
+import { siteConfig } from '../../siteConfig';
+
+// 管理端是本机控制台，内容随时会被后端改写（发布杂谈/说说、改相册等），
+// 页面必须在每次请求时实时读盘，不能被构建期静态化固化。
+export const dynamic = 'force-dynamic';
+
 
 export const metadata = {
-  title: "杂谈 | XingHuiSama の 博客",
-  description: "日常碎片与灵感记录",
+  title: "杂谈 | " + siteConfig.title,
+  description: siteConfig.chatterDescription,
 };
 
 export default function ChatterPage() {
@@ -33,7 +39,7 @@ export default function ChatterPage() {
       return {
         slug,
         title: data.title || '',
-        date: data.date || '1970-01-01', // 👇 核心修复：加上日期兜底防崩溃
+        date: data.date || '1970-01-01', // 核心修复：加上日期兜底防崩溃
         tags: data.tags || [],
         mood: data.mood || '',
         cover: data.cover || '',

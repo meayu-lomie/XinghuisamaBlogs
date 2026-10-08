@@ -3,8 +3,14 @@ import path from 'path';
 import matter from 'gray-matter';
 import { siteConfig } from '../../siteConfig';
 import TimelineClient from '../../components/TimelineClient';
+import BlogPathWarning from '../../components/BlogPathWarning';
 import { ToastProvider } from '../../components/ToastProvider';
 import { getBlogRoot } from '../../lib/blog-paths';
+
+// 管理端是本机控制台，内容随时会被后端改写（发布杂谈/说说、改相册等），
+// 页面必须在每次请求时实时读盘，不能被构建期静态化固化。
+export const dynamic = 'force-dynamic';
+
 
 export const metadata = {
   title: "时间线 | " + siteConfig.authorName + " の 控制台",
@@ -12,12 +18,12 @@ export const metadata = {
 
 export default function TimelinePage() {
   // 与管理端其他页面一致：内容只读博客目录（唯一真相源）
-  // 时间线 = 文章(posts) + 杂谈(chatters) 的自动汇总
+  // 时间线 = 杂谈(chatters) 的自动汇总
   const blogRoot = getBlogRoot();
   let posts: any[] = [];
   let tagCounts: Record<string, number> = {};
 
-  const collect = (dir: string, type: 'post' | 'chatter') => {
+  const collect = (dir: string) => {
     try {
       if (!blogRoot || !fs.existsSync(dir)) return;
       const fileNames = fs.readdirSync(dir).filter(f => f.endsWith('.md'));
@@ -34,21 +40,21 @@ export default function TimelinePage() {
 
         posts.push({
           slug,
-          type,
-          title: data.title || (type === 'chatter' ? '碎片记录' : '无标题'),
+          type: 'chatter',
+          title: data.title || '无标题',
           date: data.date || '1970-01-01',
-          description: data.description || (type === 'chatter' && data.mood ? `心情：${data.mood}` : ''),
+          description: data.description || (data.mood ? `心情：${data.mood}` : ''),
           tags: itemTags,
           cover: data.cover || siteConfig.defaultPostCover,
         });
       });
     } catch (e) {
-      console.error(`读取${type === 'chatter' ? '杂谈' : '文章'}列表失败`, e);
+      console.error('读取杂谈列表失败', e);
     }
   };
 
   if (blogRoot) {
-    collect(path.join(blogRoot, 'chatters'), 'chatter');
+    collect(path.join(blogRoot, 'chatters'));
   }
 
   posts.sort((a, b) => {
@@ -64,6 +70,7 @@ export default function TimelinePage() {
     <ToastProvider>
       <div className="min-h-screen relative pb-32">
         <div>
+          <BlogPathWarning />
           <TimelineClient posts={posts} tags={tagsArray} />
         </div>
       </div>

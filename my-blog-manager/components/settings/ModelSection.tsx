@@ -7,7 +7,7 @@ import { useToast } from '../ToastProvider';
 
 /**
  * 模型设置：AI 润色功能的外部模型配置。
- * 与其他设置 tab 不同：模型配置（含 API Key）不进 siteConfig，也不走操作队列，
+ * 与其他设置 tab 不同：模型配置（含 API Key）不进 siteConfig，也不走收件箱，
  * 直接读写 Python 后端 /api/model/get|update|test，Key 只存本地 model_config.json。
  */
 

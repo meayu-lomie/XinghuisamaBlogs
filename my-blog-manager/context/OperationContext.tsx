@@ -8,7 +8,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 // - publish_article : 文章 / 杂谈 / 关于页
 // - create_moment   : 说说
 // - sync_photowall  : 照片墙（相册）
-// - sync_projects   : 项目矩阵
+// - sync_projects   : 项目
 // - CONFIG          : 站点配置
 export type OperationType =
   | 'publish_article'
@@ -23,11 +23,11 @@ export type OperationType =
 export interface Operation {
   id: string;
   type: OperationType;
-  label: string;      // 显示在列表里的简短描述，如 "修改文章：GNN研究"
+  label: string;      // 显示在列表里的简短描述，如 "修改杂谈：某篇标题"
   description?: string; // 详细描述（可选，多数调用方省略）
   timestamp: string;
   payload?: any;      // 实际要修改的数据内容
-  value?: any;        // 部分操作（照片墙 / 项目矩阵）用它携带全量数组
+  value?: any;        // 部分操作（照片墙 / 项目）用它携带全量数组
   key?: string;       // 设置类操作：被改的字段名
 }
 

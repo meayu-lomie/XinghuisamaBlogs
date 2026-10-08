@@ -1,9 +1,16 @@
 import ProjectsBoard from './ProjectsBoard';
+import BlogPathWarning from '../../components/BlogPathWarning';
 import { readBlogDataArray } from '../../lib/blog-data';
 import type { Project } from '../../data/projects';
+import { siteConfig } from '../../siteConfig';
+
+// 管理端是本机控制台，内容随时会被后端改写（发布杂谈/说说、改相册等），
+// 页面必须在每次请求时实时读盘，不能被构建期静态化固化。
+export const dynamic = 'force-dynamic';
+
 
 export const metadata = {
-  title: "项目矩阵 | XingHuiSama の 博客",
+  title: "项目 | " + siteConfig.title,
   description: "开源项目与代码仓库展示",
 };
 
@@ -15,6 +22,7 @@ export default function ProjectsPage() {
     <div className="min-h-screen relative pb-20">
       <div>
         <div className="mt-28">
+          <BlogPathWarning />
           <ProjectsBoard initialProjects={projects} />
         </div>
       </div>

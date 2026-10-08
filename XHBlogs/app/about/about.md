@@ -7,6 +7,4 @@ cover: /images/20261007_103854_34868a.jpg
 description: ''
 ---
 
-个人简介
-
 你好，我是 Meayu。

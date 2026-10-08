@@ -6,14 +6,14 @@ import { siteConfig } from '../../siteConfig';
 
 export const metadata = {
   title: "说说 | " + siteConfig.title,
-  description: "说说与瞬间记录",
+  description: "说说与日常记录",
 };
 
 export default function MomentsPage() {
   let allMoments: any[] = [];
 
   try {
-    // 🌟 终极防漏绝招：同时扫描两个可能的文件夹，把所有的说说都抓出来！
+    // 终极防漏绝招：同时扫描两个可能的文件夹，把所有的说说都抓出来！
     const possibleDirs = [
       path.join(process.cwd(), 'posts', 'moments'),
       path.join(process.cwd(), 'moments')

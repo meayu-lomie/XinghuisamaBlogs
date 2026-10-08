@@ -35,9 +35,9 @@ async def sync_gallery(request: Request):
         json_str = json.dumps(albums_data, ensure_ascii=False, indent=2)
 
         # 2. 构造标准的 TypeScript 导出模板
-        # 🛡️ 这种方式不依赖于绝对路径，只要相对位置不变，哪里都能跑
+        # 不依赖绝对路径，只要相对位置不变就能跑
         ts_content = (
-            "// 🛡️ 本文件由 XingHuiSama 控制台自动生成，请勿手动修改\n"
+            "// 本文件由控制台自动生成，请勿手动修改\n"
             "export interface Photo { url: string; caption?: string; }\n"
             "export interface Album { id: string; title: string; description: string; cover: string; date: string; photos: Photo[]; }\n\n"
             f"export const albums: Album[] = {json_str};"
@@ -50,7 +50,7 @@ async def sync_gallery(request: Request):
 
         return {
             "success": True,
-            "message": f"📸 画廊物理文件已更新！已同步 {len(albums_data)} 个相册。"
+            "message": f"照片墙已更新，共 {len(albums_data)} 个相册"
         }
     except Exception as e:
         # 这里把具体的报错抛给前端方便排查

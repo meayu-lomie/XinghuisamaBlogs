@@ -13,6 +13,7 @@
 """
 
 import os
+import re
 import json
 
 CURRENT_CORE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -53,3 +54,16 @@ def blog_dir(*parts) -> str:
     if not root:
         return ""
     return os.path.join(root, *parts)
+
+
+def safe_id(raw, fallback: str = "") -> str:
+    """把前端传来的 id 净化为安全的文件名片段。
+
+    这些 id 会被直接拼进 os.path.join 当文件名用，而它们来自请求体，
+    不做过滤时 "../" 之类的输入可以跳到目标目录之外去读写文件。
+    这里只保留字母、数字、下划线、连字符与中文，其余一律丢弃；
+    结果为空时返回 fallback（调用方可据此报错或生成新 id）。
+    """
+    text = str(raw or "")
+    cleaned = re.sub(r"[^0-9A-Za-z_\-\u4e00-\u9fff]", "", text)
+    return cleaned or fallback
