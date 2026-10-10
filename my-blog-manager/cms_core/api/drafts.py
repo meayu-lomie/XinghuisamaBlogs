@@ -85,7 +85,7 @@ async def save_draft(request: Request):
     try:
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(draft_data, f, ensure_ascii=False, indent=2)
-        return {"success": True, "message": "草稿已安全落盘", "id": draft_id}
+        return {"success": True, "message": "草稿已保存", "id": draft_id}
     except Exception as e:
         return {"success": False, "message": f"草稿保存失败: {str(e)}"}
 
@@ -125,7 +125,7 @@ async def get_draft(request: Request):
     doc_type = payload.get("type", "chatter")
     base_dir = get_blog_root()
     if not base_dir:
-        return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
+        return {"success": False, "message": "还没设置博客目录，请到【设置 → 项目仓库设置】里填一下"}
 
     drafts_dir = get_manager_drafts_dir()
     # 1. 优先从草稿箱读取 JSON
@@ -200,7 +200,7 @@ async def delete_draft(request: Request):
     raw_id = safe_id(payload.get("id", "").replace(".md", "").replace(".json", ""))
     base_dir = get_blog_root()
     if not base_dir:
-        return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
+        return {"success": False, "message": "还没设置博客目录，请到【设置 → 项目仓库设置】里填一下"}
     drafts_dir = get_manager_drafts_dir()
 
     possible_paths = [
@@ -218,7 +218,7 @@ async def delete_draft(request: Request):
                 continue
 
     if deleted_count > 0:
-        return {"success": True, "message": "已删除相关文件"}
+        return {"success": True, "message": "已删除"}
     return {"success": False, "message": "未找到相关文件"}
 
 
@@ -228,7 +228,7 @@ async def sync_local_operations(request: Request):
     operations = payload.get("operations", [])
     base_dir = get_blog_root()
     if not base_dir:
-        return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
+        return {"success": False, "message": "还没设置博客目录，请到【设置 → 项目仓库设置】里填一下"}
     drafts_dir = get_manager_drafts_dir()
     results = []
 

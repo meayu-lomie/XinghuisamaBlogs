@@ -3,7 +3,7 @@ import {siteConfig} from "@/siteConfig";
 
 export const metadata = {
   title: "项目 | " + siteConfig.title,
-  description: "开源项目与代码仓库展示",
+  description: "我写过的开源项目",
 };
 
 export default function ProjectsPage() {

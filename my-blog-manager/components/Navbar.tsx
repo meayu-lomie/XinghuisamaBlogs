@@ -1,9 +1,10 @@
 "use client";
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Loader2 } from 'lucide-react';
 import { useOperations } from '../context/OperationContext';
 import { useToast } from './ToastProvider';
 import { siteConfig } from '../siteConfig';
@@ -17,7 +18,12 @@ export default function Navbar() {
 
   const pathname = usePathname();
   const { operations, removeOperation, clearOperations } = useOperations();
+  const [isWriting, setIsWriting] = useState(false);
   const { showToast } = useToast();
+
+  // 防重入：写入是逐条 POST，网络慢时连点会并发跑两轮循环，
+  // 同一份内容被写两次（后端按 id 命名，两轮的 id 可能不同）→ 博客端出现重复。
+  const writingRef = useRef(false);
 
 
   useEffect(() => {
@@ -63,12 +69,16 @@ export default function Navbar() {
   // 监控增强版更新逻辑
   const handleUpdateLocal = async () => {
       if (operations.length === 0) {
-        showToast("收件箱里还没有待写入的改动", "warning");
+        showToast("还没有待保存的改动", "warning");
         return;
       }
+      // state 更新是异步的，连点时拦不住，必须用 ref 立即加锁
+      if (writingRef.current) return;
+      writingRef.current = true;
+      setIsWriting(true);
 
       try {
-        showToast(`正在准备发送 ${operations.length} 个任务...`, "info");
+        showToast(`正在写入 ${operations.length} 项改动...`, "info");
 
         const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
         const configData = await configRes.json();
@@ -101,7 +111,7 @@ export default function Navbar() {
               break;
           }
 
-          showToast(`正在请求后端: ${apiUrl}`, "info");
+          showToast("正在保存...", "info");
 
           const res = await fetch(apiUrl, {
             method: 'POST',
@@ -119,16 +129,19 @@ export default function Navbar() {
           if (data.message) showToast(`任务已执行：${data.message}`, "success");
         }
 
-        showToast(`收件箱已清空，共写入 ${operations.length} 项改动`, "success");
         clearOperations();
         setIsOpBoxOpen(false);
+        showToast(`已写入 ${operations.length} 项改动，正在刷新...`, "success");
 
         setTimeout(() => {
           window.location.reload();
-        }, 2000);
+        }, 1200);
 
     } catch (error) {
-      showToast("无法连接到后端引擎", "error");
+      showToast("无法连接到后端，请确认管理端后端在运行", "error");
+    } finally {
+      writingRef.current = false;
+      setIsWriting(false);
     }
   };
 
@@ -162,10 +175,10 @@ export default function Navbar() {
             <div className="relative">
               <button
                 onClick={() => setIsOpBoxOpen(!isOpBoxOpen)}
-                title="待写入的改动"
+                title="待保存的改动"
                 className="relative h-10 px-4 rounded-xl paper-card flex items-center justify-center text-xs font-bold whitespace-nowrap hover:scale-105 transition-all border border-[var(--card-border)] shadow-sm cursor-pointer"
               >
-                收件箱
+                待保存
                 {operations.length > 0 && (
                   <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -180,13 +193,13 @@ export default function Navbar() {
                 {isOpBoxOpen && (
                   <motion.div initial={{ opacity: 0, y: 10, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.95 }} className="absolute right-0 mt-3 w-80 paper-card-strong border border-slate-200 dark:border-slate-700 rounded-2xl shadow-lg p-4 z-50 cursor-default">
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">待写入的改动</h3>
+                      <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest">待保存的改动</h3>
                       <button onClick={clearOperations} className="text-[10px] text-red-500 font-bold hover:underline">清空全部</button>
                     </div>
 
                     <div className="flex flex-col gap-2 max-h-64 overflow-y-auto mb-4 custom-scrollbar">
                       {operations.length === 0 ? (
-                        <p className="text-center py-6 text-sm text-slate-400 font-medium">暂无待写入的改动</p>
+                        <p className="text-center py-6 text-sm text-slate-400 font-medium">还没有待保存的改动</p>
                       ) : (
                         operations.map(op => (
                           <div key={op.id} className="paper-card p-3 rounded-xl border border-slate-100 dark:border-slate-700 flex justify-between items-center group">
@@ -201,8 +214,8 @@ export default function Navbar() {
                     </div>
 
                     {/* 只有"更新本地"一步：内容直接写进博客前端目录，不再需要同步 */}
-                    <button onClick={handleUpdateLocal} className="w-full py-2.5 rounded-xl bg-indigo-500 text-white text-xs font-black shadow-lg hover:bg-indigo-600 transition-colors">
-                      写入博客
+                    <button onClick={handleUpdateLocal} disabled={isWriting} className="w-full py-2.5 rounded-xl bg-indigo-500 text-white text-xs font-black shadow-lg hover:bg-indigo-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                      {isWriting ? <><Loader2 size={14} className="animate-spin" /> 正在保存...</> : "保存到博客"}
                     </button>
                   </motion.div>
                 )}

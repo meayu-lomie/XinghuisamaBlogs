@@ -99,7 +99,7 @@ async def test_picbed_connection(payload: dict = Body(...)):
             data = response.json()
             if data.get("status") is True:
                 user_email = data.get("data", {}).get("email", "未知用户")
-                return {"success": True, "message": f"连接成功！当前账户: {user_email}"}
+                return {"success": True, "message": f"连接成功，当前账户：{user_email}"}
             else:
                 return {"success": False, "message": f"Token 无效: {data.get('message', '未知错误')}"}
     except Exception as e:
@@ -190,7 +190,7 @@ async def upload_image_local(file: UploadFile = File(...)):
     if not images_dir:
         return {
             "success": False,
-            "message": "还没配置博客物理路径，请先在【项目仓库设置】里填写并保存博客路径",
+            "message": "还没设置博客目录，请到【设置 → 项目仓库设置】里填一下",
         }
 
     try:

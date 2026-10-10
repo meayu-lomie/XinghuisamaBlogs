@@ -10,7 +10,7 @@ export default function ProfileCard({ chatterCount, momentCount, photoCount }: {
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    showToast(`${label}已复制到剪贴板: ${text}`, 'success');
+    showToast(`${label}已复制到剪贴板：${text}`, 'success');
   };
 
   return (

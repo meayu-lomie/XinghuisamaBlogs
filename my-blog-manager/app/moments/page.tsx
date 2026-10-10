@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 
 
 export const metadata = {
-  title: "说说 | " + siteConfig.authorName + " の 博客",
+  title: "说说 | " + siteConfig.authorName + " の 控制台",
   description: "说说与日常记录",
 };
 

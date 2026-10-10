@@ -55,7 +55,7 @@ export default function ChatterBoard({ chatters }: { chatters: Chatter[] }) {
           {/* 核心修改：搜索框在手机端更扁凑 */}
           <input
             type="text"
-            placeholder="搜索杂谈..."
+            placeholder="搜索杂谈…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full paper-card border border-[var(--card-border)] rounded-xl md:rounded-2xl px-4 md:px-6 py-3 md:py-4 pl-10 md:pl-14 text-sm md:text-base text-slate-800 dark:text-white shadow-lg md:shadow-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder-slate-400 font-medium"
@@ -85,7 +85,7 @@ export default function ChatterBoard({ chatters }: { chatters: Chatter[] }) {
         <div className="text-center py-20 rounded-2xl paper-card border border-[var(--card-border)]">
           <p className="text-slate-500 dark:text-slate-400 font-bold">
             {chatters.length === 0
-              ? "还没有杂谈，第一篇正在路上"
+              ? "还没有内容"
               : "没有匹配的杂谈，换个关键词或标签试试"}
           </p>
         </div>

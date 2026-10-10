@@ -62,7 +62,7 @@ export default function RepoSection() {
   }, []);
 
   const testPathConnection = async () => {
-    if (!deployData.blogPath) { showToast("路径不能为空！", "warning"); return; }
+    if (!deployData.blogPath) { showToast("请先填写博客目录", "warning"); return; }
     setIsCheckingPath(true);
     try {
       const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
@@ -75,12 +75,12 @@ export default function RepoSection() {
       const data = await res.json();
       if (data.success) showToast(data.message, "success");
       else showToast(data.message, "error");
-    } catch (e) { showToast("无法连接引擎", "error"); }
+    } catch (e) { showToast("连不上管理端后端", "error"); }
     setIsCheckingPath(false);
   };
 
   const testGitConnection = async () => {
-    if (!deployData.blogPath) { showToast("请先配置物理路径！", "warning"); return; }
+    if (!deployData.blogPath) { showToast("请先填写博客目录", "warning"); return; }
     setIsCheckingGit(true);
     try {
       const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
@@ -93,7 +93,7 @@ export default function RepoSection() {
       const data = await res.json();
       if (data.success) showToast(data.message, "success");
       else showToast(data.message, "error");
-    } catch (e) { showToast("引擎未响应", "error"); }
+    } catch (e) { showToast("管理端后端没有响应", "error"); }
     setIsCheckingGit(false);
   };
 
@@ -117,7 +117,7 @@ export default function RepoSection() {
   const executeInitEnv = async () => {
     setModalConfig({ isOpen: false, type: null });
     setIsInitializing(true);
-    showToast("正在初始化仓库环境...", "info");
+    showToast("正在初始化仓库环境…", "info");
     try {
       const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
       const configData = await configRes.json();
@@ -129,14 +129,14 @@ export default function RepoSection() {
       const data = await res.json();
       if (data.success) showToast(data.message, "success");
       else showToast(`初始化失败：${data.message}`, "error");
-    } catch (error) { showToast("引擎未响应", "error"); }
+    } catch (error) { showToast("管理端后端没有响应", "error"); }
     setIsInitializing(false);
   };
 
   const executeDeploy = async () => {
     setModalConfig({ isOpen: false, type: null });
     setIsDeploying(true);
-    showToast("正在编译打包并推送至静态仓库...", "info");
+    showToast("正在编译打包并推送至静态仓库…", "info");
     try {
       const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
       const configData = await configRes.json();
@@ -155,7 +155,7 @@ export default function RepoSection() {
   const executeUploadSource = async () => {
     setModalConfig({ isOpen: false, type: null });
     setIsUploading(true);
-    showToast("正在推送源码，Vercel 将自动构建...", "info");
+    showToast("正在推送源码，Vercel 将自动构建…", "info");
     try {
       const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
       const configData = await configRes.json();
@@ -166,8 +166,8 @@ export default function RepoSection() {
       });
       const data = await res.json();
       if (data.success) showToast("源码推送成功，Vercel 即将自动构建", "success");
-      else showToast(`上传失败：${data.message}`, "error");
-    } catch (error) { showToast("源码上传请求失败", "error"); }
+      else showToast(`推送失败：${data.message}`, "error");
+    } catch (error) { showToast("推送源码失败", "error"); }
     setIsUploading(false);
   };
 
@@ -204,9 +204,9 @@ export default function RepoSection() {
         <div className="space-y-8">
           <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 dark:border-slate-700/50">
             <div className="flex justify-between items-center mb-3">
-               <label className="text-[11px] font-black text-slate-600 dark:text-slate-300 uppercase flex items-center gap-1"><ShieldCheck size={14} className="text-[var(--ink-faint)]" /> 1. 本地 Blog 物理路径</label>
+               <label className="text-[11px] font-black text-slate-600 dark:text-slate-300 uppercase flex items-center gap-1"><ShieldCheck size={14} className="text-[var(--ink-faint)]" /> 1. 本地博客目录</label>
                <button onClick={testPathConnection} disabled={isCheckingPath} className="text-[10px] paper-card text-[var(--ink-soft)] px-3 py-1 rounded-full font-bold hover:text-[var(--accent)] transition-colors">
-                 {isCheckingPath ? "探测中..." : "测试路径"}
+                 {isCheckingPath ? "探测中…" : "测试路径"}
                </button>
             </div>
             <input type="text" value={deployData.blogPath} onChange={e => setDeployData({...deployData, blogPath: e.target.value})} className="w-full paper-card rounded-xl px-4 py-3 text-xs font-mono text-[var(--ink)] outline-none focus:ring-2 focus:ring-indigo-500/40" placeholder="C:/Workspace/XinghuisamaBlogs/XHBlogs" />
@@ -216,7 +216,7 @@ export default function RepoSection() {
             <div className="flex justify-between items-center mb-4">
                <label className="text-[11px] font-black text-slate-600 dark:text-slate-300 uppercase flex items-center gap-1"><GitBranch size={14} className="text-[var(--ink-faint)]" /> 2. GitHub 仓库配置</label>
                <button onClick={testGitConnection} disabled={isCheckingGit} className="text-[10px] paper-card text-[var(--ink-soft)] px-3 py-1 rounded-full font-bold hover:text-[var(--accent)] transition-colors">
-                 {isCheckingGit ? "探测中..." : "校验 Git 环境"}
+                 {isCheckingGit ? "探测中…" : "校验 Git 环境"}
                </button>
             </div>
 
@@ -263,23 +263,23 @@ export default function RepoSection() {
             {/* 操作按钮区 */}
             <div className="pt-6 border-t border-slate-200 dark:border-slate-700/50 flex flex-col gap-3">
                <button onClick={() => setModalConfig({isOpen: true, type: 'init'})} disabled={isInitializing} className="w-full flex items-center justify-center gap-2 py-3.5 paper-card text-[var(--ink)] rounded-2xl text-sm font-black hover:shadow-md active:scale-95 transition-all">
-                  <Wand2 size={18} className={isInitializing ? "animate-spin" : ""} /> {isInitializing ? "初始化中..." : "初始化仓库环境"}
+                  <Wand2 size={18} className={isInitializing ? "animate-spin" : ""} /> {isInitializing ? "初始化中…" : "初始化仓库环境"}
                </button>
 
                <div className="flex gap-3 flex-col md:flex-row">
                  <button onClick={() => setModalConfig({isOpen: true, type: 'deploy'})} disabled={isDeploying || isUploading} className="flex-1 flex items-center justify-center gap-2 py-3.5 paper-card text-[var(--ink)] rounded-2xl text-sm font-black hover:shadow-md active:scale-95 transition-all">
-                    <Rocket size={18} className={isDeploying ? "animate-bounce" : ""} /> {isDeploying ? "编译中..." : "编译并发布静态页"}
+                    <Rocket size={18} className={isDeploying ? "animate-bounce" : ""} /> {isDeploying ? "编译中…" : "编译并发布静态页"}
                  </button>
 
                  <button onClick={() => setModalConfig({isOpen: true, type: 'upload'})} disabled={isDeploying || isUploading} className="flex-1 flex items-center justify-center gap-2 py-3.5 paper-card text-[var(--ink)] rounded-2xl text-sm font-black hover:shadow-md active:scale-95 transition-all">
-                    <CloudUpload size={18} className={isUploading ? "animate-pulse" : ""} /> {isUploading ? "同步中..." : "仅推送源码（Vercel）"}
+                    <CloudUpload size={18} className={isUploading ? "animate-pulse" : ""} /> {isUploading ? "推送中…" : "仅推送源码（Vercel）"}
                  </button>
                </div>
             </div>
           </div>
 
           <button onClick={handleSaveConfig} disabled={isSaving} className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl text-sm font-black shadow-md active:scale-95 transition-all hover:shadow-2xl hover:-translate-y-1">
-            <Save size={18} className="inline mr-2" /> {isSaving ? "正在保存..." : "保存配置"}
+            <Save size={18} className="inline mr-2" /> {isSaving ? "正在保存…" : "保存配置（立即生效）"}
           </button>
         </div>
       </motion.section>
@@ -297,7 +297,7 @@ export default function RepoSection() {
                   <>
                         <div className="w-16 h-16 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6"><Key className="text-amber-500" size={32} /></div>
                         <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">
-                          你的 {sshConfig.type === 'static' ? 'A 线 (静态库)' : 'B 线 (源码库)'} 通行证已就绪
+                          {sshConfig.type === 'static' ? '静态页面仓库' : '源码仓库'}的部署密钥已生成
                         </h3>
                         <p className="text-xs text-slate-500 mb-6 leading-relaxed">请将此密钥配置到对应 GitHub 仓库的 Deploy Keys 中以获取对应权限。</p>
 
@@ -332,7 +332,7 @@ export default function RepoSection() {
                     <>
                         <div className="w-16 h-16 bg-[var(--paper-deep)] rounded-2xl flex items-center justify-center mx-auto mb-6"><Wand2 className="text-[var(--ink)]" size={32} /></div>
                         <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">执行自动化改造？</h3>
-                        <p className="text-sm text-slate-500 mb-8 leading-relaxed">一键绑定 Git、安装插件并注入核心双轨配置</p>
+                        <p className="text-sm text-slate-500 mb-8 leading-relaxed">自动绑定 Git 仓库、安装 gh-pages，并写入部署配置</p>
                         <div className="flex gap-3">
                             <button onClick={() => setModalConfig({isOpen: false, type: null})} className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-black transition-colors hover:bg-slate-200">取消</button>
                             <button onClick={executeInitEnv} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl text-xs font-black shadow-lg active:scale-95 transition-all">确认执行</button>
@@ -344,7 +344,7 @@ export default function RepoSection() {
                     <>
                         <div className="w-16 h-16 bg-[var(--paper-deep)] rounded-2xl flex items-center justify-center mx-auto mb-6"><Rocket className="text-[var(--ink)]" size={32} /></div>
                         <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">执行编译并部署？</h3>
-                        <p className="text-sm text-slate-500 mb-8 leading-relaxed">打包前端静态文件，并推送至你在 A 线配置的静态仓库。</p>
+                        <p className="text-sm text-slate-500 mb-8 leading-relaxed">打包前端静态文件，推送到「仓库一（静态页面）」。</p>
                         <div className="flex gap-3">
                             <button onClick={() => setModalConfig({isOpen: false, type: null})} className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-black transition-colors hover:bg-slate-200">取消</button>
                             <button onClick={executeDeploy} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl text-xs font-black shadow-lg active:scale-95 transition-all">确认执行</button>
@@ -355,11 +355,11 @@ export default function RepoSection() {
                 {modalConfig.type === 'upload' && (
                     <>
                         <div className="w-16 h-16 bg-[var(--paper-deep)] rounded-2xl flex items-center justify-center mx-auto mb-6"><CloudUpload className="text-[var(--ink)]" size={32} /></div>
-                        <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">同步源码至 Vercel？</h3>
-                        <p className="text-sm text-slate-500 mb-8 leading-relaxed">将本地源代码提交，并推送到你在 B 线配置的源码仓库，自动触发 Vercel 构建。</p>
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">推送源码至 Vercel？</h3>
+                        <p className="text-sm text-slate-500 mb-8 leading-relaxed">把本地源码提交并推送到「仓库二（博客源码）」，Vercel 会自动构建。</p>
                         <div className="flex gap-3">
                             <button onClick={() => setModalConfig({isOpen: false, type: null})} className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-black transition-colors hover:bg-slate-200">取消</button>
-                            <button onClick={executeUploadSource} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl text-xs font-black shadow-lg active:scale-95 transition-all">开始同步</button>
+                            <button onClick={executeUploadSource} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl text-xs font-black shadow-lg active:scale-95 transition-all">开始推送</button>
                         </div>
                     </>
                 )}

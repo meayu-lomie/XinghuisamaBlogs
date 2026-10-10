@@ -163,7 +163,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
       <div className="mb-10 md:mb-16 flex flex-col items-center gap-5 md:gap-8">
         <div className="relative w-full max-w-lg group px-2 md:px-0">
           <Search className="w-5 h-5 md:w-6 md:h-6 absolute left-6 md:left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors z-20 pointer-events-none" />
-          <input type="text" placeholder="搜索说说..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full paper-card border border-[var(--card-border)] rounded-xl md:rounded-2xl px-5 md:px-6 py-3 md:py-4 pl-12 md:pl-14 text-sm md:text-base text-slate-800 dark:text-white shadow-lg md:shadow-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-medium relative z-10" />
+          <input type="text" placeholder="搜索说说…" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full paper-card border border-[var(--card-border)] rounded-xl md:rounded-2xl px-5 md:px-6 py-3 md:py-4 pl-12 md:pl-14 text-sm md:text-base text-slate-800 dark:text-white shadow-lg md:shadow-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all font-medium relative z-10" />
         </div>
 
         <div className="flex paper-card p-1 md:p-1.5 rounded-xl md:rounded-2xl border border-[var(--card-border)] shadow-sm relative z-10">
@@ -198,7 +198,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
                 <Ghost size={32} className="md:w-12 md:h-12 text-indigo-500 relative z-10" strokeWidth={1.5} />
               </div>
               <h2 className="text-xl md:text-3xl font-black text-slate-900 dark:text-white mb-2 md:mb-4 tracking-tight">{searchQuery ? "没找到相关记忆" : "还没有说说"}</h2>
-              <p className="text-slate-500 dark:text-slate-400 font-medium text-sm md:text-lg leading-relaxed px-2 md:px-4">{searchQuery ? `换个关键词再试试` : `还没有说说。`}</p>
+              <p className="text-slate-500 dark:text-slate-400 font-medium text-sm md:text-lg leading-relaxed px-2 md:px-4">{searchQuery ? `换个关键词再试试` : `去写下第一条吧`}</p>
             </motion.div>
           </div>
         )}

@@ -26,7 +26,7 @@ async def sync_gallery(request: Request):
 
         target = albums_ts_path()
         if not target:
-            return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
+            return {"success": False, "message": "还没设置博客目录，请到【设置 → 项目仓库设置】里填一下"}
 
         if not isinstance(albums_data, list):
             return {"success": False, "message": "数据格式非法，预期为数组"}

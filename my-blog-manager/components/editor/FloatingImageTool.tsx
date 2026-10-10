@@ -30,7 +30,7 @@ export default function FloatingImageTool({ isOpen, onClose, onInsert }: Floatin
 
     setIsUploading(true);
     showToast(
-      useRemote ? "正在将图片传送至云端图床..." : "正在保存到本地图片目录...",
+      useRemote ? "正在上传到图床…" : "正在保存到本地…",
       "success"
     );
 
@@ -56,15 +56,15 @@ export default function FloatingImageTool({ isOpen, onClose, onInsert }: Floatin
         setUploadedUrl(data.url);
         showToast(
           useRemote
-            ? "上传成功！"
+            ? "上传成功"
             : "已保存到本地图片目录",
           "success"
         );
       } else {
-        showToast(`上传失败: ${data.message || '未知错误'}`, "error");
+        showToast(`上传失败：${data.message || '未知错误'}`, "error");
       }
     } catch (error: any) {
-      showToast(`连接异常: ${error.message}`, "error");
+      showToast(`连接异常：${error.message}`, "error");
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -93,7 +93,7 @@ export default function FloatingImageTool({ isOpen, onClose, onInsert }: Floatin
   const copyUrlToClipboard = () => {
     if (uploadedUrl) {
       navigator.clipboard.writeText(uploadedUrl);
-      showToast("链接已复制到剪贴板！", "success");
+      showToast("链接已复制到剪贴板", "success");
     }
   };
 
@@ -150,7 +150,7 @@ export default function FloatingImageTool({ isOpen, onClose, onInsert }: Floatin
                   <input type="file" ref={fileInputRef} onChange={e => e.target.files && handleFileUpload(e.target.files[0])} accept="image/*" className="hidden" />
                   <div className="text-4xl drop-shadow-sm">{isUploading ? '上传中' : '上传'}</div>
                   <div className="text-center">
-                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{isUploading ? '正在极速上传...' : '点击或拖拽图片'}</p>
+                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300">{isUploading ? '正在上传…' : '点击或拖拽图片'}</p>
                   </div>
                 </div>
               ) : (
@@ -160,7 +160,7 @@ export default function FloatingImageTool({ isOpen, onClose, onInsert }: Floatin
                     <textarea
                       value={externalUrl}
                       onChange={(e) => setExternalUrl(e.target.value)}
-                      placeholder="粘贴图片链接 (http://...)"
+                      placeholder="粘贴图片链接（http://…）"
                       className="w-full h-24 p-4 text-xs font-medium paper-card border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-emerald-500 outline-none transition-all resize-none text-slate-700 dark:text-slate-200"
                     />
                   </div>

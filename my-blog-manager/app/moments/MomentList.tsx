@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
-import { MapPin, MessageSquare, Clock, Sparkles, Search, ArrowDownAZ, ArrowUpZA, ChevronLeft, ChevronRight, Ghost, Plus, Image as ImageIcon, X, Send, Link as LinkIcon, Zap, Trash2, AlertTriangle } from 'lucide-react';
+import { MapPin, MessageSquare, Clock, Sparkles, Search, ArrowDownAZ, ArrowUpZA, ChevronLeft, ChevronRight, Ghost, Plus, Image as ImageIcon, X, Send, Link as LinkIcon, Zap, Trash2, AlertTriangle, Loader2, RefreshCw } from 'lucide-react';
 import MomentComments from '../../components/MomentComments';
 import { useToast } from '../../components/ToastProvider';
 import { siteConfig } from '../../siteConfig';
@@ -39,9 +39,21 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageUrlInput, setImageUrlInput] = useState('');
 
-  // AI 润色（纯文本模式）
+  // 防重入：网络卡顿时用户可能连点，state 更新是异步的拦不住，必须用 ref 立即加锁
+  const submitLockRef = useRef(false);
+  // 本次编辑期间固定的说说 id：重复提交写的始终是同一个文件，不会产生重复内容
+  const momentIdRef = useRef<string | null>(null);
+
+  // AI 润色（纯文本模式）：结果进对照面板，可编辑后再应用，不直接覆盖原文
   const [isPolishing, setIsPolishing] = useState(false);
-  const [polishPreview, setPolishPreview] = useState<string | null>(null);
+  const [polishOpen, setPolishOpen] = useState(false);
+  const [polishOriginal, setPolishOriginal] = useState('');
+  const [polishDraft, setPolishDraft] = useState('');
+
+  const getMomentId = () => {
+    if (!momentIdRef.current) momentIdRef.current = `moment-${Date.now()}`;
+    return momentIdRef.current;
+  };
 
   const handlePolishMoment = async () => {
     if (isPolishing) return;
@@ -58,7 +70,9 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
       });
       const data = await res.json();
       if (data.success && data.polished) {
-        setPolishPreview(data.polished);
+        setPolishOriginal(newMoment.content);
+        setPolishDraft(data.polished);
+        setPolishOpen(true);
       } else {
         showToast(data.message || '润色失败', 'error');
       }
@@ -170,11 +184,11 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
 
   const handleQueueMoment = () => {
     if (!newMoment.content.trim()) {
-      showToast("内容不能为空哦！", "warning");
+      showToast("先写点什么吧", "warning");
       return;
     }
     const payload = {
-      id: `moment-${Date.now()}`,
+      id: getMomentId(),
       date: new Date().toLocaleString('sv-SE'),
       content: newMoment.content,
       location: newMoment.location,
@@ -187,18 +201,20 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
       payload: payload,
       timestamp: new Date().toLocaleString()
     });
-    showToast("队列保存成功！\n请点击右上角导航栏的收件箱更新本地", "success");
+    showToast("已加入待保存，点右上角【保存到博客】即可生效", "success");
     setIsPublishOpen(false);
     setNewMoment({ content: '', location: '', images: [] });
   };
 
   const handleDirectPublish = async () => {
     if (!newMoment.content.trim()) {
-      showToast("说说内容不能为空！", "error");
+      showToast("说点什么再发布吧", "warning");
       return;
     }
+    if (submitLockRef.current) return;
+    submitLockRef.current = true;
     setIsSubmitting(true);
-    showToast("正在强行直连 Python 引擎...", "info");
+    showToast("正在发布...", "info");
 
     try {
       const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
@@ -206,7 +222,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
       const configData = await configRes.json();
 
       const payload = {
-        id: `moment-${Date.now()}`,
+        id: getMomentId(),
         date: new Date().toLocaleString('sv-SE'),
         content: newMoment.content,
         location: newMoment.location,
@@ -220,21 +236,23 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
         body: JSON.stringify(payload)
       });
 
-      if (!res.ok) throw new Error(`后端返回 HTTP 状态码: ${res.status}`);
+      if (!res.ok) throw new Error(`服务器返回 ${res.status}`);
 
       const data = await res.json();
       if (data.success) {
-        showToast("发布成功！正在刷新...", "success");
+        showToast("发布成功，正在刷新...", "success");
         setIsPublishOpen(false);
         setNewMoment({ content: '', location: '', images: [] });
+        momentIdRef.current = null;
         setTimeout(() => window.location.reload(), 1000);
       } else {
-        showToast(`后端拒绝了请求：${data.message}`, "error");
+        showToast(`保存失败：${data.message}`, "error");
       }
     } catch (error: any) {
-      showToast(`请求彻底断裂：${error.message}`, "error");
+      showToast(`发布失败：${error.message}`, "error");
     } finally {
       setIsSubmitting(false);
+      submitLockRef.current = false;
     }
   };
 
@@ -411,7 +429,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
         </div>
       </div>
 
-      {/* 完美的 Flexbox 分列瀑布流！彻底告别错位和缝隙！ */}
+      {/* 左右两列瀑布流 */}
       <LayoutGroup>
         {processedMoments.length > 0 ? (
           <div className="flex flex-col md:flex-row gap-8 pb-32 w-full items-start">
@@ -476,37 +494,83 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
                 className="w-full paper-card rounded-2xl p-4 text-sm text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-indigo-500/40 min-h-[110px] resize-none mb-3 leading-relaxed custom-scrollbar"
               />
 
-              {/* AI 润色：按钮 + 预览提示条 */}
+              {/* AI 润色：结果进对照面板，可改后再应用 */}
               <div className="flex items-center gap-3 mb-5">
                 <button
                   onClick={handlePolishMoment}
                   disabled={isPolishing}
-                  className="px-4 py-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-black flex items-center gap-2 hover:bg-emerald-500 hover:text-white transition-all disabled:opacity-50"
-                  title="让 AI 帮你把这段文字润色一下"
+                  className="px-4 py-2 rounded-xl paper-card text-[var(--ink-soft)] border border-[var(--card-border)] text-xs font-bold flex items-center gap-2 hover:text-[var(--accent)] hover:border-[var(--accent-soft)] transition-colors disabled:opacity-50"
+                  title="润色这段文字"
                 >
-                  {isPolishing ? <Clock size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                  {isPolishing ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
                   {isPolishing ? '润色中...' : 'AI 润色'}
                 </button>
-                {polishPreview && (
-                  <div className="flex-1 min-w-0 flex items-center gap-3 bg-emerald-500/5 border border-emerald-500/20 rounded-xl px-4 py-2">
-                    <span className="flex-1 min-w-0 truncate text-xs font-bold text-emerald-700 dark:text-emerald-300" title={polishPreview}>
-                      润色结果：{polishPreview}
-                    </span>
+                {polishOpen && (
+                  <span className="text-[11px] font-bold text-[var(--ink-faint)]">
+                    已生成润色结果，可在下方对照修改
+                  </span>
+                )}
+              </div>
+
+              {/* 润色对照面板：左原文右结果，结果可直接编辑后再应用 */}
+              {polishOpen && (
+                <div className="mb-5 rounded-2xl border border-[var(--card-border)] paper-card p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-black text-[var(--ink)]">润色对照</span>
                     <button
-                      onClick={() => { setNewMoment({ ...newMoment, content: polishPreview }); setPolishPreview(null); }}
-                      className="shrink-0 px-3 py-1.5 bg-emerald-500 text-white rounded-lg text-[11px] font-bold hover:bg-emerald-600 transition-colors"
+                      onClick={() => { setPolishOpen(false); setPolishDraft(''); }}
+                      className="text-[11px] font-bold text-[var(--ink-faint)] hover:text-[var(--accent)] transition-colors"
                     >
-                      应用
+                      收起
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <p className="text-[11px] font-bold text-[var(--ink-faint)] mb-1.5">原文</p>
+                      <div className="max-h-40 overflow-y-auto custom-scrollbar rounded-xl border border-[var(--rule)] p-3 text-xs leading-relaxed text-[var(--ink-soft)] whitespace-pre-wrap">
+                        {polishOriginal}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-bold text-[var(--accent)] mb-1.5">润色后（可直接修改）</p>
+                      <textarea
+                        value={polishDraft}
+                        onChange={(e) => setPolishDraft(e.target.value)}
+                        className="w-full h-40 resize-none custom-scrollbar rounded-xl border border-[var(--accent-soft)] bg-[var(--paper)] p-3 text-xs leading-relaxed text-[var(--ink)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-soft)]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 mt-3">
+                    <button
+                      onClick={() => {
+                        setNewMoment({ ...newMoment, content: polishDraft });
+                        setPolishOpen(false);
+                        showToast('已应用润色结果', 'success');
+                      }}
+                      disabled={!polishDraft.trim()}
+                      className="px-4 py-2 rounded-xl bg-[var(--accent)] text-white text-xs font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
+                    >
+                      应用到正文
                     </button>
                     <button
-                      onClick={() => setPolishPreview(null)}
-                      className="shrink-0 px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg text-[11px] font-bold hover:bg-slate-300 transition-colors"
+                      onClick={handlePolishMoment}
+                      disabled={isPolishing}
+                      className="px-4 py-2 rounded-xl paper-card border border-[var(--card-border)] text-[var(--ink-soft)] text-xs font-bold hover:text-[var(--accent)] transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                    >
+                      {isPolishing ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+                      重新润色
+                    </button>
+                    <button
+                      onClick={() => { setPolishOpen(false); setPolishDraft(''); }}
+                      className="px-4 py-2 rounded-xl text-[var(--ink-faint)] text-xs font-bold hover:text-[var(--ink)] transition-colors"
                     >
                       丢弃
                     </button>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
               <div className="flex items-center gap-4 mb-6">
                 <div className="relative flex-1 group">
@@ -594,7 +658,7 @@ export default function MomentList({ moments, authorName, avatarUrl }: any) {
                   disabled={isUploading || isSubmitting}
                   className="sm:flex-1 py-3 px-4 rounded-2xl paper-card text-[var(--ink)] text-sm font-bold hover:shadow-md transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
-                  <Send size={15} /> 加入收件箱
+                  <Send size={15} /> 加入待保存
                 </button>
 
                 <button

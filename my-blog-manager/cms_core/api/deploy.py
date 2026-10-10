@@ -52,7 +52,7 @@ async def check_blog_path(request: Request):
         target_path = (payload.get("blogPath") or "").strip()
 
         if not target_path or not os.path.exists(target_path):
-            return {"success": False, "message": "目标物理路径不存在，请检查输入！"}
+            return {"success": False, "message": "博客目录不存在，请检查输入"}
 
         # 防呆：必须是 Next.js 项目（含 package.json），避免误选到别处
         if not os.path.exists(os.path.join(target_path, "package.json")):
@@ -137,11 +137,11 @@ async def check_git_env(request: Request):
         blog_path = payload.get("blogPath", "").strip()
 
         if not blog_path or not os.path.exists(blog_path):
-            return {"success": False, "message": "本地物理路径不存在，请先检查路径！"}
+            return {"success": False, "message": "本地博客目录不存在，请先检查路径"}
 
         git_dir = os.path.join(blog_path, ".git")
         if not os.path.exists(git_dir):
-            return {"success": False, "message": "该路径未初始化 Git 仓库，请点击下方【一键初始化】按钮。"}
+            return {"success": False, "message": "这个目录还不是 Git 仓库，点下面的「初始化仓库环境」就能建好。"}
 
         return {"success": True, "message": "Git 环境正常，已准备就绪"}
     except Exception as e:
@@ -157,7 +157,7 @@ async def init_deploy_env(request: Request):
         static_repo = payload.get("staticRepoUrl", "").strip()
 
         if not blog_path or not os.path.exists(blog_path):
-            return {"success": False, "message": "目标博客路径不存在！"}
+            return {"success": False, "message": "目标博客目录不存在"}
 
         # 1. 基础 Git 初始化
         subprocess.run(["git", "init"], cwd=blog_path, check=True)
@@ -209,7 +209,7 @@ async def publish_to_github_pages(request: Request):
         blog_path = payload.get("blogPath", "").strip()
 
         if not blog_path or not os.path.exists(blog_path):
-            return {"success": False, "message": "博客物理路径不存在，请先在【项目仓库设置】里检查路径"}
+            return {"success": False, "message": "博客目录不存在，请到【设置 → 项目仓库设置】里检查一下"}
 
         pkg_path = os.path.join(blog_path, "package.json")
         if not os.path.exists(pkg_path):
@@ -220,7 +220,7 @@ async def publish_to_github_pages(request: Request):
         if "deploy" not in (pkg_data.get("scripts") or {}):
             return {
                 "success": False,
-                "message": "还没初始化静态部署环境：缺少 npm run deploy 脚本，请先点击下方【一键初始化】",
+                "message": "还没初始化静态部署环境：缺少 npm run deploy 脚本，请先点下方的「初始化仓库环境」",
             }
 
         # next.config 没开 output:'export' 时，next build 不会产出 out/，
@@ -233,7 +233,7 @@ async def publish_to_github_pages(request: Request):
                 return {
                     "success": False,
                     "message": "next.config.ts 里的 output: 'export' 仍是注释状态，构建不会产出 out/ 目录。"
-                               "请先启用静态导出（或改用 B 线源码同步部署到 Vercel）",
+                               "请先启用静态导出，或改用「仓库二（博客源码）」部署到 Vercel",
                 }
 
         process = subprocess.Popen(
@@ -252,7 +252,7 @@ async def publish_to_github_pages(request: Request):
         detail = (stderr or "").strip() or (stdout or "").strip()[-800:]
         return {"success": False, "message": f"发布失败，报错：\n{detail}"}
     except Exception as e:
-        return {"success": False, "message": f"静态发布引擎崩溃: {str(e)}"}
+        return {"success": False, "message": f"发布失败：{str(e)}"}
 
 
 # B 线接口：同步源代码到 Vercel 仓库
@@ -264,7 +264,7 @@ async def sync_source_to_vercel(request: Request):
 
         # 读取配置
         if not os.path.exists(CONFIG_FILE):
-            return {"success": False, "message": "未找到配置文件，请先点击保存！"}
+            return {"success": False, "message": "未找到配置文件，请先点保存"}
 
         with open(CONFIG_FILE, "r", encoding="utf-8") as f:
             config = json.load(f)
@@ -273,7 +273,7 @@ async def sync_source_to_vercel(request: Request):
         source_branch = config.get("sourceBranch", "main").strip()
 
         if not source_repo:
-            return {"success": False, "message": "源码仓库地址为空，无法同步。请先在下方填写仓库二的地址"}
+            return {"success": False, "message": "源码仓库地址为空，无法推送。请先在下方填写仓库二的地址"}
 
         # 不用 os.chdir：那会永久改变后端进程的工作目录，影响其它接口。
         # git 的 cwd 参数就能指定工作目录。
@@ -306,9 +306,9 @@ async def sync_source_to_vercel(request: Request):
 
         # 判断是否成功
         if push_process.returncode != 0 and "Everything up-to-date" not in (push_process.stderr or ""):
-            return {"success": False, "message": f"源码同步失败:\n{push_process.stderr}"}
+            return {"success": False, "message": f"推送源码失败：\n{push_process.stderr}"}
 
         return {"success": True, "message": "源码已推送到 GitHub，Vercel 构建已触发"}
 
     except Exception as e:
-        return {"success": False, "message": f"源码同步引擎异常: {str(e)}"}
+        return {"success": False, "message": f"推送源码失败：{str(e)}"}

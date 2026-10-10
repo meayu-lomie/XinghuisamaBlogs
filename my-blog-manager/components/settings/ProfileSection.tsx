@@ -150,7 +150,7 @@ export default function ProfileSection({ formData, handleUpdate, pushToQueue }: 
             </div>
 
             <button onClick={handleSaveAll} className="px-10 py-3 bg-indigo-500 text-white rounded-2xl text-sm font-black shadow-md hover:bg-indigo-600 transition-all active:scale-95 w-full md:w-auto">
-              暂存修改至收件箱
+              加入待保存
             </button>
           </div>
         </div>

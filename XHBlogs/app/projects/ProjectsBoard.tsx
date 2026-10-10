@@ -33,7 +33,7 @@ export default function ProjectsBoard() {
             项目 · Projects
           </h1>
           <p className="text-slate-600 dark:text-slate-400 font-serif">
-            开源项目、科研代码与实验室折腾记录。
+            我写过的开源项目
           </p>
         </div>
       </div>
@@ -43,7 +43,7 @@ export default function ProjectsBoard() {
         <div className="relative w-full max-w-lg">
           <input
             type="text"
-            placeholder="搜索项目名称、描述或技术栈..."
+            placeholder="搜索项目名称、描述或技术栈…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full paper-card border border-[var(--card-border)] rounded-full px-6 py-3 pl-12 text-slate-800 dark:text-white shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder-slate-500 font-serif"

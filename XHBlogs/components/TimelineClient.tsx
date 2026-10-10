@@ -90,7 +90,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
         <div className="relative w-full max-w-lg group" ref={searchContainerRef}>
           <input
             type="text"
-            placeholder="搜寻被封存的知识..."
+            placeholder="搜索杂谈…"
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value);
@@ -159,11 +159,11 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
           <div className="hidden md:flex paper-card p-1 rounded-2xl shadow-inner shrink-0">
             <button onClick={() => setViewMode('timeline')} className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all duration-300 ${viewMode === 'timeline' ? 'bg-white dark:bg-slate-700 text-indigo-500 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
               <ListTree size={16} />
-              <span>中枢链路</span>
+              <span>列表</span>
             </button>
             <button onClick={() => setViewMode('card')} className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-sm transition-all duration-300 ${viewMode === 'card' ? 'bg-white dark:bg-slate-700 text-indigo-500 shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
               <LayoutGrid size={16} />
-              <span>矩阵网格</span>
+              <span>卡片</span>
             </button>
           </div>
         </div>
@@ -207,7 +207,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
                         {/* 文本边距和字号全方位缩放 */}
                         <div className="p-3 md:p-5 flex-1 flex flex-col">
                           <h3 className="text-xs sm:text-sm md:text-lg font-bold text-slate-800 dark:text-slate-100 mb-1 md:mb-2 line-clamp-2 transition-colors group-hover:text-indigo-500">{post.title}</h3>
-                          <p className="text-[10px] sm:text-xs md:text-sm text-slate-500 dark:text-slate-400 mb-2 md:mb-4 line-clamp-2 flex-1 leading-snug">{post.description || "暂时没有描述喵..."}</p>
+                          <p className="text-[10px] sm:text-xs md:text-sm text-slate-500 dark:text-slate-400 mb-2 md:mb-4 line-clamp-2 flex-1 leading-snug">{post.description || "还没有写简介"}</p>
                           <div className="flex flex-wrap gap-1 sm:gap-2 mt-auto">
                             {post.tags.map((tag: string) => (
                               <span key={tag} className="text-[8px] md:text-[10px] font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 md:px-2 md:py-1 rounded">#{tag}</span>
@@ -266,7 +266,7 @@ export default function TimelineClient({ posts: initialPosts, tags }: { posts: a
 
               {timelinePosts.length === 0 && (
                  <div className="text-center py-20 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest text-sm">
-                    这里还没有留下痕迹
+                    这里还没有内容
                  </div>
               )}
             </div>

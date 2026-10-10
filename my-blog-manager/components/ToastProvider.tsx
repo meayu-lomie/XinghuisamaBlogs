@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from 'react';
+import { CheckCircle2, AlertTriangle, AlertCircle, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // 定义全局可以调用的方法
@@ -26,14 +27,21 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             initial={{ opacity: 0, y: -50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -50, scale: 0.9 }}
-            className={`fixed top-20 left-1/2 -translate-x-1/2 z-[9999] px-6 py-3 rounded-2xl shadow-lg flex items-center gap-3 border
-              ${toastMsg.type === 'success' ? 'bg-green-500/90 border-green-400 text-white' : ''}
-              ${toastMsg.type === 'warning' ? 'bg-amber-500/90 border-amber-400 text-white' : ''}
-              ${toastMsg.type === 'error' ? 'bg-red-500/90 border-red-400 text-white' : ''}
-              ${toastMsg.type === 'info' ? 'bg-indigo-500/90 border-indigo-400 text-white' : ''}
-            `}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-[9999] px-5 py-3 rounded-2xl shadow-lg flex items-center gap-3 paper-card-strong border border-[var(--card-border)] border-l-[3px]"
+            style={{
+              // 纸面卡片 + 左侧一道语义色条：比整块饱和底色更贴合纸张主题
+              borderLeftColor:
+                toastMsg.type === 'success' ? 'var(--ok)'
+                : toastMsg.type === 'warning' ? 'var(--warn)'
+                : toastMsg.type === 'error' ? 'var(--danger)'
+                : 'var(--accent)',
+            }}
           >
-            <span className="font-bold text-sm">{toastMsg.text}</span>
+            {toastMsg.type === 'success' && <CheckCircle2 size={16} className="shrink-0 text-[var(--ok)]" />}
+            {toastMsg.type === 'warning' && <AlertTriangle size={16} className="shrink-0 text-[var(--warn)]" />}
+            {toastMsg.type === 'error' && <AlertCircle size={16} className="shrink-0 text-[var(--danger)]" />}
+            {toastMsg.type === 'info' && <Info size={16} className="shrink-0 text-[var(--accent)]" />}
+            <span className="font-bold text-sm text-[var(--ink)]">{toastMsg.text}</span>
           </motion.div>
         )}
       </AnimatePresence>

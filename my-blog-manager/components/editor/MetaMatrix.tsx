@@ -46,7 +46,7 @@ export default function MetaMatrix({
       {/* 头部标题 */}
       <div className="shrink-0 p-8 pb-4 flex flex-col border-b border-white/10 bg-white/5">
         <span className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em]">{type === 'about' ? '关于 · About Mode' : '杂谈 · Chatter Mode'}</span>
-        <h2 className="text-xl font-black text-slate-900 dark:text-white">属性设置</h2>
+        <h2 className="text-xl font-black text-slate-900 dark:text-white">文章信息</h2>
       </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-8 flex flex-col gap-10">
@@ -68,7 +68,7 @@ export default function MetaMatrix({
             </div>
           </div>
           <input
-            type="text" value={cover} onChange={(e) => setCover(e.target.value)} placeholder="或手动粘贴 URL..."
+            type="text" value={cover} onChange={(e) => setCover(e.target.value)} placeholder="或手动粘贴 URL…"
             className="w-full bg-white/10 dark:bg-black/20 rounded-2xl px-5 py-3.5 text-xs text-slate-800 dark:text-slate-200 border border-[var(--card-border)] outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
           />
         </div>
@@ -91,7 +91,7 @@ export default function MetaMatrix({
             </div>
             <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto custom-scrollbar">
               {isLoadingTags ? (
-                <span className="text-[10px] text-slate-400 animate-pulse italic">扫描历史标签中...</span>
+                <span className="text-[10px] text-slate-400 animate-pulse italic">扫描历史标签中…</span>
               ) : currentHistoryTags.length > 0 ? (
                 currentHistoryTags.map(t => (
                   <button
@@ -117,7 +117,7 @@ export default function MetaMatrix({
           <div className="flex flex-col animate-in fade-in slide-in-from-bottom duration-700">
             <Label icon={Smile} text="今日心情 · Mood Today" color="border-yellow-500" />
             <input
-              type="text" value={mood} onChange={(e) => setMood(e.target.value)} placeholder="输入心情词..."
+              type="text" value={mood} onChange={(e) => setMood(e.target.value)} placeholder="输入心情词…"
               className="w-full bg-white/10 dark:bg-black/20 rounded-2xl px-5 py-4 text-xs text-slate-800 dark:text-slate-200 border border-[var(--card-border)] outline-none focus:ring-2 focus:ring-yellow-500 mb-4 shadow-inner"
             />
             <div className="flex flex-wrap gap-2">
@@ -154,7 +154,7 @@ export default function MetaMatrix({
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400">
             <Clock size={12} />
-            {isSaving ? "正在落盘至本地系统..." : lastSaved ? `最近落盘: ${lastSaved}` : "文档尚未在本地生成"}
+            {isSaving ? "正在保存…" : lastSaved ? `上次保存：${lastSaved}` : "还没有保存过"}
           </div>
           <div className="flex gap-3">
             <button
@@ -167,7 +167,7 @@ export default function MetaMatrix({
               onClick={() => onSave(true)} disabled={isSaving}
               className="flex-1 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
             >
-              <Send size={14} /> 正式发布
+              <Send size={14} /> 加入待保存
             </button>
           </div>
         </div>

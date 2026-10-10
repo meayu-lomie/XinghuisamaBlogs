@@ -52,7 +52,7 @@ export default function PhotoWallClient() {
               <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-6">
                 <div>
                   <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-widest mb-2 transition-colors duration-700">照片墙</h1>
-                  <p className="text-slate-600 dark:text-slate-400 font-medium tracking-wider transition-colors duration-700">定格时间，封存每一次心跳</p>
+                  <p className="text-slate-600 dark:text-slate-400 font-medium tracking-wider transition-colors duration-700">随手拍下的一些照片</p>
                 </div>
 
                 <div className="relative w-full md:w-80 group">
@@ -61,7 +61,7 @@ export default function PhotoWallClient() {
                   </svg>
                   <input
                     type="text"
-                    placeholder="搜索相册名或照片描述..."
+                    placeholder="搜索相册名或照片描述…"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full h-12 pl-12 pr-4 paper-card border border-[var(--card-border)] rounded-full text-sm text-slate-800 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 shadow-sm transition-all duration-700"
@@ -75,7 +75,7 @@ export default function PhotoWallClient() {
                   <div className="mb-16">
                     <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2">
                       <span className="w-2 h-6 bg-indigo-500 rounded-full"></span>
-                      匹配的单张照片 ({matchedPhotos.length})
+                      匹配的照片 ({matchedPhotos.length})
                     </h3>
                     <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
                       {matchedPhotos.map((photo, index) => (
@@ -138,7 +138,7 @@ export default function PhotoWallClient() {
 
                 {activeQuery && matchedAlbums.length === 0 && matchedPhotos.length === 0 && (
                   <div className="text-center py-20 text-slate-500 font-medium">
-                    没有找到相关的记忆...
+                    没有找到相关照片
                   </div>
                 )}
               </div>

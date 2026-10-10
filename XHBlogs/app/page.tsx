@@ -58,7 +58,7 @@ export default function Home() {
   } catch (e) {}
   const top5Chatters = allChatters.length > 0
     ? allChatters.slice(0, 5)
-    : [{ slug: 'none', title: '暂无记录', description: '还没有内容', cover: siteConfig.defaultPostCover, date: '', formattedDate: '' }];
+    : [{ slug: 'none', title: '还没有内容', description: '去写下第一条吧', cover: siteConfig.defaultPostCover, date: '', formattedDate: '' }];
 
   // ---- 说说（moments）----
   const momentsDirectory = path.join(process.cwd(), 'moments');
@@ -119,7 +119,7 @@ export default function Home() {
                     <Link href="/moments" className="rounded-2xl paper-card border border-[var(--card-border)] shadow-md min-h-[420px] h-full flex flex-col items-center justify-center gap-3 group">
                       <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest bg-black/30 px-2 py-1 rounded-md border border-[var(--card-border)]">说说 · Moments</span>
                       <p className="text-slate-600 dark:text-slate-300 font-bold">还没有说说</p>
-                      <p className="text-sm text-slate-500 dark:text-slate-400">还没有内容</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">去写下第一条吧</p>
                     </Link>
                   )}
                 </div>

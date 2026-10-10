@@ -23,7 +23,7 @@ export default function Error({
           这个页面没能加载
         </h1>
         <p className="text-sm text-[var(--ink-soft)] leading-relaxed mb-3">
-          常见原因：博客物理路径未配置或已变动、内容文件读取失败。
+          常见原因：博客目录未设置或已变动、内容文件读取失败。
         </p>
         {error?.message && (
           <p className="text-xs font-mono break-all mb-8 px-3 py-2 rounded-xl bg-[var(--code-bg)] text-[var(--code-fg)] text-left">

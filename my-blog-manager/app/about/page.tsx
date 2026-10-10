@@ -50,7 +50,7 @@ function getDirActivities(dirPath: string, typeLabel: '杂谈' | '说说', linkP
 
 export default async function AboutPage() {
   const blogRoot = getBlogRoot();
-  let contentHtml = "博主很懒，还没有写自我介绍哦...";
+  let contentHtml = "博主很懒，还没有写自我介绍…";
   let coverImage = "/images/20261007_103854_34868a.jpg";
 
   // 与管理端其他页面一致：about.md 也只读博客目录

@@ -22,7 +22,7 @@ MANAGER_ROOT = os.path.dirname(CURRENT_CORE_DIR)
 DEPLOY_CONFIG_FILE = os.path.join(MANAGER_ROOT, "data", "deploy_config.json")
 
 BLOG_NOT_CONFIGURED_MSG = (
-    "还没配置博客物理路径，请先在【项目仓库设置】里填写本地 Blog 路径并保存"
+    "还没设置博客目录，请到【设置 → 项目仓库设置】里填一下"
 )
 
 

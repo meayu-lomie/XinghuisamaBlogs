@@ -240,7 +240,7 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, EditorProps>(({ title, s
           value={title}
           onChange={(e) => !isTitleLocked && setTitle(e.target.value)}
           readOnly={isTitleLocked}
-          placeholder="文章大标题..."
+          placeholder="文章大标题…"
           className={`flex-1 text-5xl font-black bg-transparent border-none outline-none transition-all tracking-tighter 
             ${isTitleLocked ? 'text-slate-400 dark:text-slate-600 cursor-default select-none' : 'text-slate-900 dark:text-white placeholder:text-slate-200 dark:placeholder:text-slate-800'}
           `}

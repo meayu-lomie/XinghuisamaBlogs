@@ -65,13 +65,13 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
 
       const data = await res.json();
       if (data.success) {
-        showToast("杂谈文件已删除", "success");
+        showToast("已删除", "success");
         setChatters(prev => prev.filter(c => c.slug !== slug));
       } else {
-        showToast("删除失败: " + data.message, "error");
+        showToast("删除失败：" + data.message, "error");
       }
     } catch (err) {
-      showToast("无法连接到 Python 引擎", "error");
+      showToast("连不上管理端后端，请确认它还在运行", "error");
     } finally {
       setDeleteModal({ isOpen: false, slug: null, title: null });
     }
@@ -121,13 +121,13 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
                   onClick={() => setDeleteModal({ isOpen: false, slug: null, title: null })}
                   className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95"
                 >
-                  先留着吧
+                  取消
                 </button>
                 <button
                   onClick={confirmDelete}
                   className="flex-1 py-4 bg-red-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-sm hover:bg-red-600 transition-all active:scale-95"
                 >
-                  确认删除
+                  删除
                 </button>
               </div>
             </motion.div>
@@ -155,7 +155,7 @@ export default function ChatterBoard({ chatters: initialChatters }: { chatters: 
       <div className="mb-12 flex flex-col items-center gap-8">
         <div className="relative w-full max-w-lg group">
           <input
-            type="text" placeholder="搜索杂谈..." value={searchQuery}
+            type="text" placeholder="搜索杂谈…" value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full paper-card border border-[var(--card-border)] rounded-2xl px-6 py-4 pl-14 text-slate-800 dark:text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder-slate-400 font-medium"
           />

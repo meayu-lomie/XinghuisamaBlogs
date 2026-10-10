@@ -16,7 +16,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
 
   /**
    * 切换全站背景轮播开关。
-   * 这个开关直接写后端（不走收件箱）：收件箱发送的是整个表单快照，
+   * 这个开关直接写后端（不走待保存队列）：待保存队列发送的是整个表单快照，
    * 开关值在其中容易过期；而且开关属于「立即想看到效果」的操作。
    */
   const toggleBgEnabled = async () => {
@@ -55,16 +55,16 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
 
   const addBgUrl = () => {
     if (!formData.newBgUrl) {
-      showToast("URL不能为空哦", "warning");
+      showToast("请先填写图片地址", "warning");
       return;
     }
     if (formData.bgImages.includes(formData.newBgUrl)) {
-      showToast("这张图已经在背景列表里啦", "warning");
+      showToast("这张图已经在列表里了", "warning");
       return;
     }
     handleUpdate('bgImages', [...formData.bgImages, formData.newBgUrl]);
     handleUpdate('newBgUrl', '');
-    showToast("成功添加背景图！", "success");
+    showToast("背景图已添加", "success");
   };
 
   // 【核心功能】：真实的图床上传逻辑
@@ -74,13 +74,13 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
     const useRemote = Boolean(picUrl && picToken);   // 两个都填了才走第三方图床
 
     if (!file.type.startsWith('image/')) {
-      showToast("只能上传图片文件哦！", "warning");
+      showToast("只能上传图片文件", "warning");
       return;
     }
 
     setIsUploading(true);
     showToast(
-      useRemote ? "正在将图片传送至图床引擎..." : "正在保存到本地图片目录...",
+      useRemote ? "正在上传到图床..." : "正在保存到本地...",
       "info"
     );
 
@@ -111,7 +111,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
         showToast(`上传失败: ${data.message}`, "error");
       }
     } catch (error) {
-      showToast("无法连接到 Python 引擎上传通道", "error");
+      showToast("连不上管理端后端，图片没能上传", "error");
     } finally {
       setIsUploading(false);
     }
@@ -121,7 +121,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
   const confirmAddPendingImage = () => {
     if (pendingImageUrl) {
       handleUpdate('bgImages', [...formData.bgImages, pendingImageUrl]);
-      showToast("已成功加入视觉背景库！", "success");
+      showToast("已加入背景图库", "success");
       setPendingImageUrl(null);
     }
   };
@@ -151,7 +151,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
         </div>
         {/* 修复暂存参数：传入真正的 key 和 value */}
         <button onClick={() => pushToQueue('视觉背景图', 'bgImages', formData.bgImages)} className="px-6 py-2 bg-indigo-500 text-white rounded-xl text-xs font-black shadow-lg active:scale-95 transition-all">
-          暂存背景修改
+          加入待保存
         </button>
       </header>
 
@@ -242,7 +242,7 @@ export default function BackgroundSection({ formData, handleUpdate, pushToQueue 
             className="absolute inset-0 z-50 bg-slate-900/40 rounded-2xl flex items-center justify-center p-6"
           >
             <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-sm w-full shadow-lg border border-[var(--card-border)]">
-              <h3 className="text-lg font-black text-slate-800 dark:text-white mb-4 text-center">图床返回成功！</h3>
+              <h3 className="text-lg font-black text-slate-800 dark:text-white mb-4 text-center">图床返回正常</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 text-center">是否将此图片设为网站轮播背景？</p>
 
               <div className="w-full aspect-video rounded-xl overflow-hidden mb-6 shadow-inner border border-slate-200 dark:border-slate-700">

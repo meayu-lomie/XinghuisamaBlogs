@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 
 
 export const metadata = {
-  title: "杂谈 | " + siteConfig.title,
+  title: "杂谈 | " + siteConfig.authorName + " の 控制台",
   description: siteConfig.chatterDescription,
 };
 

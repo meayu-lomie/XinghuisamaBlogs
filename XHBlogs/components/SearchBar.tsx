@@ -98,7 +98,7 @@ export default function SearchBar({ posts = [], moments = [] }: { posts?: Post[]
         <input
           type="text"
           className="w-full pl-14 pr-6 py-4 paper-card border border-[var(--card-border)] rounded-2xl shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-slate-800 dark:text-slate-200 transition-all placeholder-slate-500 dark:placeholder-slate-400 font-medium text-lg relative z-0"
-          placeholder="搜寻杂谈与说说..."
+          placeholder="搜索杂谈与说说…"
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);

@@ -73,13 +73,13 @@ function DraftsContent() {
 
       const data = await res.json();
       if (data.success) {
-        showToast("草稿已删除", "success");
+        showToast("已删除", "success");
         setDrafts(prev => prev.filter(draft => draft.id !== id));
       } else {
-        showToast(`删除失败: ${data.message}`, "error");
+        showToast(`删除失败：${data.message}`, "error");
       }
     } catch (error) {
-      showToast("引擎连接失败", "error");
+      showToast("连不上管理端后端", "error");
     } finally {
       // 关闭弹窗并重置状态
       setDeleteModal({ isOpen: false, id: null, title: null });
@@ -140,13 +140,13 @@ function DraftsContent() {
                   onClick={() => setDeleteModal({ isOpen: false, id: null, title: null })}
                   className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95"
                 >
-                  继续保留
+                  取消
                 </button>
                 <button
                   onClick={confirmDelete}
                   className="flex-1 py-4 bg-red-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-sm hover:bg-red-600 transition-all active:scale-95"
                 >
-                  确认删除
+                  删除
                 </button>
               </div>
             </motion.div>
@@ -171,7 +171,7 @@ function DraftsContent() {
             <div className="relative w-full md:w-72 group">
               <input
                 type="text"
-                placeholder="检索草稿..."
+                placeholder="搜索草稿…"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full paper-card border border-slate-200 dark:border-slate-700 rounded-2xl px-5 py-3 pl-12 text-sm outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm"
@@ -226,7 +226,7 @@ function DraftsContent() {
                           {draft.title || "无标题草稿"}
                         </h3>
                         <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed h-10">
-                          {draft.contentPreview || "没有任何内容..."}
+                          {draft.contentPreview || "还没有内容"}
                         </p>
                       </Link>
                     </div>
@@ -239,7 +239,7 @@ function DraftsContent() {
                   {loadError ? (
                     <p className="text-red-500 font-bold">草稿读取失败：{loadError}</p>
                   ) : drafts.length === 0 ? (
-                    <p className="text-slate-500 font-bold">草稿箱是空的，去「写杂谈」攒第一篇吧。</p>
+                    <p className="text-slate-500 font-bold">还没有内容</p>
                   ) : (
                     <p className="text-slate-500 font-bold">搜索不到相关草稿，换个关键词试试？</p>
                   )}

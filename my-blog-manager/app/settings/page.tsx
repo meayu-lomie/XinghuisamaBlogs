@@ -79,13 +79,13 @@ function SettingsContent() {
       id: Date.now().toString(),
       type: 'CONFIG',
       label: `暂存配置：${label}`,
-      description: `修改了 ${label}，等待写入博客`,
+      description: `修改了 ${label}，等待保存到博客`,
       timestamp: new Date().toLocaleTimeString().slice(0, 5),
       payload: formData,
       key: key,
       value: value
     });
-    showToast(`【${label}】已加入收件箱，请在右上角点击【写入博客】`, "success");
+    showToast(`【${label}】已加入待保存，请在右上角点【保存到博客】`, "success");
   };
 
   const menuItems = [
@@ -105,7 +105,7 @@ function SettingsContent() {
 
           <div className="w-full md:w-72 shrink-0 flex flex-col gap-4">
             <div className="paper-card border border-[var(--card-border)] dark:border-slate-800/50 rounded-2xl p-4 shadow-md">
-              <p className="text-[10px] font-black text-slate-400 uppercase mb-4 ml-2 tracking-widest">系统管理维度</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase mb-4 ml-2 tracking-widest">设置分类</p>
               <nav className="flex flex-col gap-2">
                 {menuItems.map((item) => (
                   <button key={item.id} onClick={() => setActiveTab(item.id)} className={`flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300 font-bold text-sm ${activeTab === item.id ? 'bg-indigo-500 text-white shadow-lg translate-x-1' : 'text-slate-600 dark:text-slate-300 hover:paper-card dark:hover:bg-slate-800/50'}`}>

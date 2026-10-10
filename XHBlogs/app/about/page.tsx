@@ -44,7 +44,7 @@ function getDirActivities(dirName: string, typeLabel: '杂谈' | '说说', linkP
 
 export default async function AboutPage() {
   const fullPath = path.join(process.cwd(), 'app', 'about', 'about.md');
-  let contentHtml = "博主很懒，还没有写自我介绍哦...";
+  let contentHtml = "博主很懒，还没有写自我介绍…";
   let coverImage = "/images/20261007_103854_34868a.jpg";
 
   try {

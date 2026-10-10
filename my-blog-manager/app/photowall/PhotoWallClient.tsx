@@ -54,7 +54,7 @@ import { useEscapeClose } from '../../lib/use-escape-close';
       label: "同步照片墙变更",
       value: normalized
     });
-    showToast("变更已加入收件箱，请在右上角点击【写入博客】", "info");
+    showToast("变更已加入待保存，请在右上角点【保存到博客】", "info");
   };
 
   const { matchedAlbums, matchedPhotos } = useMemo(() => {
@@ -93,7 +93,7 @@ import { useEscapeClose } from '../../lib/use-escape-close';
             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative w-full max-w-sm paper-card-strong rounded-2xl shadow-lg border border-[var(--card-border)] p-10 text-center">
               <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6"><AlertTriangle className="text-red-500" /></div>
               <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">确认删除？</h3>
-              <p className="text-sm text-slate-500 mb-8 leading-relaxed">该操作将加入收件箱并清空相关数据</p>
+              <p className="text-sm text-slate-500 mb-8 leading-relaxed">该操作会加入待保存，并清空相关数据</p>
               <div className="flex gap-3">
                 <button onClick={() => setDeleteModal({ ...deleteModal, isOpen: false })} className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-black uppercase">取消</button>
                 <button onClick={() => {
@@ -124,7 +124,7 @@ import { useEscapeClose } from '../../lib/use-escape-close';
               <h2 className="text-2xl font-black mb-6 dark:text-white">{albumModal.mode === 'add' ? '创建新相册' : '修改相册属性'}</h2>
               <div className="space-y-5">
                 <input type="text" value={albumModal.data.title || ''} onChange={e => setAlbumModal({...albumModal, data: {...albumModal.data, title: e.target.value}})} className="w-full bg-slate-100 dark:bg-black/20 rounded-2xl px-5 py-3.5 dark:text-white outline-none border border-transparent focus:border-indigo-500" placeholder="相册名称" />
-                <textarea value={albumModal.data.description || ''} onChange={e => setAlbumModal({...albumModal, data: {...albumModal.data, description: e.target.value}})} className="w-full bg-slate-100 dark:bg-black/20 rounded-2xl px-5 py-3.5 dark:text-white h-24 outline-none border border-transparent focus:border-indigo-500 resize-none" placeholder="描述这段记忆..." />
+                <textarea value={albumModal.data.description || ''} onChange={e => setAlbumModal({...albumModal, data: {...albumModal.data, description: e.target.value}})} className="w-full bg-slate-100 dark:bg-black/20 rounded-2xl px-5 py-3.5 dark:text-white h-24 outline-none border border-transparent focus:border-indigo-500 resize-none" placeholder="描述这段记忆…" />
 
                 <div className="relative group">
                    <input type="text" value={albumModal.data.cover || ''} onChange={e => setAlbumModal({...albumModal, data: {...albumModal.data, cover: e.target.value}})} className="w-full bg-slate-100 dark:bg-black/20 rounded-2xl px-5 py-3.5 pr-14 dark:text-white outline-none border border-transparent focus:border-indigo-500" placeholder="封面图片 URL" />
@@ -143,7 +143,7 @@ import { useEscapeClose } from '../../lib/use-escape-close';
                     next = editableAlbums.map(a => a.id === albumModal.data.id ? albumModal.data : a);
                   }
                   setEditableAlbums(next); syncToQueue(next); setAlbumModal({ ...albumModal, isOpen: false });
-                }} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl font-black shadow-lg flex items-center justify-center gap-2 hover:bg-indigo-600 transition-colors"><Save size={18} /> 加入收件箱</button>
+                }} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl font-black shadow-lg flex items-center justify-center gap-2 hover:bg-indigo-600 transition-colors"><Save size={18} /> 加入待保存</button>
               </div>
             </motion.div>
           </div>
@@ -165,7 +165,7 @@ import { useEscapeClose } from '../../lib/use-escape-close';
                     </button>
                   </div>
                 )}
-                <textarea value={photoModal.data.caption || ''} onChange={e => setPhotoModal({...photoModal, data: {...photoModal.data, caption: e.target.value}})} className="w-full bg-slate-100 dark:bg-black/20 rounded-2xl px-5 py-3.5 dark:text-white h-24 outline-none border border-transparent focus:border-indigo-500 resize-none" placeholder="为这张照片写点什么..." />
+                <textarea value={photoModal.data.caption || ''} onChange={e => setPhotoModal({...photoModal, data: {...photoModal.data, caption: e.target.value}})} className="w-full bg-slate-100 dark:bg-black/20 rounded-2xl px-5 py-3.5 dark:text-white h-24 outline-none border border-transparent focus:border-indigo-500 resize-none" placeholder="为这张照片写点什么…" />
               </div>
               <div className="mt-8 flex gap-3">
                 <button onClick={() => setPhotoModal({ ...photoModal, isOpen: false })} className="flex-1 py-3 text-slate-500 font-bold uppercase text-xs hover:text-slate-800 dark:hover:text-white transition-colors">取消</button>
@@ -178,7 +178,7 @@ import { useEscapeClose } from '../../lib/use-escape-close';
                   const next = [...editableAlbums];
                   setEditableAlbums(next); setCurrentAlbum({...album}); syncToQueue(next);
                   setPhotoModal({ ...photoModal, isOpen: false });
-                }} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl font-black shadow-lg flex items-center justify-center gap-2 hover:bg-indigo-600 transition-colors"><Save size={18} /> 加入收件箱</button>
+                }} className="flex-1 py-4 bg-indigo-500 text-white rounded-2xl font-black shadow-lg flex items-center justify-center gap-2 hover:bg-indigo-600 transition-colors"><Save size={18} /> 加入待保存</button>
               </div>
             </motion.div>
           </div>
@@ -193,13 +193,13 @@ import { useEscapeClose } from '../../lib/use-escape-close';
               <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-6">
                 <div>
                   <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-widest mb-2 transition-colors duration-700">照片墙</h1>
-                  <p className="text-slate-600 dark:text-slate-400 font-medium tracking-wider transition-colors duration-700">定格时间，封存每一次心跳</p>
+                  <p className="text-slate-600 dark:text-slate-400 font-medium tracking-wider transition-colors duration-700">随手拍下的一些照片</p>
                 </div>
 
                 <div className="relative w-full md:w-80 group">
                   <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 z-10 text-slate-500 transition-colors group-focus-within:text-indigo-500" />
                   <input
-                    type="text" placeholder="搜索相册或描述..." value={searchQuery}
+                    type="text" placeholder="搜索相册或描述…" value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full h-12 pl-12 pr-4 paper-card border border-[var(--card-border)] rounded-full text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 shadow-sm transition-all"
                   />
@@ -209,7 +209,7 @@ import { useEscapeClose } from '../../lib/use-escape-close';
               <div className={`transition-opacity duration-300 ${isTransitioning ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
                 {activeQuery && matchedPhotos.length > 0 && (
                   <div className="mb-16">
-                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2">匹配单张 ({matchedPhotos.length})</h3>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2">匹配的照片 ({matchedPhotos.length})</h3>
                     <div className="columns-1 sm:columns-2 md:columns-4 gap-6 space-y-6">
                       {matchedPhotos.map((photo, i) => (
                         <div key={i} onClick={() => setSelectedImage(photo)} className="break-inside-avoid relative group rounded-2xl overflow-hidden shadow-lg hover:scale-[1.02] transition-transform">

@@ -106,12 +106,14 @@ export default function AboutClient({
     return { weeks: weeksArr, activityMap: map };
   }, [activities]);
 
+  // 热力图用主题强调色的渐进梯度，而不是原生饱和绿——
+  // 整站是纸张/印章主题，亮绿会显得像贴上去的色块。
   const getColorClass = (count: number) => {
-    if (count === 0) return 'bg-slate-100';
-    if (count === 1) return 'bg-green-300 dark:bg-green-900/80';
-    if (count === 2) return 'bg-green-400 dark:bg-green-700/80';
-    if (count === 3) return 'bg-green-500 dark:bg-green-600';
-    return 'bg-green-600 dark:bg-green-500';
+    if (count === 0) return 'bg-[var(--paper-deep)]';
+    if (count === 1) return 'bg-[var(--accent-soft)]';
+    if (count === 2) return 'bg-[color-mix(in_oklab,var(--accent)_55%,var(--paper))]';
+    if (count === 3) return 'bg-[color-mix(in_oklab,var(--accent)_78%,var(--paper))]';
+    return 'bg-[var(--accent)]';
   };
 
   const getTypeColor = (type: string) => {
@@ -236,13 +238,13 @@ export default function AboutClient({
                 </div>
 
                 <div className="flex items-center justify-end gap-2 mt-2 text-[10px] md:text-xs font-bold text-slate-500">
-                  Less
-                  <div className="w-[11px] h-[11px] rounded-[3px] bg-slate-100"></div>
-                  <div className="w-[11px] h-[11px] rounded-[3px] bg-green-300 dark:bg-green-900/80"></div>
-                  <div className="w-[11px] h-[11px] rounded-[3px] bg-green-400 dark:bg-green-700/80"></div>
-                  <div className="w-[11px] h-[11px] rounded-[3px] bg-green-500 dark:bg-green-600"></div>
-                  <div className="w-[11px] h-[11px] rounded-[3px] bg-green-600 dark:bg-green-500"></div>
-                  More
+                  少
+                  <div className="w-[11px] h-[11px] rounded-[3px] bg-[var(--paper-deep)]"></div>
+                  <div className="w-[11px] h-[11px] rounded-[3px] bg-[var(--accent-soft)]"></div>
+                  <div className="w-[11px] h-[11px] rounded-[3px] bg-[color-mix(in_oklab,var(--accent)_55%,var(--paper))]"></div>
+                  <div className="w-[11px] h-[11px] rounded-[3px] bg-[color-mix(in_oklab,var(--accent)_78%,var(--paper))]"></div>
+                  <div className="w-[11px] h-[11px] rounded-[3px] bg-[var(--accent)]"></div>
+                  多
                 </div>
               </div>
 
@@ -266,7 +268,7 @@ export default function AboutClient({
                             <div className="flex items-center gap-2">
                               <span className="font-black text-slate-800 dark:text-slate-200 text-sm">{siteConfig.authorName}</span>
                               <span className={`text-xs font-bold ${getTypeColor(act.type)}`}>
-                                {isMoment ? '发布了 说说' : `更新了 ${act.type}`}
+                                {isMoment ? '发了条说说' : '写了篇杂谈'}
                               </span>
                             </div>
 
@@ -300,7 +302,7 @@ export default function AboutClient({
                 })}
 
                 {activities.length === 0 && (
-                  <div className="text-slate-500 text-sm font-bold">暂无活动记录...</div>
+                  <div className="text-slate-500 text-sm font-bold">暂无活动记录</div>
                 )}
               </div>
 

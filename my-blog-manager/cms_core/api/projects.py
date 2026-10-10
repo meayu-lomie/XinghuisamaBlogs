@@ -23,7 +23,7 @@ async def sync_projects(request: Request):
 
         target = projects_ts_path()
         if not target:
-            return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
+            return {"success": False, "message": "还没设置博客目录，请到【设置 → 项目仓库设置】里填一下"}
 
         print(f"写入项目数据: {target}")
 

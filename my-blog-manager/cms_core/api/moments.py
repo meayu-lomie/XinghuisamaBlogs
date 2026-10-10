@@ -21,7 +21,7 @@ def save_moment(payload: MomentPayload):
     try:
         project_root = get_blog_root()
         if not project_root:
-            return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
+            return {"success": False, "message": "还没设置博客目录，请到【设置 → 项目仓库设置】里填一下"}
 
         MOMENTS_DIR = os.path.join(project_root, "moments")
 
@@ -75,7 +75,7 @@ def delete_moment(payload: DeletePayload):
     try:
         project_root = get_blog_root()
         if not project_root:
-            return {"success": False, "message": "还没配置博客物理路径，请先在【项目仓库设置】里保存本地 Blog 路径"}
+            return {"success": False, "message": "还没设置博客目录，请到【设置 → 项目仓库设置】里填一下"}
         MOMENTS_DIR = os.path.join(project_root, "moments")
 
         moment_id = safe_id(payload.id)
@@ -87,7 +87,7 @@ def delete_moment(payload: DeletePayload):
         if os.path.exists(file_path):
             os.remove(file_path)
             print(f"\n[删除成功] 物理文件已删除：{file_path}\n")
-            return {"success": True, "message": "文件已删除"}
+            return {"success": True, "message": "已删除"}
         else:
             return {"success": False, "message": "文件不存在，无法删除"}
 

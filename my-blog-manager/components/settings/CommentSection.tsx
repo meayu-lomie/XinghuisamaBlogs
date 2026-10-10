@@ -109,7 +109,7 @@ export default function CommentSection({ formData, handleUpdate, pushToQueue }: 
             onClick={saveToQueue}
             className="px-6 py-3 bg-indigo-500 text-white rounded-2xl font-black text-sm shadow-lg flex items-center gap-2 hover:bg-indigo-600 transition-colors"
           >
-            <Save size={16} /> 暂存修改
+            <Save size={16} /> 加入待保存
           </button>
         </div>
 
@@ -125,7 +125,7 @@ export default function CommentSection({ formData, handleUpdate, pushToQueue }: 
                 value={giscus.repo}
                 onChange={(e) => updateGiscus('repo', e.target.value)}
                 className={inputCls}
-                placeholder="例如: meayu-lomie/XinghuisamaBlogs"
+                placeholder="例如：meayu-lomie/XinghuisamaBlogs"
               />
               <button
                 onClick={fetchIds}

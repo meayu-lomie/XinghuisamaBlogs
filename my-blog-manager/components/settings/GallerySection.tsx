@@ -13,13 +13,13 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
     const token = formData.picBedToken;
 
     if (!url || !token) {
-      showToast("请完整填写图床 API 地址和 TOKEN！", "warning");
+      showToast("请先填完整图床地址和 Token", "warning");
       return;
     }
 
     setIsTesting(true);
     setTestResult(null);
-    showToast("正在向图床服务器发送校验探针...", "info");
+    showToast("正在验证图床账号...", "info");
 
     try {
       const configRes = await fetch(`/backend_config.json?t=${Date.now()}`);
@@ -35,13 +35,13 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
       setTestResult({ success: data.success, msg: data.message });
 
       if (data.success) {
-        showToast("测试通过！图床已就绪", "success");
+        showToast("连接正常，图床可用", "success");
       } else {
         showToast("Token 无效或服务异常", "error");
       }
     } catch (error) {
-      showToast("无法连接到本地 Python 引擎", "error");
-      setTestResult({ success: false, msg: "桌面引擎连接失败，请检查终端日志" });
+      showToast("连不上管理端后端，请确认它还在运行", "error");
+      setTestResult({ success: false, msg: "连不上管理端后端，请确认它还在运行" });
     } finally {
       setIsTesting(false);
     }
@@ -49,17 +49,17 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
 
   const handleSave = () => {
     if (!formData.picBedUrl || !formData.picBedToken) {
-      showToast("API 地址和 TOKEN 不能为空，无法暂存！", "error");
+      showToast("图床地址和 Token 都不能为空", "error");
       return;
     }
     // pushToQueue 推送的是整个表单快照，key/value 会被忽略；
-    // 图床三项配置在同一份快照里，推一次即可，重复推送只会塞满收件箱。
+      // 图床三项配置在同一份快照里，推一次即可，重复推送只会塞满待保存队列。
     pushToQueue('图床配置');
   };
 
   return (
     <motion.section initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} className="paper-card border border-[var(--card-border)] dark:border-slate-800/50 rounded-2xl p-8 shadow-lg">
-      <h2 className="text-xl font-black text-slate-800 dark:text-white mb-8">图床引擎设置</h2>
+        <h2 className="text-xl font-black text-slate-800 dark:text-white mb-8">图床设置</h2>
 
       <div className="max-w-xl space-y-6">
         <div>
@@ -104,14 +104,14 @@ export default function GallerySection({ formData, handleUpdate, pushToQueue }: 
           >
             {isTesting ? (
               <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-            ) : "发送探针测试 Token"}
+                ) : "测试连接"}
           </button>
 
           <button
             onClick={handleSave}
             className="flex-1 py-3 bg-indigo-500 text-white rounded-2xl text-sm font-black shadow-lg hover:bg-indigo-600 transition-all active:scale-95"
           >
-            暂存图床配置
+            加入待保存
           </button>
         </div>
 

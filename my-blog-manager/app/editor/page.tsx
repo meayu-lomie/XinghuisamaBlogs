@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import RichTextEditor, { RichTextEditorHandle } from '../../components/editor/RichTextEditor';
 import MetaMatrix from '../../components/editor/MetaMatrix';
 import FloatingImageTool from '../../components/editor/FloatingImageTool';
-import { ArrowLeft, AlertTriangle, Save, LogOut, Sparkles, Check } from 'lucide-react';
+import { ArrowLeft, AlertTriangle, Save, LogOut, Sparkles, Check, Loader2, RefreshCw } from 'lucide-react';
 import { useToast } from '../../components/ToastProvider';
 import { useOperations } from '../../context/OperationContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -22,6 +22,10 @@ function EditorContent() {
   const [currentDocId, setCurrentDocId] = useState(
     searchParams.get('type') === 'about' ? 'about' : (searchParams.get('id') || 'new')
   );
+
+  // 新建文档先占一个稳定 id：网络卡顿导致重复点发布时，
+  // 写的始终是同一个文件，不会生成多份重复内容。
+  const [pendingDocId] = useState(() => `${docType}_${Date.now()}${Math.floor(Math.random() * 1000)}`);
 
   const [title, setTitle] = useState('');
   const [tags, setTags] = useState<string[]>([]);
@@ -168,7 +172,7 @@ function EditorContent() {
       showToast("请填写标题", "warning"); return;
     }
     const payload = {
-      id: docType === 'about' ? 'about' : (currentDocId === 'new' ? null : currentDocId),
+      id: docType === 'about' ? 'about' : (currentDocId === 'new' ? pendingDocId : currentDocId),
       type: docType, title, tags, cover, mood, description: summary,
       content: editorRef.current?.getContent() || '',
       date: date || new Date().toLocaleDateString('sv-SE'),
@@ -183,7 +187,7 @@ function EditorContent() {
         value: payload
       });
       setHasUnsavedChanges(false);
-      showToast("已加入收件箱，记得点右上角【写入博客】；刷新页面会丢失收件箱", "info");
+      showToast("已加入待保存，记得点右上角【保存到博客】；刷新页面会丢失", "info");
       if (shouldExitAfterSave) router.back();
       return;
     }
@@ -241,7 +245,7 @@ function EditorContent() {
                 <div className="flex gap-3">
                   <button onClick={() => setExitModalOpen(false)} className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 transition-all">取消</button>
                   <button onClick={() => { setExitModalOpen(false); setHasUnsavedChanges(false); router.back(); }} className="flex-1 py-4 bg-red-500/10 text-red-500 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2">
-                    <LogOut size={16} /> 强行抛弃
+                  <LogOut size={16} /> 不保存直接离开
                   </button>
                 </div>
               </div>
@@ -263,23 +267,31 @@ function EditorContent() {
               initial={{ scale: 0.92, opacity: 0, y: 24 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.92, opacity: 0, y: 24 }}
               className="relative w-full max-w-5xl h-[82vh] paper-card-strong rounded-2xl shadow-lg border border-[var(--card-border)] flex flex-col overflow-hidden"
             >
-              <div className="shrink-0 px-10 pt-8 pb-6 border-b border-white/30 flex justify-between items-center">
+              <div className="shrink-0 px-8 pt-7 pb-5 border-b border-[var(--rule)] flex justify-between items-center">
                 <div>
-                  <h3 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-                    <Sparkles size={20} className="text-emerald-500" /> AI 润色预览
+                  <h3 className="text-lg font-black text-[var(--ink)] flex items-center gap-2">
+                    <Sparkles size={18} className="text-[var(--accent)]" /> AI 润色预览
                   </h3>
-                  <p className="text-xs text-slate-500 mt-1 font-bold">满意就应用，不满意点丢弃，原文不受影响</p>
+                  <p className="text-xs text-[var(--ink-faint)] mt-1">满意就应用，不满意点丢弃，原文不受影响</p>
                 </div>
-                <div className="flex gap-3">
+                <div className="flex gap-2">
+                  <button
+                    onClick={handlePolish}
+                    disabled={isPolishing}
+                    className="px-5 py-2.5 paper-card border border-[var(--card-border)] text-[var(--ink-soft)] rounded-xl text-xs font-bold hover:text-[var(--accent)] transition-colors disabled:opacity-50 flex items-center gap-1.5"
+                  >
+                    {isPolishing ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+                    重新润色
+                  </button>
                   <button
                     onClick={() => setPolishModal({ open: false, original: '', polished: '' })}
-                    className="px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                    className="px-5 py-2.5 paper-card border border-[var(--card-border)] text-[var(--ink-soft)] rounded-xl text-xs font-bold hover:text-[var(--ink)] transition-colors"
                   >
                     丢弃
                   </button>
                   <button
                     onClick={applyPolished}
-                    className="px-6 py-3 bg-emerald-500 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-sm hover:bg-emerald-600 transition-colors flex items-center gap-2"
+                    className="px-5 py-2.5 bg-[var(--accent)] text-white rounded-xl text-xs font-bold hover:opacity-90 transition-opacity flex items-center gap-1.5"
                   >
                     <Check size={14} /> 应用润色
                   </button>
@@ -288,14 +300,14 @@ function EditorContent() {
 
               <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 p-6 overflow-hidden min-h-0">
                 <div className="flex flex-col min-h-0">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">原文</p>
+                  <p className="text-[11px] font-bold text-[var(--ink-faint)] mb-2">原文</p>
                   <div className="flex-1 overflow-y-auto custom-scrollbar paper-card rounded-2xl p-5 border border-[var(--card-border)]">
                     <div className="prose prose-slate dark:prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: polishModal.original }} />
                   </div>
                 </div>
                 <div className="flex flex-col min-h-0">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500 mb-2">润色后</p>
-                  <div className="flex-1 overflow-y-auto custom-scrollbar paper-card rounded-2xl p-5 border border-emerald-500/20 dark:border-emerald-500/10">
+                  <p className="text-[11px] font-bold text-[var(--accent)] mb-2">润色后</p>
+                  <div className="flex-1 overflow-y-auto custom-scrollbar paper-card rounded-2xl p-5 border border-[var(--accent-soft)]">
                     <div className="prose prose-slate dark:prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: polishModal.polished }} />
                   </div>
                 </div>
@@ -359,7 +371,7 @@ export default function EditorPage() {
       <div className="h-screen w-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
-          <p className="text-slate-500 font-bold tracking-widest text-sm uppercase">加载编辑器内核中...</p>
+            <p className="text-slate-500 font-bold tracking-widest text-sm uppercase">编辑器加载中...</p>
         </div>
       </div>
     }>

@@ -32,7 +32,7 @@ import { useEscapeClose } from '../../lib/use-escape-close';
     );
   }, [searchQuery, editableProjects]);
 
-  // --- 核心逻辑：加入收件箱 ---
+  // --- 核心逻辑：加入待保存 ---
   const syncToQueue = (nextList: Project[]) => {
     addOperation({
       id: `sync_projects_${Date.now()}`,
@@ -40,7 +40,7 @@ import { useEscapeClose } from '../../lib/use-escape-close';
       label: "同步项目变更",
       value: nextList
     });
-    showToast("变更已加入收件箱，请在右上角点击【写入博客】", "info");
+    showToast("变更已加入待保存，请在右上角点【保存到博客】", "info");
   };
 
   const handleSaveProject = () => {
@@ -139,7 +139,7 @@ import { useEscapeClose } from '../../lib/use-escape-close';
         <div className="text-center md:text-left w-full">
           <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-4 tracking-widest uppercase">项目 · Projects</h1>
           <p className="text-slate-600 dark:text-slate-400 font-serif italic opacity-80 flex items-center justify-center md:justify-start gap-2">
-            <Sparkles size={14} className="text-indigo-500" /> 开源项目、科研代码与实验室折腾记录
+            <Sparkles size={14} className="text-indigo-500" /> 我写过的开源项目
           </p>
         </div>
       </div>

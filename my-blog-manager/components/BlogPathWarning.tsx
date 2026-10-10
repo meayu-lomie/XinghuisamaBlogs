@@ -14,7 +14,7 @@ export default function BlogPathWarning() {
   return (
     <div className="mb-6 px-5 py-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-left">
       <p className="text-xs font-black text-amber-700 dark:text-amber-300 mb-1">
-        还没配置博客物理路径
+        还没设置博客目录
       </p>
       <p className="text-xs text-[var(--ink-soft)] leading-relaxed">
         下面显示为空是因为管理端还不知道博客目录在哪，不代表内容不存在。
@@ -22,7 +22,7 @@ export default function BlogPathWarning() {
         <Link href="/settings" className="mx-1 font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
           【设置 → 项目仓库设置】
         </Link>
-        填写本地 Blog 路径并保存。
+        填写本地博客目录并保存。
       </p>
     </div>
   );
