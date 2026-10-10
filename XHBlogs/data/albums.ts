@@ -6,7 +6,7 @@ export const albums: Album[] = [
   {
     "title": "测试",
     "description": "",
-    "cover": "/images/20261007_014558_12db85.jpg",
+    "cover": "/images/20261008_185939_da2d66.jpg",
     "id": "album_1791308761210",
     "photos": [],
     "date": "2026-10-06"
